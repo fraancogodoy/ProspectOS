@@ -20,7 +20,7 @@ export function useLeadMutations(placeId: string) {
     onSuccess: (_dados, status) => {
       invalidarListaEMetricas()
       if (status === "fechou") tocarSom("lead-fechou")
-      toast.success("Status atualizado.")
+      toast.success("Estado actualizado.")
     },
   })
 
@@ -32,14 +32,14 @@ export function useLeadMutations(placeId: string) {
       ]),
     onSuccess: () => {
       invalidarListaEMetricas()
-      toast.success("Tags e follow-up salvos.")
+      toast.success("Etiquetas y seguimiento guardados.")
     },
   })
 
   const salvarObservacoes = useMutation({
     mutationFn: (observacoes: string) =>
       leadsService.atualizarObservacoes(placeId, observacoes),
-    onSuccess: () => toast.success("Observações salvas."),
+    onSuccess: () => toast.success("Notas guardadas."),
   })
 
   const gerarMensagem = useMutation({
@@ -61,15 +61,15 @@ export function useLeadMutations(placeId: string) {
     onSuccess: ({ resposta, estadoAnterior }) => {
       invalidarListaEMetricas()
       tocarSom("followup-marcado")
-      toast.success(`Follow-up nº ${resposta.follow_ups_enviados} registrado.`, {
+      toast.success(`Seguimiento nº ${resposta.follow_ups_enviados} registrado.`, {
         action: {
-          label: "Desfazer",
+          label: "Deshacer",
           onClick: () => {
             leadsService
               .desfazerFollowupEnviado(placeId, estadoAnterior)
               .then(() => {
                 invalidarListaEMetricas()
-                toast.success("Follow-up desfeito.")
+                toast.success("Seguimiento deshecho.")
               })
           },
         },
@@ -83,7 +83,7 @@ export function useLeadMutations(placeId: string) {
       invalidarListaEMetricas()
       toast("Lead ignorado.", {
         action: {
-          label: "Desfazer",
+          label: "Deshacer",
           onClick: () => {
             leadsService.atualizarStatus(placeId, statusAnterior).then(() => {
               invalidarListaEMetricas()
@@ -99,9 +99,9 @@ export function useLeadMutations(placeId: string) {
     mutationFn: () => leadsService.reanalisarSite(placeId),
     onSuccess: (resultado) => {
       invalidarListaEMetricas()
-      const rotulos = { sem_site: "sem site", site_ruim: "site ruim", site_ok: "site ok" }
+      const rotulos = { sem_site: "sin web", site_ruim: "web mala", site_ok: "web ok" }
       const detalhe = resultado.site_problemas ? ` - ${resultado.site_problemas}` : ""
-      toast.success(`Site reanalisado: ${rotulos[resultado.site_status]}${detalhe}`)
+      toast.success(`Web reanalizada: ${rotulos[resultado.site_status]}${detalhe}`)
     },
   })
 
@@ -110,7 +110,7 @@ export function useLeadMutations(placeId: string) {
     onSuccess: () => {
       invalidarListaEMetricas()
       tocarSom("apagar-lead")
-      toast.success("Lead excluído definitivamente.")
+      toast.success("Lead eliminado definitivamente.")
     },
   })
 

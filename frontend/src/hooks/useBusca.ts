@@ -47,7 +47,7 @@ export function useBusca() {
       setResultadoFinal(statusBusca.data)
       queryClient.invalidateQueries({ queryKey: ["nichos"] })
       invalidarListaEMetricas()
-      notificar("Busca de leads concluída", statusBusca.data.mensagem)
+      notificar("Búsqueda de leads terminada", statusBusca.data.mensagem)
       tocarSom("busca-maps-concluida")
     }
   }, [poll, statusBusca.data, queryClient, invalidarListaEMetricas])

@@ -374,14 +374,14 @@ class TestPromptAnalise:
                 {"autor": "lead", "texto": "Eu já tenho um Instagram", "enviada_em": "2026-07-26T00:38:00"},
             ],
         )
-        assert "VOCÊ (vendedor): Oi, tudo bem?" in prompt
+        assert "VOS (vendedor): Oi, tudo bem?" in prompt
         assert "LEAD: Eu já tenho um Instagram" in prompt
         # a última fala do lead vira foco explícito
-        assert 'A última mensagem do lead foi: "Eu já tenho um Instagram"' in prompt
+        assert 'El último mensaje del lead fue: "Eu já tenho um Instagram"' in prompt
 
     def test_conversa_vazia_avisa_no_prompt(self):
         prompt = ia.montar_prompt_analise_conversa({"nome": "X", "site_status": "sem_site"}, [])
-        assert "nenhuma mensagem trocada ainda" in prompt
+        assert "todavía no se intercambió ningún mensaje" in prompt
 
     def test_historico_longo_e_truncado(self):
         from constantes import MAX_MENSAGENS_NO_PROMPT
@@ -390,7 +390,7 @@ class TestPromptAnalise:
             for i in range(MAX_MENSAGENS_NO_PROMPT + 15)
         ]
         prompt = ia.montar_prompt_analise_conversa({"nome": "X", "site_status": "sem_site"}, mensagens)
-        assert "15 mensagem(ns) mais antiga(s) omitida(s)" in prompt
+        assert "15 mensaje(s) más antiguo(s) omitido(s)" in prompt
         assert "mensagem 0" not in prompt
         assert f"mensagem {MAX_MENSAGENS_NO_PROMPT + 14}" in prompt
 
@@ -399,7 +399,7 @@ class TestPromptAnalise:
             {"nome": "X", "site_status": "sem_site"},
             [{"autor": "vendedor", "texto": "Oi", "enviada_em": "2026-07-26T00:00:00"}],
         )
-        assert "ainda não respondeu" in prompt
+        assert "El lead todavía no respondió" in prompt
 
 
 class TestRotaAnalisar:

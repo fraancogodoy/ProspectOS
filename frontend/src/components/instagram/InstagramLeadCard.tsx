@@ -62,7 +62,7 @@ export function InstagramLeadCard({
         checked={selecionado}
         onChange={() => onAlternarSelecao()}
         onClick={(e) => e.stopPropagation()}
-        aria-label={`Selecionar @${lead.username}`}
+        aria-label={`Seleccionar @${lead.username}`}
         className="absolute right-3 top-3 size-4 cursor-pointer accent-primary"
       />
 
@@ -135,7 +135,7 @@ export function InstagramLeadCard({
             onClick={() => copiar(lead.sugestao_dm ?? "")}
           >
             <Copy className="size-4" />
-            {copiado ? "Copiado!" : "Copiar sugestão de DM"}
+            {copiado ? "¡Copiado!" : "Copiar sugerencia de DM"}
           </Button>
         </div>
       )}
@@ -146,7 +146,7 @@ export function InstagramLeadCard({
           onClick={(e) => e.stopPropagation()}
         >
           <summary className="cursor-pointer select-none hover:text-foreground">
-            Bio, comentários e detalhes da análise
+            Bio, comentarios y detalles del análisis
           </summary>
           <div className="mt-2 flex flex-col gap-2">
             {lead.biography && (
@@ -179,7 +179,7 @@ export function InstagramLeadCard({
           }}
         >
           <Archive className="size-3.5" />
-          Arquivar lead difícil
+          Archivar lead difícil
         </Button>
       )}
     </motion.div>

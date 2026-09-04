@@ -22,12 +22,12 @@ export function BreakdownPorNicho({
     return (
       <div className="rounded-xl border border-border bg-card p-4">
         <h3 className="mb-4 text-sm font-medium text-muted-foreground">
-          Conversão por nicho
+          Conversión por rubro
         </h3>
         <EmptyStateCard
           icone={<PieChart className="size-5" />}
-          titulo="Nenhum nicho ainda"
-          descricao="Os nichos vêm das suas buscas (ex.: 'clínica de estética em Londrina') - rode uma busca para começar a comparar a conversão por nicho."
+          titulo="Todavía no hay rubros"
+          descricao="Los rubros vienen de tus búsquedas (ej.: 'centro de estética en Tandil') - corré una búsqueda para empezar a comparar la conversión por rubro."
           className="h-[240px] border-0 bg-transparent"
         />
       </div>
@@ -37,7 +37,7 @@ export function BreakdownPorNicho({
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       <h3 className="mb-4 text-sm font-medium text-muted-foreground">
-        Conversão por nicho
+        Conversión por rubro
       </h3>
       <div className="max-h-[240px] space-y-3 overflow-y-auto pr-1">
         {nichos.map((n) => (

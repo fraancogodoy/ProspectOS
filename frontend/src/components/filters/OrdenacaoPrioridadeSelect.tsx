@@ -15,10 +15,10 @@ export function OrdenacaoPrioridadeSelect({
       valor={valor}
       onChange={(v) => onChange(v as OrdenacaoPrioridade)}
       opcoes={[
-        { valor: "prioridade-desc", label: "Maior prioridade primeiro" },
-        { valor: "prioridade-asc", label: "Menor prioridade primeiro" },
+        { valor: "prioridade-desc", label: "Mayor prioridad primero" },
+        { valor: "prioridade-asc", label: "Menor prioridad primero" },
       ]}
-      labelVazio="Ordem padrão"
+      labelVazio="Orden por defecto"
       placeholder="Ordenar"
       className="w-[190px]"
     />

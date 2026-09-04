@@ -16,11 +16,11 @@ export function InstagramAnalyticsPage() {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          Voltar para leads do Instagram
+          Volver a leads de Instagram
         </Link>
 
         <h2 className="bg-gradient-to-r from-instagram-start via-instagram-mid to-instagram-end bg-clip-text text-xl font-semibold tracking-tight text-transparent">
-          Analytics do Instagram
+          Analytics de Instagram
         </h2>
 
         <InstagramMetricsDashboard />

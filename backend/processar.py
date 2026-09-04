@@ -159,16 +159,16 @@ def montar_checklist_site(html, url_final):
     )
 
     itens = [
-        ("botão de WhatsApp", ("wa.me" in html_min or "api.whatsapp.com" in html_min or "whatsapp" in html_min)),
-        ("telefone clicável", 'href="tel:' in html_min or "href='tel:" in html_min),
-        ("e-mail de contato", "mailto:" in html_min),
-        ("link para redes sociais", "instagram.com" in html_min or "facebook.com" in html_min),
-        ("endereço ou mapa", ("google.com/maps" in html_min or "maps.google" in html_min
+        ("botón de WhatsApp", ("wa.me" in html_min or "api.whatsapp.com" in html_min or "whatsapp" in html_min)),
+        ("teléfono cliqueable", 'href="tel:' in html_min or "href='tel:" in html_min),
+        ("e-mail de contacto", "mailto:" in html_min),
+        ("link a redes sociales", "instagram.com" in html_min or "facebook.com" in html_min),
+        ("dirección o mapa", ("google.com/maps" in html_min or "maps.google" in html_min
                               or "<address" in html_min or bool(REGEX_CEP.search(html or "")))),
-        ("fotos do negócio", imagens >= 3),
-        ("título descritivo na aba", len(titulo_texto) > 8 and titulo_texto.lower() not in ("home", "index", "início", "untitled")),
-        ("descrição para aparecer no Google", bool(descricao)),
-        ("ícone na aba do navegador (favicon)", bool(re.search(r'rel=["\'](?:shortcut )?icon', html_min))),
+        ("fotos del negocio", imagens >= 3),
+        ("título descriptivo en la pestaña", len(titulo_texto) > 8 and titulo_texto.lower() not in ("home", "index", "início", "inicio", "untitled")),
+        ("descripción para aparecer en Google", bool(descricao)),
+        ("ícono en la pestaña del navegador (favicon)", bool(re.search(r'rel=["\'](?:shortcut )?icon', html_min))),
     ]
 
     checklist = {
@@ -1013,7 +1013,7 @@ def processar(caminho_csv_bruto, caminho_queries=CAMINHO_QUERIES_PADRAO, callbac
                             "nota": nota,
                             "num_avaliacoes": num_avaliacoes,
                             "whatsapp": link_whatsapp,
-                            "situacao_site": "sem site" if site_status == "sem_site" else f"site ruim ({site_problemas})",
+                            "situacao_site": "sin web" if site_status == "sem_site" else f"web mala ({site_problemas})",
                             "instagram": verificacao["instagram_url"] or "",
                         }
                     )
@@ -1038,7 +1038,7 @@ def processar(caminho_csv_bruto, caminho_queries=CAMINHO_QUERIES_PADRAO, callbac
         escritor.writeheader()
         escritor.writerows(novos)
 
-    print(f"Leads novos encontrados nesta rodada: {len(novos)} ({novos_sem_site} sem site, {novos_site_ruim} com site ruim)")
+    print(f"Leads nuevos encontrados en esta ronda: {len(novos)} ({novos_sem_site} sin web, {novos_site_ruim} con web mala)")
     if descartados_por_site_ok:
         print(f"Descartados por já terem um site decente: {descartados_por_site_ok}")
     if erros_de_linha:

@@ -53,12 +53,12 @@ export class ErrorBoundary extends Component<Props, State> {
       >
         <div style={{ fontSize: 44 }}>😵</div>
         <h1 style={{ fontSize: 22, fontWeight: 700, margin: 0 }}>
-          Algo deu errado nesta tela
+          Algo salió mal en esta pantalla
         </h1>
         <p style={{ maxWidth: 560, margin: 0, color: "#9aa8b2", fontSize: 15, lineHeight: 1.5 }}>
-          O ProspectOS encontrou um erro inesperado. Recarregar geralmente
-          resolve. Se continuar acontecendo, tire um print desta tela e abra um
-          issue no GitHub - a mensagem abaixo diz exatamente o que quebrou.
+          ProspectOS encontró un error inesperado. Recargar suele resolverlo.
+          Si sigue pasando, sacá una captura de esta pantalla y abrí un issue en
+          GitHub - el mensaje de abajo dice exactamente qué falló.
         </p>
         <pre
           style={{
@@ -94,7 +94,7 @@ export class ErrorBoundary extends Component<Props, State> {
             cursor: "pointer",
           }}
         >
-          Recarregar o ProspectOS
+          Recargar ProspectOS
         </button>
       </div>
     )

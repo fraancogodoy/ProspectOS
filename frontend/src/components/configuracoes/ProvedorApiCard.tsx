@@ -38,27 +38,27 @@ export function ProvedorApiCard({ provedor, titulo, config }: ProvedorApiCardPro
           </span>
         ) : (
           <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-            Não configurada
+            No configurada
           </span>
         )}
       </div>
 
       <div className="space-y-1.5">
-        <Label>Chave de API</Label>
+        <Label>Clave de API</Label>
         <div className="flex gap-2">
           <Input
             type="password"
             autoComplete="off"
             value={valor}
             onChange={(e) => setValor(e.target.value)}
-            placeholder={config.configurada ? "Digite para substituir a chave atual" : "Cole sua chave de API aqui"}
+            placeholder={config.configurada ? "Escribí para reemplazar la clave actual" : "Pegá tu clave de API acá"}
           />
           <Button
             size="sm"
             disabled={!valor.trim() || salvar.isPending}
             onClick={handleSalvar}
           >
-            {salvar.isPending ? "Salvando..." : "Salvar"}
+            {salvar.isPending ? "Guardando..." : "Guardar"}
           </Button>
         </div>
       </div>
@@ -70,7 +70,7 @@ export function ProvedorApiCard({ provedor, titulo, config }: ProvedorApiCardPro
         className="inline-flex w-fit items-center gap-1 text-xs text-muted-foreground hover:text-foreground hover:underline"
       >
         <ExternalLink className="size-3" />
-        Obtenha sua chave gratuita aqui
+        Conseguí tu clave gratuita acá
       </a>
     </div>
   )

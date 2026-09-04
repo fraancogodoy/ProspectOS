@@ -40,7 +40,7 @@ export function LeadCard({
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") onClick()
       }}
-      aria-label={`Abrir detalhes de ${lead.nome}`}
+      aria-label={`Abrir detalle de ${lead.nome}`}
       className={cn(
         "relative flex cursor-pointer flex-col gap-2 rounded-xl border border-border bg-card p-4 text-left shadow-sm transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         vencido && "ring-2 ring-warning",
@@ -52,7 +52,7 @@ export function LeadCard({
         checked={selecionado}
         onChange={() => onAlternarSelecao()}
         onClick={(e) => e.stopPropagation()}
-        aria-label={`Selecionar ${lead.nome}`}
+        aria-label={`Seleccionar ${lead.nome}`}
         className="absolute right-3 top-3 size-4 cursor-pointer accent-primary"
       />
 
@@ -66,10 +66,10 @@ export function LeadCard({
       </div>
 
       <p className="text-sm text-muted-foreground">
-        {lead.categoria || "Sem categoria"}
+        {lead.categoria || "Sin rubro"}
       </p>
       <p className="text-xs text-muted-foreground">
-        {lead.endereco || "Sem endereço"}
+        {lead.endereco || "Sin dirección"}
       </p>
 
       <TagChips tags={lead.tags} />
@@ -85,9 +85,9 @@ export function LeadCard({
             target="_blank"
             rel="noreferrer"
             onClick={(e) => e.stopPropagation()}
-            title={`Abrir Instagram do negócio: ${lead.instagram_url}`}
+            title={`Abrir Instagram del negocio: ${lead.instagram_url}`}
             className="inline-flex items-center text-instagram-mid hover:opacity-80"
-            aria-label="Abrir Instagram do negócio"
+            aria-label="Abrir Instagram del negocio"
           >
             <InstagramIcon className="size-3.5" />
           </a>
@@ -99,10 +99,10 @@ export function LeadCard({
         <span className="font-medium text-foreground">
           {formatarNota(lead.nota)}
         </span>
-        <span>({lead.num_avaliacoes ?? 0} avaliações)</span>
+        <span>({lead.num_avaliacoes ?? 0} reseñas)</span>
         <span
           className="ml-auto inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 font-medium text-primary"
-          title="Score de prioridade (nota + volume de avaliações + situação do site)"
+          title="Score de prioridad (puntuación + volumen de reseñas + situación de la web)"
         >
           <Flame className="size-3" />
           {lead.score}
@@ -120,7 +120,7 @@ export function LeadCard({
           }}
         >
           <Archive className="size-3.5" />
-          Arquivar lead difícil
+          Archivar lead difícil
         </Button>
       )}
     </motion.div>

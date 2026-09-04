@@ -94,19 +94,19 @@ function CartaoDaSessao({
             <h2 className="text-xl font-semibold tracking-tight">{lead.nome}</h2>
             {modo === "followup" && (
               <Badge variant="outline" className="border-warning/40 bg-warning/15 text-warning">
-                Follow-up {lead.proximo_followup ? `venceu ${lead.proximo_followup}` : "pendente"}
+                Seguimiento {lead.proximo_followup ? `venció ${lead.proximo_followup}` : "pendiente"}
               </Badge>
             )}
           </div>
           <p className="text-sm text-muted-foreground">
-            {lead.categoria || "Sem categoria"}
+            {lead.categoria || "Sin rubro"}
             {lead.cidade ? ` · ${lead.cidade}` : ""}
-            {modo === "followup" && ` · ${lead.follow_ups_enviados} follow-up(s) já enviado(s)`}
+            {modo === "followup" && ` · ${lead.follow_ups_enviados} seguimiento(s) ya enviado(s)`}
           </p>
         </div>
         <span
           className="inline-flex items-center gap-1 rounded-full bg-primary/10 px-2.5 py-1 text-sm font-semibold tabular-nums text-primary"
-          title="Score de prioridade"
+          title="Score de prioridad"
         >
           <Flame className="size-4" />
           {lead.score}
@@ -117,7 +117,7 @@ function CartaoDaSessao({
         <span className="inline-flex items-center gap-1 text-muted-foreground">
           <Star className="size-4 fill-warning text-warning" />
           <span className="font-medium text-foreground">{formatarNota(lead.nota)}</span>
-          ({lead.num_avaliacoes ?? 0} avaliações)
+          ({lead.num_avaliacoes ?? 0} reseñas)
         </span>
         <SiteStatusBadge siteStatus={lead.site_status} siteProblemas={lead.site_problemas} />
         {lead.site_url && (
@@ -128,7 +128,7 @@ function CartaoDaSessao({
             className="inline-flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground hover:underline"
           >
             <ExternalLink className="size-3" />
-            site atual
+            web actual
           </a>
         )}
         {lead.instagram_url && (
@@ -146,7 +146,7 @@ function CartaoDaSessao({
 
       <div className="rounded-xl border border-primary/25 bg-primary/[0.04] p-3">
         <div className="mb-1 flex items-center justify-between gap-2">
-          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Estratégia</p>
+          <p className="text-xs font-semibold uppercase tracking-wide text-primary">Estrategia</p>
           <Badge variant="outline" className="border-primary/40 bg-primary/10 text-primary">
             {estrategia.cenario}
           </Badge>
@@ -161,7 +161,7 @@ function CartaoDaSessao({
             onChange={(e) => setMensagem(e.target.value)}
             rows={5}
             className="w-full resize-none rounded-lg border border-border bg-background p-3 text-sm focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-            aria-label="Mensagem de abordagem"
+            aria-label="Mensaje de abordaje"
           />
         ) : (
           <Button
@@ -177,10 +177,10 @@ function CartaoDaSessao({
           >
             <Sparkles className="size-4" />
             {mutations.gerarMensagem.isPending
-              ? "Gerando copy com a estratégia acima..."
+              ? "Generando copy con la estrategia de arriba..."
               : modo === "followup"
-                ? "Gerar copy de follow-up"
-                : "Gerar copy de contato"}
+                ? "Generar copy de seguimiento"
+                : "Generar copy de contacto"}
           </Button>
         )}
       </div>
@@ -189,13 +189,13 @@ function CartaoDaSessao({
         <Button size="lg" onClick={abrirWhatsappEContatar} disabled={!lead.whatsapp_link}>
           <MessageCircle className="size-4" />
           {modo === "followup"
-            ? "Abrir WhatsApp + follow-up feito"
-            : "Abrir WhatsApp + marcar contatado"}
+            ? "Abrir WhatsApp + seguimiento hecho"
+            : "Abrir WhatsApp + marcar contactado"}
           <kbd className="ml-1 hidden rounded bg-primary-foreground/20 px-1.5 text-[10px] sm:inline">Enter</kbd>
         </Button>
         <Button size="lg" variant="outline" onClick={onPular}>
           <SkipForward className="size-4" />
-          Pular
+          Saltar
           <kbd className="ml-1 hidden rounded bg-muted px-1.5 text-[10px] sm:inline">→</kbd>
         </Button>
         <Button
@@ -276,28 +276,28 @@ export function SessaoProspeccaoPage() {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          Voltar para o dashboard
+          Volver al dashboard
         </Link>
 
         <PageHero
           icone={<Zap className="size-6" />}
-          titulo="Sessão de prospecção"
-          descricao="Um lead por vez, do mais quente pro mais frio - estratégia e copy prontas, abordagem em um clique."
+          titulo="Sesión de prospección"
+          descricao="Un lead por vez, del más caliente al más frío - estrategia y copy listas, abordaje en un clic."
           gradiente="from-google-maps-start/85 via-primary/85 to-google-maps-end/85"
         />
 
         <div className="flex items-center justify-between text-sm text-muted-foreground">
           <span>
-            <span className="font-semibold tabular-nums text-success">{contatados}</span> contatado(s)
-            nesta sessão
+            <span className="font-semibold tabular-nums text-success">{contatados}</span> contactado(s)
+            en esta sesión
           </span>
           <span className="tabular-nums">
             {followupsPendentes.length > 0 && (
               <span className="mr-2 text-warning">
-                {followupsPendentes.length} follow-up(s) primeiro
+                {followupsPendentes.length} seguimiento(s) primero
               </span>
             )}
-            {fila.length} na fila
+            {fila.length} en la cola
           </span>
         </div>
 
@@ -317,15 +317,15 @@ export function SessaoProspeccaoPage() {
             icone={<PartyPopper className="size-5" />}
             titulo={
               contatados > 0
-                ? `Fila zerada - ${contatados} lead(s) contatado(s) nesta sessão!`
-                : "Nenhum lead novo na fila"
+                ? `Cola vacía - ¡${contatados} lead(s) contactado(s) en esta sesión!`
+                : "Ningún lead nuevo en la cola"
             }
-            descricao="Rode uma busca no Google Maps para encher a fila de novo."
+            descricao="Corré una búsqueda en Google Maps para llenar la cola de nuevo."
             acao={
               <Button size="sm" variant="outline" asChild>
                 <Link to="/leads">
                   <Check className="size-4" />
-                  Ir para leads do Maps
+                  Ir a leads de Maps
                 </Link>
               </Button>
             }

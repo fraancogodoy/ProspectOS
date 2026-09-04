@@ -26,7 +26,7 @@ export function ScraperProxyCard() {
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Globe className="size-4 text-muted-foreground" />
-          <h3 className="font-medium">Proxy do scraper (Google Maps)</h3>
+          <h3 className="font-medium">Proxy del scraper (Google Maps)</h3>
         </div>
         {data?.configurado ? (
           <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success">
@@ -35,24 +35,24 @@ export function ScraperProxyCard() {
           </span>
         ) : (
           <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-            Não configurado
+            No configurado
           </span>
         )}
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Opcional. Se as buscas no Google Maps voltarem sempre com 0
-        resultados (mesmo com o scraper rodando sem erro), o Google pode
-        estar bloqueando o seu IP. Configurar um ou mais proxies pode
-        contornar isso.
+        Opcional. Si las búsquedas en Google Maps siempre vuelven con 0
+        resultados (aun con el scraper corriendo sin error), Google puede
+        estar bloqueando tu IP. Configurar uno o más proxies puede
+        solucionarlo.
       </p>
 
       <div className="space-y-1.5">
-        <Label>Lista de proxies (separados por vírgula)</Label>
+        <Label>Lista de proxies (separados por coma)</Label>
         <Textarea
           value={valor}
           onChange={(e) => setValor(e.target.value)}
-          placeholder="socks5://usuario:senha@host:porta,http://host2:porta2"
+          placeholder="socks5://usuario:clave@host:puerto,http://host2:puerto2"
           rows={2}
           className="font-mono text-xs"
         />
@@ -64,7 +64,7 @@ export function ScraperProxyCard() {
         disabled={salvar.isPending}
         onClick={handleSalvar}
       >
-        {salvar.isPending ? "Salvando..." : "Salvar"}
+        {salvar.isPending ? "Guardando..." : "Guardar"}
       </Button>
     </div>
   )

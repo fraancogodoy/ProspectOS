@@ -111,8 +111,8 @@ def _buscar_uma_query(chave, texto_busca, area=None):
     for _ in range(MAX_PAGINAS_POR_QUERY):
         corpo = {
             "textQuery": texto_busca,
-            "languageCode": "pt-BR",
-            "regionCode": "BR",
+            "languageCode": "es-419",
+            "regionCode": "AR",
             "pageSize": RESULTADOS_POR_PAGINA,
         }
         if area:

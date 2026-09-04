@@ -23,21 +23,21 @@ export function AnaliseConversaCard({
       <div>
         <h2 className="flex items-center gap-2 font-semibold">
           <Sparkles className="size-4 text-success" />
-          Sugestão da negociação
+          Sugerencia de la negociación
         </h2>
         <p className="mt-1 text-xs text-muted-foreground">
-          A IA lê a conversa e sugere o próximo passo. Você revisa e envia.
+          La IA lee la conversación y sugiere el próximo paso. Vos revisás y enviás.
         </p>
       </div>
 
       <Button onClick={onAnalisar} disabled={analisando || !temMensagens} className="w-full">
         <Sparkles className="size-4" />
-        {analisando ? "Analisando..." : "Analisar conversa"}
+        {analisando ? "Analizando..." : "Analizar conversación"}
       </Button>
 
       {!temMensagens && (
         <p className="text-xs text-muted-foreground">
-          Registre ao menos uma mensagem para a IA ter o que analisar.
+          Registrá al menos un mensaje para que la IA tenga qué analizar.
         </p>
       )}
 
@@ -54,7 +54,7 @@ export function AnaliseConversaCard({
             </span>
             {analise.mensagens_consideradas ? (
               <span className="text-[11px] text-muted-foreground">
-                com base em {analise.mensagens_consideradas} mensagem(ns)
+                en base a {analise.mensagens_consideradas} mensaje(s)
               </span>
             ) : null}
           </div>
@@ -62,7 +62,7 @@ export function AnaliseConversaCard({
           {analise.leitura && (
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Leitura
+                Lectura
               </h3>
               <p className="mt-1.5 text-sm leading-relaxed">{analise.leitura}</p>
             </div>
@@ -81,7 +81,7 @@ export function AnaliseConversaCard({
           {analise.resposta_sugerida && (
             <div>
               <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-                Resposta sugerida
+                Respuesta sugerida
               </h3>
               <p className="mt-1.5 whitespace-pre-wrap rounded-lg bg-muted/50 p-3 text-sm leading-relaxed">
                 {analise.resposta_sugerida}
@@ -92,7 +92,7 @@ export function AnaliseConversaCard({
                 className="mt-2 w-full"
                 onClick={() => onUsarResposta(analise.resposta_sugerida)}
               >
-                Usar no campo de mensagem
+                Usar en el campo de mensaje
               </Button>
             </div>
           )}
@@ -101,7 +101,7 @@ export function AnaliseConversaCard({
             <div>
               <h3 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-warning">
                 <AlertTriangle className="size-3.5" />
-                Evite agora
+                Evitá ahora
               </h3>
               <ul className="mt-1.5 space-y-1">
                 {analise.evitar.map((item) => (

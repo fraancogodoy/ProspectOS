@@ -62,13 +62,13 @@ export function BulkActionsBar({
       className="fixed bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-3 rounded-full border border-border bg-card px-4 py-2.5 shadow-lg"
     >
       <span className="text-sm font-medium">
-        {placeIdsSelecionados.length} selecionado(s)
+        {placeIdsSelecionados.length} seleccionado(s)
       </span>
 
       {!modoIgnorados && (
         <Select onValueChange={(v) => handleMudarStatus(v as StatusLead)}>
           <SelectTrigger className="h-8 w-[160px]">
-            <SelectValue placeholder="Mudar status" />
+            <SelectValue placeholder="Cambiar estado" />
           </SelectTrigger>
           <SelectContent>
             {STATUS_VALIDOS.filter((s) => s !== "ignorado").map((status) => (
@@ -84,26 +84,26 @@ export function BulkActionsBar({
         <AlertDialogTrigger asChild>
           <Button size="sm" variant="outline" className="text-destructive hover:bg-destructive/10">
             <Trash2 className="size-4" />
-            {modoIgnorados ? "Excluir definitivamente" : "Excluir"}
+            {modoIgnorados ? "Eliminar definitivamente" : "Eliminar"}
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
               {modoIgnorados
-                ? `Excluir ${placeIdsSelecionados.length} lead(s) definitivamente?`
-                : `Excluir ${placeIdsSelecionados.length} lead(s)?`}
+                ? `¿Eliminar ${placeIdsSelecionados.length} lead(s) definitivamente?`
+                : `¿Eliminar ${placeIdsSelecionados.length} lead(s)?`}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {modoIgnorados
-                ? "Isso apaga esses leads de vez do banco de dados. Não tem como desfazer, e se a mesma busca rodar de novo no futuro, eles podem voltar a aparecer como leads novos."
-                : "Eles não vão mais aparecer na sua lista, nem em buscas futuras do mesmo nicho/cidade."}
+                ? "Esto borra esos leads para siempre de la base de datos. No se puede deshacer, y si la misma búsqueda se corre de nuevo en el futuro, pueden volver a aparecer como leads nuevos."
+                : "No van a aparecer más en tu lista, ni en búsquedas futuras del mismo rubro/ciudad."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={handleExcluir}>
-              {modoIgnorados ? "Excluir definitivamente" : "Excluir"}
+              {modoIgnorados ? "Eliminar definitivamente" : "Eliminar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

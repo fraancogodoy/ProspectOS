@@ -85,7 +85,7 @@ export function LeadsDoPost({
       <div className="flex flex-col items-center justify-center gap-2 rounded-xl border border-dashed border-border py-12 text-center">
         <Users className="size-7 text-muted-foreground" />
         <p className="text-sm text-muted-foreground">
-          Nenhum perfil corresponde aos filtros selecionados.
+          Ningún perfil coincide con los filtros seleccionados.
         </p>
       </div>
     )
@@ -103,17 +103,17 @@ export function LeadsDoPost({
                 className="text-destructive hover:bg-destructive/10"
               >
                 <Trash2 className="size-4" />
-                Esvaziar ignorados
+                Vaciar ignorados
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>
-                  Excluir todos os {leads.length} lead(s) ignorado(s)?
+                  ¿Eliminar los {leads.length} lead(s) ignorado(s)?
                 </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Isso apaga de vez todos os leads ignorados carregados nesta
-                  lista. Não tem como desfazer.
+                  Esto borra para siempre todos los leads ignorados cargados en
+                  esta lista. No se puede deshacer.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -123,7 +123,7 @@ export function LeadsDoPost({
                     excluirEmLoteDefinitivamente.mutate(leads.map((l) => l.id))
                   }
                 >
-                  Excluir todos
+                  Eliminar todos
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>

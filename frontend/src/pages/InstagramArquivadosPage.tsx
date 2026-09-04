@@ -14,17 +14,17 @@ export function InstagramArquivadosPage() {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          Voltar para leads do Instagram
+          Volver a leads de Instagram
         </Link>
 
         <div>
           <h2 className="text-xl font-semibold tracking-tight">
-            Posts arquivados
+            Posts archivados
           </h2>
           <p className="text-sm text-muted-foreground">
-            Posts arquivados ficam fora da lista principal. Você pode
-            restaurá-los ou excluí-los definitivamente (o que apaga também
-            todos os leads daquele post).
+            Los posts archivados quedan fuera de la lista principal. Podés
+            restaurarlos o eliminarlos definitivamente (lo que borra también
+            todos los leads de ese post).
           </p>
         </div>
 

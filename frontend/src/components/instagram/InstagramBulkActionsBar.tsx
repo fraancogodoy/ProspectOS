@@ -64,13 +64,13 @@ export function InstagramBulkActionsBar({
       className="fixed bottom-5 left-1/2 z-30 flex -translate-x-1/2 items-center gap-3 rounded-full border border-border bg-card px-4 py-2.5 shadow-lg"
     >
       <span className="text-sm font-medium">
-        {leadIdsSelecionados.length} selecionado(s)
+        {leadIdsSelecionados.length} seleccionado(s)
       </span>
 
       {!modoIgnorados && (
         <Select onValueChange={(v) => handleMudarStatus(v as StatusLead)}>
           <SelectTrigger className="h-8 w-[160px]">
-            <SelectValue placeholder="Mudar status" />
+            <SelectValue placeholder="Cambiar estado" />
           </SelectTrigger>
           <SelectContent>
             {STATUS_VALIDOS.filter((s) => s !== "ignorado").map((status) => (
@@ -86,26 +86,26 @@ export function InstagramBulkActionsBar({
         <AlertDialogTrigger asChild>
           <Button size="sm" variant="outline" className="text-destructive hover:bg-destructive/10">
             <Trash2 className="size-4" />
-            {modoIgnorados ? "Excluir definitivamente" : "Excluir"}
+            {modoIgnorados ? "Eliminar definitivamente" : "Eliminar"}
           </Button>
         </AlertDialogTrigger>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
               {modoIgnorados
-                ? `Excluir ${leadIdsSelecionados.length} lead(s) definitivamente?`
-                : `Excluir ${leadIdsSelecionados.length} lead(s)?`}
+                ? `¿Eliminar ${leadIdsSelecionados.length} lead(s) definitivamente?`
+                : `¿Eliminar ${leadIdsSelecionados.length} lead(s)?`}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {modoIgnorados
-                ? "Isso apaga esses leads de vez do banco de dados. Não tem como desfazer."
-                : "Eles não vão mais aparecer na lista deste post."}
+                ? "Esto borra esos leads para siempre de la base de datos. No se puede deshacer."
+                : "No van a aparecer más en la lista de este post."}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancelar</AlertDialogCancel>
             <AlertDialogAction onClick={handleExcluir}>
-              {modoIgnorados ? "Excluir definitivamente" : "Excluir"}
+              {modoIgnorados ? "Eliminar definitivamente" : "Eliminar"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

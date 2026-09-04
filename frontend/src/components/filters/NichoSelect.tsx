@@ -14,8 +14,8 @@ export function NichoSelect({ valor, onChange }: NichoSelectProps) {
       valor={valor}
       onChange={onChange}
       opcoes={(nichos ?? []).map((nicho) => ({ valor: nicho, label: nicho }))}
-      labelVazio="Todos os nichos"
-      placeholder="Nicho"
+      labelVazio="Todos los rubros"
+      placeholder="Rubro"
       className="w-[200px]"
     />
   )

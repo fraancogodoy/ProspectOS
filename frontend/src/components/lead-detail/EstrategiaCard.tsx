@@ -20,7 +20,7 @@ export function EstrategiaCard({ lead }: EstrategiaCardProps) {
       <div className="flex items-center justify-between gap-2">
         <h3 className="flex items-center gap-1.5 text-sm font-semibold">
           <Target className="size-4 text-primary" />
-          Estratégia de abordagem
+          Estrategia de abordaje
         </h3>
         <Badge variant="outline" className="border-primary/40 bg-primary/10 text-primary">
           {estrategia.cenario}
@@ -48,7 +48,7 @@ export function EstrategiaCard({ lead }: EstrategiaCardProps) {
         <summary className="flex cursor-pointer items-center justify-between gap-2 px-3 py-2 text-xs font-medium text-muted-foreground [&::-webkit-details-marker]:hidden">
           <span className="flex items-center gap-1.5">
             <MessageSquareQuote className="size-3.5" />
-            Objeções prováveis e como responder
+            Objeciones probables y cómo responder
           </span>
           <ChevronDown className="size-3.5 transition-transform group-open:rotate-180" />
         </summary>
@@ -65,7 +65,7 @@ export function EstrategiaCard({ lead }: EstrategiaCardProps) {
       </details>
 
       <p className="rounded-lg bg-muted/60 px-3 py-2 text-xs leading-relaxed text-muted-foreground">
-        <span className="font-semibold text-foreground">Próximo passo: </span>
+        <span className="font-semibold text-foreground">Próximo paso: </span>
         {estrategia.proximoPasso}
       </p>
     </div>

@@ -44,13 +44,13 @@ export interface EstadoCaptura {
 }
 
 export const LABEL_ESTAGIO: Record<EstagioNegociacao, string> = {
-  primeiro_contato: "Primeiro contato",
-  descoberta: "Descoberta",
-  interesse: "Interesse",
-  objecao: "Objeção",
-  negociacao: "Negociação",
-  fechamento: "Fechamento",
-  esfriou: "Esfriou",
+  primeiro_contato: "Primer contacto",
+  descoberta: "Descubrimiento",
+  interesse: "Interés",
+  objecao: "Objeción",
+  negociacao: "Negociación",
+  fechamento: "Cierre",
+  esfriou: "Se enfrió",
 }
 
 /** Cor do badge do estágio: verde conforme avança, laranja em objeção, cinza quando esfria. */

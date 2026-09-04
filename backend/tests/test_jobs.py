@@ -69,13 +69,13 @@ class TestTraduzirErroScraper:
         # o caso do usuário real: scraper antigo procurando driver que a
         # Microsoft removeu - a mensagem tem que apontar pra atualização do .exe
         msg = jobs.traduzir_erro_scraper("Error: could not install driver", 1)
-        assert "desatualizado" in msg
+        assert "desactualizado" in msg
         assert "releases" in msg
         assert "Places API" in msg
 
     def test_erro_menciona_playwright(self):
         msg = jobs.traduzir_erro_scraper("playwright install failed", 1)
-        assert "navegador interno" in msg
+        assert "navegador interno" in msg  # "no pudo preparar el navegador interno"
 
     def test_arquivo_nao_encontrado(self):
         msg = jobs.traduzir_erro_scraper("no such file or directory", 127)
@@ -83,7 +83,7 @@ class TestTraduzirErroScraper:
 
     def test_timeout_deadline(self):
         msg = jobs.traduzir_erro_scraper("context deadline exceeded", 1)
-        assert "demorou demais" in msg
+        assert "tardó demasiado" in msg
 
     def test_erro_generico_cai_no_fallback_com_codigo(self):
         msg = jobs.traduzir_erro_scraper("algo estranho aconteceu", 42)

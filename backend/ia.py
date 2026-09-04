@@ -9,6 +9,12 @@ Arquitetura dos prompts:
   colapsa sempre pro mesmo padrão.
 - Um único motor de fallback (`executar_com_fallback`) serve todos os usos:
   mensagem do Maps, DM do Instagram e classificação de perfis.
+
+NOTA (adaptação PresencIA): os prompts abaixo foram reescritos para
+español rioplatense (voseo) e para uma oferta de *automação de atendimento
+por WhatsApp* (PresencIA), no lugar da oferta original de "criação de sites".
+A lógica, as assinaturas de função, as chaves de JSON e os tokens de enum
+(prioridade/estágio) NÃO mudaram - só o texto dos prompts.
 """
 
 import json
@@ -97,19 +103,19 @@ def _e_erro_de_cota(erro):
 
 
 def traduzir_erro_ia(erro):
-    """Converte erros técnicos de qualquer provedor de IA em mensagens que um usuário leigo entende."""
+    """Convierte errores técnicos de cualquier proveedor de IA en mensajes que un usuario común entiende."""
     texto_erro = str(erro).lower()
 
     if "api_key" in texto_erro or "api key" in texto_erro or isinstance(erro, RuntimeError):
         return str(erro)
     if _e_erro_de_cota(erro):
-        return "cota gratuita excedida por agora"
+        return "cuota gratuita agotada por ahora"
     if "timeout" in texto_erro or "deadline" in texto_erro:
-        return "demorou demais para responder"
+        return "tardó demasiado en responder"
     if "unavailable" in texto_erro or "503" in texto_erro:
-        return "serviço indisponível no momento"
+        return "servicio no disponible en este momento"
 
-    return "erro inesperado (veja logs/prospeccao.log)"
+    return "error inesperado (mirá logs/prospeccao.log)"
 
 
 # ---------------------------------------------------------------------------
@@ -192,7 +198,7 @@ def executar_com_fallback(system, user, parser=None, descricao_log="gerar mensag
         if _provedor_em_cooldown(provedor):
             logger.info("provedor %s em cooldown (cota excedida recentemente), pulando", provedor)
             avisos.append(
-                f"{NOMES_AMIGAVEIS_PROVEDOR[provedor]} indisponível agora (cota gratuita excedida por agora)."
+                f"{NOMES_AMIGAVEIS_PROVEDOR[provedor]} no disponible ahora (cuota gratuita agotada por ahora)."
             )
             continue
 
@@ -207,7 +213,7 @@ def executar_com_fallback(system, user, parser=None, descricao_log="gerar mensag
             logger.warning("provedor %s falhou ao %s: %s", provedor, descricao_log, erro)
             _marcar_cooldown_se_cota(provedor, erro)
             avisos.append(
-                f"{NOMES_AMIGAVEIS_PROVEDOR[provedor]} indisponível agora ({traduzir_erro_ia(erro)})."
+                f"{NOMES_AMIGAVEIS_PROVEDOR[provedor]} no disponible ahora ({traduzir_erro_ia(erro)})."
             )
             erro_final = erro
             continue
@@ -225,22 +231,22 @@ def saudacao_por_horario():
     pelo modelo."""
     hora = datetime.now().hour
     if 5 <= hora < 12:
-        return "Bom dia"
-    if 12 <= hora < 18:
-        return "Boa tarde"
-    return "Boa noite"
+        return "Buen día"
+    if 12 <= hora < 20:
+        return "Buenas tardes"
+    return "Buenas noches"
 
 
 PERGUNTAS_DE_FECHAMENTO = [
-    "Quer que eu te mostre um exemplo rápido?",
-    "Faz sentido eu te mandar uma prévia?",
-    "Posso te enviar uma ideia de como ficaria?",
-    "Quer ver como ficaria o seu?",
-    "Posso te mandar um diagnóstico rápido, sem compromisso?",
+    "¿Querés que te muestre cómo funcionaría con tu negocio?",
+    "¿Te mando una demo rápida, sin compromiso?",
+    "¿Te sirve si te muestro un ejemplo con un caso parecido al tuyo?",
+    "¿Querés que te pase más info y lo vemos con calma?",
+    "¿Te hago una prueba con tu propio WhatsApp para que veas cómo responde?",
 ]
 
-HORARIOS_COMERCIAIS = ["9h", "9h30", "10h", "10h40", "11h", "14h", "14h30", "15h20", "16h", "17h"]
-NOMES_DIAS_UTEIS = ["segunda", "terça", "quarta", "quinta", "sexta"]
+HORARIOS_COMERCIAIS = ["9", "9:30", "10", "10:40", "11", "14", "14:30", "15:20", "16", "17"]
+NOMES_DIAS_UTEIS = ["lunes", "martes", "miércoles", "jueves", "viernes"]
 
 
 def sortear_fechamento():
@@ -251,7 +257,7 @@ def sortear_fechamento():
     if random.random() < 0.5:
         pergunta = random.choice(PERGUNTAS_DE_FECHAMENTO)
         return (
-            f'Encerre com esta pergunta de sim/não (adapte só o necessário para fluir no texto): "{pergunta}"'
+            f'Cerrá con esta pregunta de sí/no (adaptá sólo lo necesario para que fluya en el texto): "{pergunta}"'
         )
 
     data_alvo = date.today() + timedelta(days=random.randint(1, 3))
@@ -259,7 +265,7 @@ def sortear_fechamento():
         data_alvo += timedelta(days=1)
     dia = NOMES_DIAS_UTEIS[data_alvo.weekday()]
     hora = random.choice(HORARIOS_COMERCIAIS)
-    return f"Encerre propondo um horário concreto para uma conversa rápida: {dia} às {hora}."
+    return f"Cerrá proponiendo un horario concreto para una charla corta: {dia} a las {hora}."
 
 
 def _bloco_perfil_vendedor():
@@ -271,39 +277,43 @@ def _bloco_perfil_vendedor():
     if not (nome or apresentacao or diferencial):
         return ""
 
-    linhas = ["", "Quem envia as mensagens (escreva na voz dessa pessoa):"]
+    linhas = ["", "Quién manda los mensajes (escribí con la voz de esta persona):"]
     if nome:
-        linhas.append(f"- Nome: {nome} (apresente-se pelo nome quando soar natural)")
+        linhas.append(f"- Nombre: {nome} (presentate por tu nombre cuando suene natural)")
     if apresentacao:
-        linhas.append(f"- O que faz: {apresentacao}")
+        linhas.append(f"- A qué se dedica: {apresentacao}")
     if diferencial:
-        linhas.append(f"- Diferencial a destacar quando couber: {diferencial}")
+        linhas.append(f"- Diferencial a destacar cuando corresponda: {diferencial}")
     return "\n".join(linhas) + "\n"
 
 
 def montar_system_copywriter(canal):
-    """System prompt fixo do copywriter (canal: 'WhatsApp' ou 'DM do Instagram') +
+    """System prompt fixo do copywriter (canal: 'WhatsApp' ou 'DM de Instagram') +
     o perfil do vendedor quando configurado."""
     tom_canal = (
-        "Tom de DM real entre duas pessoas - leve e informal, sem 'prezado(a)', sem formalidade de e-mail."
-        if canal == "DM do Instagram"
-        else "Tom de conversa direta e confiante entre humanos, sem soar vendedor robótico nem arrogante."
+        "Tono de DM real entre dos personas: liviano e informal, sin 'estimado/a', sin formalidad de e-mail."
+        if canal == "DM de Instagram"
+        else "Tono de charla directa y con seguridad entre personas, sin sonar a vendedor robótico ni arrogante."
     )
 
-    return f"""Você é um copywriter sênior especializado em prospecção B2B fria via {canal}, com décadas de experiência em vendas consultivas para pequenos negócios locais no Brasil. Donos de empresa recebem spam de "site/marketing" toda semana; suas mensagens se destacam por serem específicas, humanas e fáceis de responder em segundos.
-{_bloco_perfil_vendedor()}
-Regras invariáveis (valem para TODA mensagem):
-- Escreva SEMPRE em primeira pessoa do singular ("eu faço", "ofereço", "posso te mostrar") - quem envia é UMA pessoa que trabalha por conta própria. Nunca "nós", "oferecemos", "nossa equipe" ou qualquer voz de agência.
-- {tom_canal}
-- Abra de forma natural e direta. Nunca comece com "Estava navegando/pesquisando no Google e vi..." nem variações - é o clichê nº 1 do spam.
-- Use APENAS os dados fornecidos; nunca invente números, prêmios, clientes ou depoimentos.
-- Adapte o vocabulário ao nicho (clínica → "agenda de pacientes"; imobiliária → "captação de clientes"; restaurante → "reservas e pedidos").
-- Se o campo Nome for dominado por nome de pessoa (ex: "Dra. Ana Souza Odontologia"), fale COM a pessoa pelo primeiro nome, "você" no singular. Se for institucional (ex: "Vivarte Odontologia"), use "vocês"/"a equipe", sem inventar nomes.
-- Termine com o fechamento EXATO indicado na tarefa - pedido de ação específico e fechado, nunca "faz sentido conversarmos?".
-- Responda APENAS com o texto final da mensagem: sem aspas em volta, sem explicações, sem markdown.
+    return f"""Sos un copywriter senior especializado en prospección B2B en frío por {canal}, con años de experiencia en ventas consultivas a negocios chicos locales de Argentina. Los dueños de negocio reciben spam de "sistema/marketing" todas las semanas; tus mensajes se destacan por ser específicos, humanos y fáciles de responder en segundos.
 
-Exemplo do tom certo (régua de qualidade - não copie a estrutura literalmente):
-"Janete, boa tarde! Vi que a Estética Vit tem nota 5.0 no Google com mais de 100 avaliações - reputação que pouca clínica da região alcança. Só que quem pesquisa 'estética em Cuiabá' fora do Maps não te encontra, e acaba no site de outra clínica. Eu crio sites profissionais para negócios locais; posso te mandar uma prévia de como ficaria o da Vit?"
+Escribí SIEMPRE en español rioplatense, con voseo ("vos hacés", "te muestro", "fijate"). Nunca uses "tú", "usted" ni "vosotros".
+
+Qué se ofrece (PresencIA): un asistente que automatiza la atención por WhatsApp del negocio. Responde solo las 24 horas, contesta las preguntas de siempre, agenda turnos, manda recordatorios y guarda la ficha de cada cliente. El negocio deja de perder mensajes fuera de horario y de anotar todo a mano. Se conecta al número propio del negocio, sin instalar nada, con un abono mensual. NO es una página web ni un sistema de gestión: es la atención por WhatsApp funcionando sola.
+{_bloco_perfil_vendedor()}
+Reglas invariables (valen para TODO mensaje):
+- Escribí SIEMPRE en primera persona del singular ("yo lo armo", "ofrezco", "te puedo mostrar"). Quien manda el mensaje es UNA persona que trabaja por su cuenta. Nunca "nosotros", "ofrecemos", "nuestro equipo" ni voz de agencia.
+- {tom_canal}
+- Abrí de forma natural y directa. Nunca empieces con "Estaba mirando/buscando en Google y vi..." ni variaciones: es el cliché número uno del spam.
+- Usá SÓLO los datos que te doy; nunca inventes números, premios, clientes ni testimonios.
+- Adaptá el vocabulario al rubro (peluquería/estética → "los turnos y las consultas por WhatsApp"; cancha de fútbol → "las reservas de cancha y las señas"; inmobiliaria → "las consultas por propiedades y las visitas"; consultorio → "la agenda de pacientes").
+- Si el campo Nombre está dominado por un nombre de persona (ej: "Dra. Ana Souza Odontología"), hablale A la persona por el nombre de pila, "vos" en singular. Si es institucional (ej: "Vivarte Odontología"), usá "ustedes"/"el equipo", sin inventar nombres.
+- Terminá con el cierre EXACTO indicado en la tarea: un pedido de acción concreto y cerrado, nunca "¿te parece si charlamos?".
+- Respondé SÓLO con el texto final del mensaje: sin comillas alrededor, sin explicaciones, sin markdown.
+
+Ejemplo del tono correcto (regla de calidad, no copies la estructura literal):
+"Janet, buenas tardes! Vi que Estética Vit tiene 5.0 en Google con más de 100 reseñas, una reputación que pocas de la zona tienen. Con esa demanda, seguro te llegan un montón de mensajes por WhatsApp y contestás todo a mano, y fuera de horario se te escapan turnos. Yo pongo a andar un asistente que responde solo y agenda los turnos en tu propio WhatsApp. ¿Te hago una prueba con tu número para que veas cómo responde?"
 """
 
 
@@ -314,14 +324,14 @@ def _linha_dado(rotulo, valor):
 def _bloco_dados_empresa(nome, categoria, endereco, nota, num_avaliacoes=None,
                          cidade=None, instagram_url=None):
     linhas = [
-        _linha_dado("Nome", nome),
-        _linha_dado("Categoria", categoria or "não informado"),
-        _linha_dado("Cidade", cidade),
-        _linha_dado("Endereço", endereco or "não informado"),
-        _linha_dado("Nota no Google", nota),
-        _linha_dado("Número de avaliações no Google", num_avaliacoes),
-        _linha_dado("Instagram do negócio", instagram_url),
-        _linha_dado("Saudação a usar (hora real de agora)", saudacao_por_horario()),
+        _linha_dado("Nombre", nome),
+        _linha_dado("Rubro", categoria or "no informado"),
+        _linha_dado("Ciudad", cidade),
+        _linha_dado("Dirección", endereco or "no informada"),
+        _linha_dado("Puntuación en Google", nota),
+        _linha_dado("Cantidad de reseñas en Google", num_avaliacoes),
+        _linha_dado("Instagram del negocio", instagram_url),
+        _linha_dado("Saludo a usar (hora real de ahora)", saudacao_por_horario()),
     ]
     return "\n".join(l for l in linhas if l)
 
@@ -329,17 +339,19 @@ def _bloco_dados_empresa(nome, categoria, endereco, nota, num_avaliacoes=None,
 def _contexto_site(site_status, site_problemas):
     if site_status == "site_ruim":
         return (
-            f"A empresa TEM um site, mas ele está com problemas sérios detectados automaticamente: "
-            f"{site_problemas or 'problemas técnicos'}. A oferta é um site NOVO (reformulação). "
-            "Cite o problema de forma LEIGA e respeitosa (ex.: em vez de 'sem viewport', diga que "
-            "'o site não abre direito no celular'; em vez de 'HTTP 500', 'o site está fora do ar'), "
-            "e use a combinação reputação forte + site problemático como a oportunidade perdida."
+            f"El negocio TIENE una web, pero con problemas serios detectados automáticamente: "
+            f"{site_problemas or 'problemas técnicos'}. Más allá de la web, el punto es otro: con esa "
+            "demanda y sin un sistema, la atención por WhatsApp la hacen a pulmón. Mencioná el problema "
+            "de la web de forma LLANA y respetuosa (ej.: en vez de 'sin viewport', decí que 'la página no "
+            "se abre bien en el celular'; en vez de 'HTTP 500', 'la página está caída') como señal de que "
+            "nadie les está dando una mano con lo digital, y llevá la charla a automatizar la atención por WhatsApp."
         )
     return (
-        "A empresa NÃO possui site. Use a combinação reputação forte + ausência de site como a "
-        "oportunidade perdida: quem pesquisa no Google fora do Maps não a encontra. Se ela tiver "
-        "Instagram, reconheça ('o Instagram de vocês é ativo') e posicione o site como o complemento "
-        "que captura quem pesquisa - nunca como substituto da rede social."
+        "El negocio NO tiene web. Sumado a que tiene buena reputación, es señal de que manejan todo a mano: "
+        "probablemente contestan cada consulta por WhatsApp o Instagram una por una y se les escapan turnos "
+        "fuera de horario. Ese es el ángulo: tienen la demanda (las reseñas lo muestran) pero no un sistema "
+        "que la sostenga. Si tienen Instagram, reconocelo ('el Instagram lo tienen activo') y posicioná el "
+        "asistente como lo que ordena la atención, nunca como reemplazo de la red social."
     )
 
 
@@ -351,24 +363,24 @@ def montar_prompt_contato(nome, categoria, endereco, nota, site_status=None, sit
                           num_avaliacoes=None, cidade=None, instagram_url=None, conteudo_site=None):
     bloco_conteudo = (
         f"""
-Conteúdo REAL do site atual da empresa (capturado agora):
+Contenido REAL de la web actual del negocio (capturado ahora):
 \"\"\"{conteudo_site}\"\"\"
-Use esse conteúdo para citar UM detalhe específico do site (algo desatualizado, vago ou fraco) em tom respeitoso - isso prova que você realmente olhou o site deles, sem humilhar o trabalho existente.
+Usá ese contenido para citar UN detalle específico de la web (algo desactualizado, vago o flojo) en tono respetuoso: eso prueba que de verdad la miraste, sin ningunear el trabajo que ya hay.
 """
         if conteudo_site
         else ""
     )
 
-    return f"""Escreva UMA mensagem de primeiro contato via WhatsApp (3-5 frases) oferecendo a criação de um site profissional para a empresa abaixo.
+    return f"""Escribí UN mensaje de primer contacto por WhatsApp (3 a 5 frases) ofreciendo automatizar la atención por WhatsApp (PresencIA) al negocio de abajo.
 
 {_contexto_site(site_status, site_problemas)}
 {bloco_conteudo}
-Dados da empresa:
+Datos del negocio:
 {_bloco_dados_empresa(nome, categoria, endereco, nota, num_avaliacoes, cidade, instagram_url)}
 
-Orientações desta mensagem:
-- Mencione a nota (e o volume de avaliações, se houver) como fato relevante do argumento, não como elogio vazio.
-- Encaixe a saudação indicada de forma natural, variando a posição na frase (nem sempre no início).
+Indicaciones de este mensaje:
+- Mencioná la puntuación (y la cantidad de reseñas, si hay) como dato relevante del argumento, no como elogio vacío.
+- Encajá el saludo indicado de forma natural, variando la posición en la frase (no siempre al principio).
 - {sortear_fechamento()}
 """
 
@@ -378,32 +390,32 @@ def montar_prompt_followup(nome, categoria, endereco, nota, follow_ups_enviados,
     numero_do_followup = max(follow_ups_enviados, 1)
     if numero_do_followup <= 1:
         orientacao_tom = (
-            "Este é o PRIMEIRO follow-up (sem resposta ao primeiro contato). Tom de reforço gentil "
-            "e leve, como quem lembra educadamente - a mensagem anterior pode ter passado despercebida."
+            "Este es el PRIMER seguimiento (sin respuesta al primer contacto). Tono de recordatorio amable "
+            "y liviano, como quien recuerda con educación: el mensaje anterior puede haber pasado desapercibido."
         )
     else:
         orientacao_tom = (
-            f"Este é o follow-up número {numero_do_followup} (já foram {numero_do_followup} mensagens "
-            "sem resposta). Seja mais direto e conciso, sem soar impaciente. Traga um elemento NOVO "
-            "que não estava nas mensagens anteriores (um prazo, uma prova social genérica sobre ter "
-            "site, ou perguntar objetivamente se ainda faz sentido)."
+            f"Este es el seguimiento número {numero_do_followup} (ya van {numero_do_followup} mensajes "
+            "sin respuesta). Sé más directo y conciso, sin sonar impaciente. Traé un elemento NUEVO "
+            "que no estaba en los mensajes anteriores (un plazo, una prueba social genérica sobre tener "
+            "la atención automatizada, o preguntar de frente si todavía tiene sentido)."
         )
 
     bloco_anterior = (
-        f'\nMensagem já enviada anteriormente (NÃO repita o argumento nem a estrutura dela - varie de verdade):\n"""{mensagem_anterior}"""\n'
+        f'\nMensaje ya enviado antes (NO repitas el argumento ni su estructura; variá de verdad):\n"""{mensagem_anterior}"""\n'
         if mensagem_anterior
         else ""
     )
 
-    return f"""Escreva UMA mensagem de FOLLOW-UP via WhatsApp (2-4 frases, mais curta que um primeiro contato) para retomar contato com a empresa abaixo, que recebeu uma proposta de criação de site e não respondeu.
+    return f"""Escribí UN mensaje de SEGUIMIENTO por WhatsApp (2 a 4 frases, más corto que un primer contacto) para retomar contacto con el negocio de abajo, que recibió una propuesta para automatizar su atención por WhatsApp y no respondió.
 
 {orientacao_tom}
 {bloco_anterior}
-Dados da empresa:
+Datos del negocio:
 {_bloco_dados_empresa(nome, categoria, endereco, nota, num_avaliacoes, cidade)}
 
-Orientações desta mensagem:
-- NÃO comece se desculpando por "incomodar de novo" nem com frases inseguras.
+Indicaciones de este mensaje:
+- NO empieces pidiendo perdón por "molestar de nuevo" ni con frases inseguras.
 - {sortear_fechamento()}
 """
 
@@ -433,12 +445,12 @@ def gerar_mensagem_com_fallback(nome, categoria, endereco, nota, tipo="contato",
     except NenhumProvedorDisponivel as excecao:
         if excecao.erro_final is None:
             raise RuntimeError(
-                "Nenhuma chave de IA configurada. Crie um arquivo .env com GEMINI_API_KEY, "
-                "GROQ_API_KEY e/ou NVIDIA_API_KEY (veja .env.example)."
+                "No hay ninguna clave de IA configurada. Cargá una en Configuraciones, o creá un archivo "
+                ".env con GEMINI_API_KEY, GROQ_API_KEY y/o NVIDIA_API_KEY (mirá .env.example)."
             )
         raise RuntimeError(
-            "Todos os provedores de IA configurados falharam agora. "
-            f"Último erro: {traduzir_erro_ia(excecao.erro_final)}"
+            "Todos los proveedores de IA configurados fallaron ahora. "
+            f"Último error: {traduzir_erro_ia(excecao.erro_final)}"
         )
 
 
@@ -448,23 +460,23 @@ def gerar_mensagem_com_fallback(nome, categoria, endereco, nota, tipo="contato",
 
 def montar_prompt_contato_instagram(username, full_name, biography, nicho, justificativa):
     linhas = [
-        _linha_dado("Username", f"@{username}"),
-        _linha_dado("Nome", full_name or "não informado"),
-        _linha_dado("Bio", biography or "não informada"),
-        _linha_dado("Nicho identificado", nicho or "não identificado"),
-        _linha_dado("Por que esse perfil foi priorizado", justificativa),
-        _linha_dado("Saudação a usar (hora real de agora)", saudacao_por_horario()),
+        _linha_dado("Usuario", f"@{username}"),
+        _linha_dado("Nombre", full_name or "no informado"),
+        _linha_dado("Bio", biography or "no informada"),
+        _linha_dado("Rubro identificado", nicho or "no identificado"),
+        _linha_dado("Por qué se priorizó este perfil", justificativa),
+        _linha_dado("Saludo a usar (hora real de ahora)", saudacao_por_horario()),
     ]
     dados = "\n".join(l for l in linhas if l)
 
-    return f"""Escreva UMA mensagem de primeiro contato via DM do Instagram (2-4 frases) oferecendo a criação de um site profissional para o perfil abaixo.
+    return f"""Escribí UN mensaje de primer contacto por DM de Instagram (2 a 4 frases) ofreciendo automatizar la atención por WhatsApp (PresencIA) al perfil de abajo.
 
-Dados do perfil:
+Datos del perfil:
 {dados}
 
-Orientações desta mensagem:
-- Cite algo específico da bio ou do nicho para mostrar que não é mensagem copiada e colada.
-- Não comece com "Oi, tudo bem? Vi seu perfil..." nem variações clichês.
+Indicaciones de este mensaje:
+- Citá algo específico de la bio o del rubro para mostrar que no es un mensaje copiado y pegado.
+- No empieces con "Hola, ¿cómo estás? Vi tu perfil..." ni variaciones cliché.
 - {sortear_fechamento()}
 """
 
@@ -474,39 +486,39 @@ def montar_prompt_followup_instagram(username, full_name, biography, nicho, foll
     numero_do_followup = max(follow_ups_enviados, 1)
     if numero_do_followup <= 1:
         orientacao_tom = (
-            "Este é o PRIMEIRO follow-up (sem resposta à primeira DM). Tom de reforço leve e casual - "
-            "DMs se perdem fácil no Instagram, assuma isso com naturalidade."
+            "Este es el PRIMER seguimiento (sin respuesta al primer DM). Tono de recordatorio liviano y "
+            "casual: los DM se pierden fácil en Instagram, asumilo con naturalidad."
         )
     else:
         orientacao_tom = (
-            f"Este é o follow-up número {numero_do_followup}. Seja mais direto e breve, sem soar "
-            "insistente. Considere perguntar objetivamente se ainda faz sentido, ou ofereça algo novo."
+            f"Este es el seguimiento número {numero_do_followup}. Sé más directo y breve, sin sonar "
+            "insistente. Considerá preguntar de frente si todavía tiene sentido, u ofrecer algo nuevo."
         )
 
     bloco_anterior = (
-        f'\nDM já enviada anteriormente (NÃO repita o argumento dela - varie de verdade):\n"""{mensagem_anterior}"""\n'
+        f'\nDM ya enviado antes (NO repitas su argumento; variá de verdad):\n"""{mensagem_anterior}"""\n'
         if mensagem_anterior
         else ""
     )
 
     linhas = [
-        _linha_dado("Username", f"@{username}"),
-        _linha_dado("Nome", full_name or "não informado"),
-        _linha_dado("Bio", biography or "não informada"),
-        _linha_dado("Nicho identificado", nicho or "não identificado"),
-        _linha_dado("Saudação a usar (hora real de agora)", saudacao_por_horario()),
+        _linha_dado("Usuario", f"@{username}"),
+        _linha_dado("Nombre", full_name or "no informado"),
+        _linha_dado("Bio", biography or "no informada"),
+        _linha_dado("Rubro identificado", nicho or "no identificado"),
+        _linha_dado("Saludo a usar (hora real de ahora)", saudacao_por_horario()),
     ]
     dados = "\n".join(l for l in linhas if l)
 
-    return f"""Escreva UMA mensagem de FOLLOW-UP via DM do Instagram (1-3 frases, curta e casual) para retomar contato com o perfil abaixo, que recebeu uma DM sobre criação de site e não respondeu.
+    return f"""Escribí UN mensaje de SEGUIMIENTO por DM de Instagram (1 a 3 frases, corto y casual) para retomar contacto con el perfil de abajo, que recibió un DM sobre automatizar la atención por WhatsApp y no respondió.
 
 {orientacao_tom}
 {bloco_anterior}
-Dados do perfil:
+Datos del perfil:
 {dados}
 
-Orientações desta mensagem:
-- NÃO se desculpe por "incomodar de novo".
+Indicaciones de este mensaje:
+- NO pidas perdón por "molestar de nuevo".
 - {sortear_fechamento()}
 """
 
@@ -525,16 +537,16 @@ def gerar_mensagem_instagram_com_fallback(username, full_name, biography, nicho,
 
     try:
         return executar_com_fallback(
-            montar_system_copywriter("DM do Instagram"), user,
+            montar_system_copywriter("DM de Instagram"), user,
             descricao_log="gerar mensagem (Instagram)",
         )
     except NenhumProvedorDisponivel as excecao:
         if excecao.erro_final is None:
             raise RuntimeError(
-                "Nenhuma chave de IA configurada. Configure em /configuracoes ou no arquivo .env."
+                "No hay ninguna clave de IA configurada. Cargala en Configuraciones o en el archivo .env."
             )
         raise RuntimeError(
-            f"Todos os provedores de IA configurados falharam agora. Último erro: {traduzir_erro_ia(excecao.erro_final)}"
+            f"Todos los proveedores de IA configurados fallaron ahora. Último error: {traduzir_erro_ia(excecao.erro_final)}"
         )
 
 
@@ -569,35 +581,35 @@ def perfil_tem_site_proprio(perfil):
     return not any(dominio in url for dominio in DOMINIOS_LINK_NA_BIO)
 
 
-SYSTEM_CLASSIFICADOR = """Você é um analista de qualificação de leads de uma operação que vende criação de sites para pequenos negócios locais no Brasil. Você avalia perfis do Instagram que comentaram numa publicação e responde SEMPRE um único objeto JSON válido, sem markdown e sem texto fora do JSON, com EXATAMENTE estas chaves:
-- "prioridade": "alta", "media", "baixa" ou "descartado" ("descartado" só sem indício nenhum de negócio/profissional real).
-- "nicho": string curta com o nicho/profissão (ex: "advogado", "esteticista"), ou "" se não identificável.
-- "justificativa": 1-2 frases explicando a prioridade.
-- "sugestao_dm": DM curta e casual (2-4 frases, tom de Instagram, PRIMEIRA PESSOA DO SINGULAR - quem envia é uma pessoa só, freelancer: "eu faço", "ofereço", nunca "nós/oferecemos") - só preencha se prioridade for "alta" ou "media"; senão "".
-Bons leads: donos de pequenos negócios locais ou profissionais autônomos, sem site próprio aparente, que se beneficiariam de um site."""
+SYSTEM_CLASSIFICADOR = """Sos un analista de calificación de leads de una operación que vende automatización de la atención por WhatsApp (PresencIA) a negocios chicos locales de Argentina: un asistente que responde solo 24/7, agenda turnos, manda recordatorios y arma la ficha de cada cliente. Evaluás perfiles de Instagram que comentaron en una publicación y respondés SIEMPRE un único objeto JSON válido, sin markdown y sin texto fuera del JSON, con EXACTAMENTE estas claves:
+- "prioridade": "alta", "media", "baixa" o "descartado" ("descartado" sólo si no hay ningún indicio de negocio/profesional real).
+- "nicho": string corto con el rubro/profesión (ej: "abogado", "esteticista"), o "" si no se puede identificar.
+- "justificativa": 1 o 2 frases explicando la prioridad.
+- "sugestao_dm": DM corto y casual (2 a 4 frases, tono de Instagram, PRIMERA PERSONA DEL SINGULAR y voseo: "yo hago", "ofrezco", nunca "nosotros/ofrecemos"). Completala sólo si la prioridad es "alta" o "media"; si no, "".
+Buenos leads: dueños de negocios chicos locales o profesionales independientes con volumen de consultas, que hoy atienden todo a mano por WhatsApp o Instagram y se beneficiarían de automatizar la atención y la agenda. El que ya tiene web propia igual sirve: lo que importa es que atienda manualmente."""
 
 
 def montar_prompt_classificacao_instagram(perfil, nicho_alvo):
     comentarios = perfil.get("comentarios", [])
-    trecho_comentarios = "\n".join(f'- "{c}"' for c in comentarios[:5]) or "(nenhum comentário capturado)"
+    trecho_comentarios = "\n".join(f'- "{c}"' for c in comentarios[:5]) or "(ningún comentario capturado)"
     contexto_nicho = (
-        f'O usuário procura especificamente leads do nicho "{nicho_alvo}". Dê prioridade mais alta a '
-        "perfis desse nicho e rebaixe (ou marque 'baixa') os que claramente não pertençam a ele, mesmo "
-        "que sejam bons leads de outro tipo."
+        f'El usuario busca específicamente leads del rubro "{nicho_alvo}". Dale prioridad más alta a '
+        "los perfiles de ese rubro y bajá (o marcá 'baixa') los que claramente no pertenezcan a él, aunque "
+        "sean buenos leads de otro tipo."
         if nicho_alvo
-        else "O usuário não informou nicho-alvo - avalie de forma geral, priorizando donos de pequenos "
-        "negócios locais sem site próprio."
+        else "El usuario no informó rubro objetivo: evaluá de forma general, priorizando dueños de negocios "
+        "chicos locales que atiendan todo a mano."
     )
 
     return f"""{contexto_nicho}
 
-Dados do perfil a avaliar (responda com o JSON especificado):
-- Username: @{perfil.get("username")}
-- Nome: {perfil.get("full_name") or "não informado"}
-- Bio: {perfil.get("biography") or "não informada"}
+Datos del perfil a evaluar (respondé con el JSON especificado):
+- Usuario: @{perfil.get("username")}
+- Nombre: {perfil.get("full_name") or "no informado"}
+- Bio: {perfil.get("biography") or "no informada"}
 - Seguidores: {perfil.get("seguidores") or 0}
-- Conta comercial: {"sim" if perfil.get("is_business_account") else "não"}
-- Comentários feitos no post analisado:
+- Cuenta comercial: {"sí" if perfil.get("is_business_account") else "no"}
+- Comentarios hechos en el post analizado:
 {trecho_comentarios}
 """
 
@@ -638,7 +650,7 @@ def classificar_lead_instagram_com_fallback(perfil, nicho_alvo):
         return resultado
     except NenhumProvedorDisponivel as excecao:
         raise RuntimeError(
-            f"nenhum provedor de IA conseguiu classificar o perfil (último erro: {excecao.erro_final})"
+            f"ningún proveedor de IA pudo clasificar el perfil (último error: {excecao.erro_final})"
         )
 
 
@@ -646,22 +658,22 @@ def classificar_lead_instagram_com_fallback(perfil, nicho_alvo):
 # Analista de negociação (cockpit de conversa)
 # ---------------------------------------------------------------------------
 
-SYSTEM_ANALISTA_CONVERSA = """Você é um consultor de vendas sênior que acompanha negociações reais por WhatsApp entre um freelancer que cria sites e donos de pequenos negócios locais no Brasil. Você lê a conversa até aqui e orienta o próximo passo.
+SYSTEM_ANALISTA_CONVERSA = """Sos un consultor de ventas senior que acompaña negociaciones reales por WhatsApp entre una persona que vende PresencIA (automatización de la atención por WhatsApp: un asistente que responde solo, agenda turnos y arma la ficha de cada cliente) y dueños de negocios chicos locales de Argentina. Leés la conversación hasta acá y orientás el próximo paso.
 
-Responda SEMPRE um único objeto JSON válido, sem markdown e sem texto fora do JSON, com EXATAMENTE estas chaves:
-- "estagio": um de "primeiro_contato" (ainda não houve resposta do lead), "descoberta" (respondeu, você ainda está entendendo a situação dele), "interesse" (demonstrou curiosidade ou pediu detalhes), "objecao" (levantou uma barreira: preço, tempo, "já tenho", "não preciso"), "negociacao" (discutindo preço, prazo ou escopo concreto), "fechamento" (perto de fechar, alinhando detalhes finais), "esfriou" (parou de responder ou perdeu o interesse).
-- "leitura": 1-3 frases interpretando o que o lead realmente quis dizer e o que isso revela sobre a chance de fechar. Seja específico sobre ESTA conversa, não genérico.
-- "objetivo": uma frase curta dizendo qual é o próximo objetivo tático AGORA (ex.: "Entender qual é a real dor dele com o site atual antes de falar de preço").
-- "resposta_sugerida": a próxima mensagem pronta para enviar, na voz de quem vende (primeira pessoa do singular). Curta, natural, fácil de responder. Sem saudação repetida se a conversa já está em andamento.
-- "evitar": array de 1 a 4 strings curtas com o que NÃO dizer agora (ex.: "Falar de preço antes dele demonstrar interesse"). Cada item é uma frase objetiva.
+Respondé SIEMPRE un único objeto JSON válido, sin markdown y sin texto fuera del JSON, con EXACTAMENTE estas claves:
+- "estagio": uno de "primeiro_contato" (todavía no hubo respuesta del lead), "descoberta" (respondió, todavía estás entendiendo su situación), "interesse" (mostró curiosidad o pidió detalles), "objecao" (levantó una barrera: precio, tiempo, "ya tengo", "no lo necesito"), "negociacao" (discutiendo precio, plazo o alcance concreto), "fechamento" (cerca de cerrar, ajustando detalles finales), "esfriou" (dejó de responder o perdió el interés).
+- "leitura": 1 a 3 frases interpretando lo que el lead realmente quiso decir y qué revela eso sobre la chance de cerrar. Sé específico sobre ESTA conversación, no genérico.
+- "objetivo": una frase corta diciendo cuál es el próximo objetivo táctico AHORA (ej.: "Entender cuál es su dolor real con la atención antes de hablar de precio").
+- "resposta_sugerida": el próximo mensaje listo para enviar, con la voz de quien vende (primera persona del singular, voseo). Corto, natural, fácil de responder. Sin saludo repetido si la conversación ya está en curso.
+- "evitar": array de 1 a 4 strings cortas con lo que NO decir ahora (ej.: "Hablar de precio antes de que muestre interés"). Cada ítem es una frase concreta.
 
-Princípios de negociação que você aplica:
-- Nunca empurre. Quem sente pressão trava. O objetivo de cada mensagem é conseguir a PRÓXIMA resposta, não fechar na hora.
-- Objeção não é "não": é pedido de informação. Acolha antes de rebater, e nunca contrarie o lead de frente.
-- Se o lead disse que já tem algo (Instagram, site antigo, sobrinho que mexe), valide o que ele já fez e posicione sua solução como complemento, nunca como substituição do que ele escolheu.
-- Espelhe o nível de formalidade e o tamanho das mensagens do lead. Se ele escreve curto, você escreve curto.
-- Nunca invente dados, preços, prazos, clientes ou resultados que não estejam no contexto fornecido.
-- Se o lead ficou em silêncio, o próximo passo é um follow-up leve que dê saída fácil, nunca cobrança."""
+Principios de negociación que aplicás:
+- Nunca empujes. El que siente presión se traba. El objetivo de cada mensaje es conseguir la PRÓXIMA respuesta, no cerrar en el momento.
+- Una objeción no es un "no": es un pedido de información. Recibila antes de responderla, y nunca contradigas al lead de frente.
+- Si el lead dijo que ya tiene algo (Instagram, una chica que contesta, un sistema viejo), validá lo que ya hizo y posicioná tu solución como complemento, nunca como reemplazo de lo que eligió.
+- Espejá el nivel de formalidad y el largo de los mensajes del lead. Si escribe corto, vos escribís corto.
+- Nunca inventes datos, precios, plazos, clientes ni resultados que no estén en el contexto que te dan.
+- Si el lead se quedó en silencio, el próximo paso es un seguimiento liviano que dé una salida fácil, nunca un reclamo."""
 
 
 def _bloco_historico_conversa(mensagens):
@@ -669,15 +681,15 @@ def _bloco_historico_conversa(mensagens):
     MAX_MENSAGENS_NO_PROMPT entram (conversa longa estoura o contexto e as
     mensagens antigas pesam pouco na decisão do próximo passo)."""
     if not mensagens:
-        return "(nenhuma mensagem trocada ainda - o primeiro contato ainda não foi enviado)"
+        return "(todavía no se intercambió ningún mensaje - el primer contacto todavía no se envió)"
 
     recentes = mensagens[-MAX_MENSAGENS_NO_PROMPT:]
     omitidas = len(mensagens) - len(recentes)
     linhas = []
     if omitidas > 0:
-        linhas.append(f"[... {omitidas} mensagem(ns) mais antiga(s) omitida(s) ...]")
+        linhas.append(f"[... {omitidas} mensaje(s) más antiguo(s) omitido(s) ...]")
     for mensagem in recentes:
-        quem = "VOCÊ (vendedor)" if mensagem["autor"] == "vendedor" else "LEAD"
+        quem = "VOS (vendedor)" if mensagem["autor"] == "vendedor" else "LEAD"
         quando = (mensagem.get("enviada_em") or "").replace("T", " ")[:16]
         linhas.append(f"[{quando}] {quem}: {mensagem['texto']}")
     return "\n".join(linhas)
@@ -701,24 +713,24 @@ def montar_prompt_analise_conversa(lead, mensagens):
         (m["texto"] for m in reversed(mensagens) if m["autor"] == "lead"), None
     )
     foco = (
-        f'\nA última mensagem do lead foi: "{ultima_do_lead}"\nSua resposta sugerida precisa endereçar '
-        "exatamente isso.\n"
+        f'\nEl último mensaje del lead fue: "{ultima_do_lead}"\nTu respuesta sugerida tiene que responder '
+        "exactamente eso.\n"
         if ultima_do_lead
-        else "\nO lead ainda não respondeu nenhuma mensagem.\n"
+        else "\nEl lead todavía no respondió ningún mensaje.\n"
     )
 
-    return f"""Negócio com quem você está negociando:
+    return f"""Negocio con el que estás negociando:
 {dados_empresa}
 
-Contexto da oferta:
+Contexto de la oferta:
 {contexto_site}
 
-Conversa até agora (ordem cronológica):
+Conversación hasta ahora (orden cronológico):
 {_bloco_historico_conversa(mensagens)}
 {foco}
-Saudação correta para a hora de agora, caso precise saudar: {saudacao_por_horario()}
+Saludo correcto para la hora de ahora, por si necesitás saludar: {saudacao_por_horario()}
 
-Analise a negociação e responda com o JSON especificado."""
+Analizá la negociación y respondé con el JSON especificado."""
 
 
 def _parsear_analise_conversa(resposta_bruta):

@@ -169,7 +169,7 @@ class TestCooldown:
         _, provedor, avisos = ia.executar_com_fallback("system", "user")
         assert provedor == "groq"
         assert chamadas == ["gemini"]  # gemini nem foi tentado de novo
-        assert any("cota gratuita" in aviso for aviso in avisos)
+        assert any("cuota gratuita" in aviso for aviso in avisos)
 
     def test_erro_generico_nao_gera_cooldown(self, monkeypatch):
         def gemini_quebrado(system, user, temperatura=None, formato_json=False):
@@ -202,8 +202,8 @@ class TestSystemPrompt:
     def test_sem_perfil_usa_persona_neutra(self, monkeypatch):
         monkeypatch.setattr(db, "obter_config", lambda chave, default=None: default)
         system = ia.montar_system_copywriter("WhatsApp")
-        assert "primeira pessoa do singular" in system
-        assert "Quem envia as mensagens (escreva na voz dessa pessoa)" not in system
+        assert "primera persona del singular" in system
+        assert "Quién manda los mensajes (escribí con la voz de esta persona)" not in system
 
     def test_perfil_do_vendedor_entra_no_system(self, monkeypatch):
         perfil = {
@@ -220,7 +220,7 @@ class TestSystemPrompt:
 
     def test_canal_muda_o_tom(self, monkeypatch):
         monkeypatch.setattr(db, "obter_config", lambda chave, default=None: default)
-        assert "DM real" in ia.montar_system_copywriter("DM do Instagram")
+        assert "DM real" in ia.montar_system_copywriter("DM de Instagram")
         assert "DM real" not in ia.montar_system_copywriter("WhatsApp")
 
     def test_wrapper_envia_o_system_do_copywriter(self, monkeypatch):
@@ -236,7 +236,7 @@ class TestSystemPrompt:
         )
 
         ia.gerar_mensagem_com_fallback("Empresa X", "clínica", "Rua A", 4.8)
-        assert "copywriter sênior" in capturado["system"]
+        assert "copywriter senior" in capturado["system"]
         assert "Fernando" in capturado["system"]
         assert "Empresa X" in capturado["user"]
 
@@ -247,7 +247,7 @@ class TestSorteioDeFechamento:
         monkeypatch.setattr(ia.random, "choice", lambda opcoes: opcoes[0])
 
         fechamento = ia.sortear_fechamento()
-        assert "pergunta de sim/não" in fechamento
+        assert "pregunta de sí/no" in fechamento
         assert ia.PERGUNTAS_DE_FECHAMENTO[0] in fechamento
 
     def test_horario_concreto_em_dia_util(self, monkeypatch):
@@ -256,9 +256,9 @@ class TestSorteioDeFechamento:
         monkeypatch.setattr(ia.random, "choice", lambda opcoes: opcoes[0])
 
         fechamento = ia.sortear_fechamento()
-        assert "horário concreto" in fechamento
+        assert "horario concreto" in fechamento
         assert any(dia in fechamento for dia in ia.NOMES_DIAS_UTEIS)
-        assert "9h" in fechamento
+        assert "a las 9" in fechamento
 
     def test_fechamento_sorteado_entra_no_prompt(self, monkeypatch):
         monkeypatch.setattr(ia, "sortear_fechamento", lambda: "FECHAMENTO-SORTEADO")
@@ -269,7 +269,7 @@ class TestSorteioDeFechamento:
 class TestPromptContato:
     def test_sem_site_usa_argumento_de_ausencia(self):
         prompt = ia.montar_prompt_contato("Empresa X", "clínica", "Rua A", 4.8)
-        assert "NÃO possui site" in prompt
+        assert "NO tiene web" in prompt
 
     def test_site_ruim_cita_problemas_e_oferece_reformulacao(self):
         prompt = ia.montar_prompt_contato(
@@ -277,9 +277,9 @@ class TestPromptContato:
             site_status="site_ruim",
             site_problemas="não adaptado para celular; sem HTTPS",
         )
-        assert "TEM um site" in prompt
+        assert "TIENE una web" in prompt
         assert "não adaptado para celular; sem HTTPS" in prompt
-        assert "NÃO possui site" not in prompt
+        assert "NO tiene web" not in prompt
 
     def test_conteudo_do_site_entra_no_prompt_quando_fornecido(self):
         prompt = ia.montar_prompt_contato(
@@ -288,11 +288,11 @@ class TestPromptContato:
             conteudo_site="Título da página: Clínica X - promoção de 2023",
         )
         assert "promoção de 2023" in prompt
-        assert "citar UM detalhe específico" in prompt
+        assert "citar UN detalle específico" in prompt
 
     def test_sem_conteudo_nao_tem_bloco(self):
         prompt = ia.montar_prompt_contato("Empresa X", "clínica", "Rua A", 4.8)
-        assert "Conteúdo REAL do site" not in prompt
+        assert "Contenido REAL de la web" not in prompt
 
     def test_avaliacoes_cidade_e_instagram_entram_no_prompt(self):
         prompt = ia.montar_prompt_contato(
@@ -312,13 +312,13 @@ class TestPromptFollowup:
             mensagem_anterior="Olá! Vi que a Empresa X tem nota alta...",
         )
         assert "Vi que a Empresa X tem nota alta" in prompt
-        assert "NÃO repita o argumento" in prompt
+        assert "NO repitas el argumento" in prompt
 
     def test_sem_mensagem_anterior_nao_tem_bloco(self):
         prompt = ia.montar_prompt_followup(
             "Empresa X", "clínica", "Rua A", 4.8, follow_ups_enviados=1,
         )
-        assert "Mensagem já enviada anteriormente" not in prompt
+        assert "Mensaje ya enviado antes" not in prompt
 
     def test_wrapper_passa_mensagem_anterior(self, monkeypatch):
         capturado = {}
@@ -340,7 +340,7 @@ class TestWrappers:
     def test_gerar_mensagem_sem_chave_tem_mensagem_amigavel(self, monkeypatch):
         configurar_provedores(monkeypatch)
 
-        with pytest.raises(RuntimeError, match="Nenhuma chave de IA configurada"):
+        with pytest.raises(RuntimeError, match="No hay ninguna clave de IA configurada"):
             ia.gerar_mensagem_com_fallback("Empresa", "Categoria", "Endereço", 4.5)
 
     def test_gerar_mensagem_todos_falharam_tem_mensagem_amigavel(self, monkeypatch):
@@ -349,7 +349,7 @@ class TestWrappers:
 
         configurar_provedores(monkeypatch, gemini=falha)
 
-        with pytest.raises(RuntimeError, match="Todos os provedores de IA configurados falharam"):
+        with pytest.raises(RuntimeError, match="Todos los proveedores de IA configurados fallaron"):
             ia.gerar_mensagem_com_fallback("Empresa", "Categoria", "Endereço", 4.5)
 
 
@@ -408,7 +408,7 @@ class TestClassificacao:
     def test_sem_provedores_levanta_runtime_error(self, monkeypatch):
         configurar_provedores(monkeypatch)
 
-        with pytest.raises(RuntimeError, match="nenhum provedor de IA conseguiu classificar"):
+        with pytest.raises(RuntimeError, match="ningún proveedor de IA pudo clasificar"):
             ia.classificar_lead_instagram_com_fallback(
                 {"username": "user1", "comentarios": []}, nicho_alvo=None
             )
@@ -416,16 +416,16 @@ class TestClassificacao:
 
 class TestTraduzirErro:
     def test_cota(self):
-        assert ia.traduzir_erro_ia(ErroDeCota("429")) == "cota gratuita excedida por agora"
+        assert ia.traduzir_erro_ia(ErroDeCota("429")) == "cuota gratuita agotada por ahora"
 
     def test_timeout(self):
-        assert ia.traduzir_erro_ia(Exception("request timeout")) == "demorou demais para responder"
+        assert ia.traduzir_erro_ia(Exception("request timeout")) == "tardó demasiado en responder"
 
     def test_indisponivel(self):
-        assert ia.traduzir_erro_ia(Exception("503 service unavailable")) == "serviço indisponível no momento"
+        assert ia.traduzir_erro_ia(Exception("503 service unavailable")) == "servicio no disponible en este momento"
 
     def test_runtime_error_passa_direto(self):
         assert ia.traduzir_erro_ia(RuntimeError("mensagem específica")) == "mensagem específica"
 
     def test_erro_desconhecido_vira_mensagem_generica(self):
-        assert "erro inesperado" in ia.traduzir_erro_ia(Exception("algo estranho"))
+        assert "error inesperado" in ia.traduzir_erro_ia(Exception("algo estranho"))

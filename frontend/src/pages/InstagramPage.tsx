@@ -35,10 +35,10 @@ export function InstagramPage() {
     retomarAnalise.mutate(postId, {
       onSuccess: () => {
         setPostSelecionadoId(postId)
-        toast.success("Análise retomada de onde parou.")
+        toast.success("Análisis retomado desde donde quedó.")
       },
       onError: (erro) => {
-        toast.error(erro instanceof ApiError ? erro.message : "Erro ao retomar análise.")
+        toast.error(erro instanceof ApiError ? erro.message : "Error al retomar el análisis.")
       },
     })
   }
@@ -54,10 +54,10 @@ export function InstagramPage() {
           setUrl("")
           setNichoAlvo("")
           setPostSelecionadoId(resposta.post_id)
-          toast.success("Análise iniciada.")
+          toast.success("Análisis iniciado.")
         },
         onError: (erro) => {
-          toast.error(erro instanceof ApiError ? erro.message : "Erro ao iniciar análise.")
+          toast.error(erro instanceof ApiError ? erro.message : "Error al iniciar el análisis.")
         },
       }
     )
@@ -73,7 +73,7 @@ export function InstagramPage() {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          Voltar para o dashboard
+          Volver al dashboard
         </Link>
 
         <InstagramBanner />
@@ -91,13 +91,13 @@ export function InstagramPage() {
             value={nichoAlvo}
             onChange={(e) => setNichoAlvo(e.target.value)}
             onKeyDown={(e) => e.key === "Enter" && handleAnalisar()}
-            placeholder="Que tipo de cliente você procura? (opcional, ex: advogados)"
+            placeholder="¿Qué tipo de cliente buscás? (opcional, ej: abogados)"
             disabled={pollingAtivo}
             className="sm:flex-[1]"
           />
           <Button onClick={handleAnalisar} disabled={pollingAtivo || !url.trim()}>
             <Send className="size-4" />
-            Analisar
+            Analizar
           </Button>
         </div>
 
@@ -115,7 +115,7 @@ export function InstagramPage() {
           <div className="space-y-3">
             <div className="flex flex-wrap items-center justify-between gap-2">
               <h3 className="text-sm font-medium text-muted-foreground">
-                Perfis encontrados neste post
+                Perfiles encontrados en este post
               </h3>
               <div className="flex flex-wrap gap-2">
                 <SearchInput valor={busca} onChange={setBusca} />

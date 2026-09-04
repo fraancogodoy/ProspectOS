@@ -12,12 +12,12 @@ export function SituacaoSiteSelect({ valor, onChange }: SituacaoSiteSelectProps)
       valor={valor}
       onChange={(v) => onChange(v as FiltrosLeads["site_status"])}
       opcoes={[
-        { valor: "sem_site", label: "Sem site" },
-        { valor: "site_ruim", label: "Site ruim" },
-        { valor: "site_ok", label: "Site ok" },
+        { valor: "sem_site", label: "Sin web" },
+        { valor: "site_ruim", label: "Web mala" },
+        { valor: "site_ok", label: "Web ok" },
       ]}
-      labelVazio="Qualquer situação"
-      placeholder="Situação do site"
+      labelVazio="Cualquier situación"
+      placeholder="Situación de la web"
       className="w-[170px]"
     />
   )

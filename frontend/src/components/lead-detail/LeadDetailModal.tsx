@@ -38,7 +38,7 @@ export function LeadDetailModal({ lead, onClose }: LeadDetailModalProps) {
         <DialogHeader className="border-b border-border px-6 py-4">
           <DialogTitle>{lead.nome}</DialogTitle>
           <p className="text-sm text-muted-foreground">
-            {lead.categoria || "Sem categoria"} · {lead.endereco || "sem endereço"} · nota{" "}
+            {lead.categoria || "Sin rubro"} · {lead.endereco || "sin dirección"} · puntuación{" "}
             {formatarNota(lead.nota)}
           </p>
           <div className="flex flex-wrap items-center gap-1.5 pt-1">
@@ -48,7 +48,7 @@ export function LeadDetailModal({ lead, onClose }: LeadDetailModalProps) {
             />
             <span
               className="inline-flex items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary"
-              title="Score de prioridade"
+              title="Score de prioridad"
             >
               <Flame className="size-3" />
               {lead.score}
@@ -61,7 +61,7 @@ export function LeadDetailModal({ lead, onClose }: LeadDetailModalProps) {
                 className="inline-flex items-center gap-1 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
               >
                 <ExternalLink className="size-3" />
-                Ver site atual
+                Ver web actual
               </a>
             )}
             {lead.instagram_url && (
@@ -72,20 +72,20 @@ export function LeadDetailModal({ lead, onClose }: LeadDetailModalProps) {
                 className="inline-flex items-center gap-1 text-xs text-instagram-mid underline-offset-2 hover:underline"
               >
                 <InstagramIcon className="size-3" />
-                Instagram do negócio
+                Instagram del negocio
               </a>
             )}
             <button
               type="button"
               onClick={() => mutations.reanalisarSite.mutate()}
               disabled={mutations.reanalisarSite.isPending}
-              title="Re-roda a análise do site agora: status, problemas e raio-X atualizados na hora"
+              title="Vuelve a correr el análisis de la web ahora: estado, problemas y radiografía actualizados al instante"
               className="inline-flex items-center gap-1 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline disabled:opacity-60"
             >
               <RefreshCw
                 className={cn("size-3", mutations.reanalisarSite.isPending && "animate-spin")}
               />
-              {mutations.reanalisarSite.isPending ? "Reanalisando..." : "Reanalisar site"}
+              {mutations.reanalisarSite.isPending ? "Reanalizando..." : "Reanalizar web"}
             </button>
 
             <Link
@@ -93,7 +93,7 @@ export function LeadDetailModal({ lead, onClose }: LeadDetailModalProps) {
               className="inline-flex items-center gap-1 text-xs font-medium text-success underline-offset-2 hover:underline"
             >
               <MessagesSquare className="size-3.5" />
-              Cockpit de conversa
+              Cockpit de conversación
             </Link>
           </div>
         </DialogHeader>
@@ -149,13 +149,13 @@ export function LeadDetailModal({ lead, onClose }: LeadDetailModalProps) {
                   asChild
                   title={
                     lead.site_status === "site_ruim"
-                      ? "Gera o PDF com os problemas do site em linguagem simples + nota do Google PageSpeed (pode levar ~30s)"
-                      : "Gera o PDF mostrando o que a ausência de site está custando"
+                      ? "Genera el PDF con los problemas de la web en criollo + nota de Google PageSpeed (puede tardar ~30s)"
+                      : "Genera el PDF mostrando lo que la falta de web está costando"
                   }
                 >
                   <a href={`/api/leads/${encodeURIComponent(lead.place_id)}/diagnostico.pdf`}>
                     <FileDown className="size-4" />
-                    Baixar diagnóstico (PDF)
+                    Descargar diagnóstico (PDF)
                   </a>
                 </Button>
 

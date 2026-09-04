@@ -16,7 +16,7 @@ export function SiteStatusBadge({ siteStatus, siteProblemas }: SiteStatusBadgePr
         title={siteProblemas ?? undefined}
       >
         <Globe className="size-3" />
-        Site ruim
+        Web mala
       </Badge>
     )
   }
@@ -25,17 +25,17 @@ export function SiteStatusBadge({ siteStatus, siteProblemas }: SiteStatusBadgePr
       <Badge
         variant="outline"
         className="bg-success/15 text-success border-success/30"
-        title="Reanálise mostrou que o site atual está tecnicamente ok"
+        title="El reanálisis mostró que la web actual está técnicamente bien"
       >
         <Globe className="size-3" />
-        Site ok
+        Web ok
       </Badge>
     )
   }
   return (
     <Badge variant="outline" className="bg-muted text-muted-foreground">
       <GlobeLock className="size-3" />
-      Sem site
+      Sin web
     </Badge>
   )
 }

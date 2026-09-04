@@ -16,23 +16,23 @@ export function SomConfigCard() {
           ) : (
             <VolumeX className="size-4 text-muted-foreground" />
           )}
-          <h3 className="font-medium">Sons do sistema</h3>
+          <h3 className="font-medium">Sonidos del sistema</h3>
         </div>
         <Switch
           checked={ativado}
           onCheckedChange={setAtivado}
-          aria-label="Ativar sons do sistema"
+          aria-label="Activar sonidos del sistema"
         />
       </div>
 
       <p className="text-sm text-muted-foreground">
-        Sons curtos ao concluir buscas, marcar follow-up, mover leads no
-        Kanban, copiar mensagens e outras ações.
+        Sonidos cortos al terminar búsquedas, marcar seguimiento, mover leads en
+        el Kanban, copiar mensajes y otras acciones.
       </p>
 
       <div className="space-y-1.5">
         <div className="flex items-center justify-between">
-          <Label>Volume</Label>
+          <Label>Volumen</Label>
           <span className="text-xs text-muted-foreground">
             {Math.round(volume * 100)}%
           </span>
@@ -54,7 +54,7 @@ export function SomConfigCard() {
             disabled={!ativado}
             onClick={testarSom}
           >
-            Testar
+            Probar
           </Button>
         </div>
       </div>

@@ -176,7 +176,7 @@ class TestReanalisarSite:
         import processar
         monkeypatch.setattr(
             processar, "avaliar_site_completo",
-            lambda url: ("ruim", ["sem HTTPS"], {"tem": ["fotos do negócio"], "falta": ["botão de WhatsApp"]}),
+            lambda url: ("ruim", ["sem HTTPS"], {"tem": ["fotos del negocio"], "falta": ["botón de WhatsApp"]}),
         )
         inserir_lead("lead-1", site_status="site_ruim")
         conexao = sqlite3.connect(db.CAMINHO_BANCO)
@@ -188,15 +188,15 @@ class TestReanalisarSite:
         dados = resposta.get_json()
         assert resposta.status_code == 200
         assert dados["site_status"] == "site_ruim"
-        assert dados["site_checklist"]["falta"] == ["botão de WhatsApp"]
+        assert dados["site_checklist"]["falta"] == ["botón de WhatsApp"]
 
         lead = cliente.get("/api/leads?status=novo").get_json()["leads"][0]
-        assert lead["site_checklist"]["falta"] == ["botão de WhatsApp"]
+        assert lead["site_checklist"]["falta"] == ["botón de WhatsApp"]
 
     def test_site_que_melhorou_vira_site_ok(self, cliente, monkeypatch):
         import processar
         monkeypatch.setattr(
-            processar, "avaliar_site_completo", lambda url: ("ok", [], {"tem": ["botão de WhatsApp"], "falta": []})
+            processar, "avaliar_site_completo", lambda url: ("ok", [], {"tem": ["botón de WhatsApp"], "falta": []})
         )
         inserir_lead("lead-1", site_status="site_ruim", site_problemas="sem HTTPS")
         conexao = sqlite3.connect(db.CAMINHO_BANCO)

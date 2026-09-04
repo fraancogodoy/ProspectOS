@@ -36,11 +36,11 @@ class TestMontarMensagemConclusao:
             "descartados_sem_telefone": 1,
             "erros_de_linha": 0,
         })
-        assert "2 lead(s) novo(s)" in mensagem
-        assert "Das 20 empresas capturadas" in mensagem
-        assert "15 já têm site bom" in mensagem
-        assert "2 com nota baixa" in mensagem
-        assert "1 sem telefone" in mensagem
+        assert "2 lead(s) nuevo(s)" in mensagem
+        assert "De 20 negocios capturados" in mensagem
+        assert "15 ya tienen web buena" in mensagem
+        assert "2 con puntuación baja" in mensagem
+        assert "1 sin teléfono" in mensagem
 
     def test_ja_conhecidos_aparecem(self):
         # 10 capturadas, 3 novas, 7 já estavam na base (dedup silencioso)
@@ -54,7 +54,7 @@ class TestMontarMensagemConclusao:
             "descartados_sem_telefone": 0,
             "erros_de_linha": 0,
         })
-        assert "7 já estavam na sua base" in mensagem
+        assert "7 ya estaban en tu base" in mensagem
 
     def test_nenhum_lead_novo_ainda_explica(self):
         mensagem = jobs.montar_mensagem_conclusao({
@@ -67,8 +67,8 @@ class TestMontarMensagemConclusao:
             "descartados_sem_telefone": 0,
             "erros_de_linha": 0,
         })
-        assert "nenhum lead novo" in mensagem
-        assert "12 já têm site bom" in mensagem
+        assert "ningún lead nuevo" in mensagem
+        assert "12 ya tienen web buena" in mensagem
 
     def test_sem_descartes_nao_polui_a_mensagem(self):
         # tudo virou lead: não deve inventar detalhamento vazio
@@ -82,13 +82,13 @@ class TestMontarMensagemConclusao:
             "descartados_sem_telefone": 0,
             "erros_de_linha": 0,
         })
-        assert "5 lead(s) novo(s)" in mensagem
-        assert "Das " not in mensagem
+        assert "5 lead(s) nuevo(s)" in mensagem
+        assert "negocios capturados" not in mensagem
 
 
 class TestDicaFontePlaces:
     def test_dica_menciona_configuracoes(self):
-        assert "Configurações" in jobs.DICA_FONTE_PLACES
+        assert "Configuración" in jobs.DICA_FONTE_PLACES
         assert "Places" in jobs.DICA_FONTE_PLACES
 
 
@@ -153,5 +153,5 @@ class TestContadoresDoFunil:
         ])
         contagens = processar.processar(caminho, caminho_queries=None)
         mensagem = jobs.montar_mensagem_conclusao(contagens)
-        assert "1 lead(s) novo(s)" in mensagem
-        assert "1 com nota baixa" in mensagem
+        assert "1 lead(s) nuevo(s)" in mensagem
+        assert "1 con puntuación baja" in mensagem

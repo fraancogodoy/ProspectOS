@@ -60,8 +60,8 @@ def carregar_sessao() -> Client:
     arquivos_sessao = list(PASTA_SESSAO.glob("session-*.json"))
     if not arquivos_sessao:
         raise RuntimeError(
-            "Nenhuma sessão do Instagram encontrada. "
-            "Faça login em Configurações → Conta do Instagram."
+            "No se encontró ninguna sesión de Instagram. "
+            "Iniciá sesión en Configuración → Cuenta de Instagram."
         )
     cliente = Client()
     cliente.load_settings(arquivos_sessao[0])

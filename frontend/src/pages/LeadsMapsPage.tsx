@@ -68,7 +68,7 @@ export function LeadsMapsPage() {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          Voltar para o dashboard
+          Volver al dashboard
         </Link>
 
         <GoogleMapsBanner />

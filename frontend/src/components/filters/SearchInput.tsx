@@ -15,7 +15,7 @@ export const SearchInput = forwardRef<HTMLInputElement, SearchInputProps>(
         <Input
           ref={ref}
           type="search"
-          placeholder="Buscar por nome ou endereço... (atalho: /)"
+          placeholder="Buscar por nombre o dirección... (atajo: /)"
           value={valor}
           onChange={(e) => onChange(e.target.value)}
           className="pl-8"

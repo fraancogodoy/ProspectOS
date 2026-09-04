@@ -24,8 +24,8 @@ export function MetaSemanalCard() {
       <div className="flex items-center justify-between gap-3 rounded-xl border border-dashed border-border bg-muted/20 p-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <Target className="size-4" />
-          Configure uma meta semanal de leads contatados para acompanhar seu
-          progresso aqui.
+          Configurá una meta semanal de leads contactados para seguir tu
+          progreso acá.
         </div>
         <Button
           size="sm"
@@ -46,7 +46,7 @@ export function MetaSemanalCard() {
       <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-4">
         <Target className="size-4 shrink-0 text-muted-foreground" />
         <span className="text-sm text-muted-foreground">
-          Meta semanal de leads contatados:
+          Meta semanal de leads contactados:
         </span>
         <Input
           type="number"
@@ -64,7 +64,7 @@ export function MetaSemanalCard() {
           disabled={salvar.isPending}
           onClick={handleSalvar}
         >
-          {salvar.isPending ? "Salvando..." : "Salvar"}
+          {salvar.isPending ? "Guardando..." : "Guardar"}
         </Button>
         <Button size="sm" variant="ghost" onClick={() => setEditando(false)}>
           Cancelar
@@ -80,7 +80,7 @@ export function MetaSemanalCard() {
       <div className="mb-2 flex items-center justify-between gap-2">
         <div className="flex items-center gap-2 text-sm font-medium">
           <Target className="size-4 text-muted-foreground" />
-          Meta semanal: {meta.progresso}/{meta.meta} contatados
+          Meta semanal: {meta.progresso}/{meta.meta} contactados
           {atingiu && " 🎉"}
         </div>
         <button
@@ -113,8 +113,8 @@ export function MetaSemanalCard() {
 
       <p className="mt-1.5 text-xs text-muted-foreground">
         {atingiu
-          ? "Meta batida essa semana!"
-          : `Faltam ${meta.faltam} para bater a meta desta semana.`}
+          ? "¡Meta alcanzada esta semana!"
+          : `Faltan ${meta.faltam} para llegar a la meta de esta semana.`}
       </p>
     </div>
   )

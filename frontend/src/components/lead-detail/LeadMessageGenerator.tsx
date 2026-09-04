@@ -62,7 +62,7 @@ export function LeadMessageGenerator({
               `${resposta.avisos.join(" ")} (usado: ${resposta.provedor ?? "?"})`
             )
           } else {
-            toast.success("Mensagem gerada com sucesso.")
+            toast.success("Mensaje generado.")
           }
         },
       }
@@ -71,11 +71,11 @@ export function LeadMessageGenerator({
 
   return (
     <div className="flex flex-1 flex-col gap-2">
-      <Label>Mensagem de abordagem (gerada por IA)</Label>
+      <Label>Mensaje de abordaje (generado por IA)</Label>
       <Textarea
         value={mensagem}
         onChange={(e) => setMensagem(e.target.value)}
-        placeholder="Clique em 'Gerar copy de contato' para criar uma sugestão"
+        placeholder="Hacé clic en 'Generar copy de contacto' para crear una sugerencia"
         className="min-h-[220px] flex-1 resize-none"
       />
       <div className="flex flex-wrap gap-2">
@@ -85,7 +85,7 @@ export function LeadMessageGenerator({
           disabled={gerarMensagem.isPending}
         >
           <Sparkles className="size-4" />
-          {gerarMensagem.isPending ? "Gerando..." : "Gerar copy de contato"}
+          {gerarMensagem.isPending ? "Generando..." : "Generar copy de contacto"}
         </Button>
         <Button
           size="sm"
@@ -94,11 +94,11 @@ export function LeadMessageGenerator({
           disabled={gerarMensagem.isPending}
         >
           <MessageCircleReply className="size-4" />
-          Gerar copy de follow-up
+          Generar copy de seguimiento
         </Button>
         <Button size="sm" variant="outline" onClick={() => copiar(ajustarSaudacao(mensagem))}>
           <Copy className="size-4" />
-          {copiado ? "Copiado!" : "Copiar"}
+          {copiado ? "¡Copiado!" : "Copiar"}
         </Button>
         <Button
           size="sm"
@@ -106,7 +106,7 @@ export function LeadMessageGenerator({
           className="border-success/40 text-success hover:bg-success/10"
           onClick={() => copiarNumero(lead.telefone ?? "")}
         >
-          {numeroCopiado ? "Copiado!" : "Copiar número"}
+          {numeroCopiado ? "¡Copiado!" : "Copiar número"}
         </Button>
         {lead.whatsapp_link && (
           <Button
@@ -141,13 +141,13 @@ export function LeadMessageGenerator({
           }
           disabled={marcarFollowupEnviado.isPending}
         >
-          Marquei follow-up
+          Marqué seguimiento
         </Button>
         {lead.follow_ups_enviados > 0 && (
           <p className="text-xs text-muted-foreground">
-            {lead.follow_ups_enviados} follow-up(s) enviado(s)
+            {lead.follow_ups_enviados} seguimiento(s) enviado(s)
             {lead.ultimo_followup_em &&
-              ` · último em ${formatarTempoRelativo(lead.ultimo_followup_em)}`}
+              ` · último ${formatarTempoRelativo(lead.ultimo_followup_em)}`}
           </p>
         )}
       </div>

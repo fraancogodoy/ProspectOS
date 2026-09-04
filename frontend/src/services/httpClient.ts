@@ -17,13 +17,13 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
     })
   } catch {
     throw new ApiError(
-      "Não foi possível falar com o servidor. Confira se o `py app.py` ainda está rodando.",
+      "No se pudo conectar con el servidor. Fijate si el `py app.py` sigue corriendo.",
       0
     )
   }
 
   if (!response.ok) {
-    let mensagem = `Erro do servidor (${response.status}).`
+    let mensagem = `Error del servidor (${response.status}).`
     try {
       const dados = await response.clone().json()
       if (dados?.erro) mensagem = dados.erro

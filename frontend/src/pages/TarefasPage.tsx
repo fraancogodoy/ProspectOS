@@ -21,14 +21,14 @@ function diasDeAtraso(proximoFollowup: string): string {
   hoje.setHours(0, 0, 0, 0)
   const data = new Date(`${proximoFollowup}T00:00:00`)
   const dias = Math.round((hoje.getTime() - data.getTime()) / 86_400_000)
-  if (dias <= 0) return "para hoje"
-  return dias === 1 ? "1 dia atrasado" : `${dias} dias atrasado`
+  if (dias <= 0) return "para hoy"
+  return dias === 1 ? "1 día de atraso" : `${dias} días de atraso`
 }
 
 async function copiarMensagem(mensagem: string) {
   await navigator.clipboard.writeText(ajustarSaudacao(mensagem))
   tocarSom("copiado")
-  toast.success("Mensagem copiada - é só colar na DM.")
+  toast.success("Mensaje copiado - pegalo en el DM.")
 }
 
 function LinhaFollowup({
@@ -50,7 +50,7 @@ function LinhaFollowup({
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{tarefa.titulo}</p>
         <p className="text-xs text-muted-foreground">
-          Follow-up nº {tarefa.follow_ups_enviados + 1} · {diasDeAtraso(tarefa.proximo_followup)}
+          Seguimiento nº {tarefa.follow_ups_enviados + 1} · {diasDeAtraso(tarefa.proximo_followup)}
         </p>
       </div>
       <div className="flex flex-wrap gap-1.5">
@@ -98,7 +98,7 @@ function LinhaFollowup({
           disabled={desabilitado}
         >
           <Check className="size-3.5" />
-          Follow-up enviado
+          Seguimiento enviado
         </Button>
       </div>
     </div>
@@ -118,7 +118,7 @@ function LinhaLeadQuente({
     <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border bg-card p-3 shadow-sm">
       <span
         className="inline-flex shrink-0 items-center gap-0.5 rounded-full bg-primary/10 px-1.5 py-0.5 text-xs font-medium text-primary"
-        title="Score de prioridade"
+        title="Score de prioridad"
       >
         <Flame className="size-3" />
         {lead.score}
@@ -126,7 +126,7 @@ function LinhaLeadQuente({
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{lead.titulo}</p>
         <p className="truncate text-xs text-muted-foreground">
-          {lead.categoria || "Sem categoria"} · nota {formatarNota(lead.nota)} (
+          {lead.categoria || "Sin rubro"} · puntuación {formatarNota(lead.nota)} (
           {lead.num_avaliacoes ?? 0})
         </p>
       </div>
@@ -140,8 +140,8 @@ function LinhaLeadQuente({
               rel="noreferrer"
               title={
                 lead.mensagem
-                  ? "Abre o WhatsApp com a mensagem gerada já preenchida"
-                  : "Abre o WhatsApp (gere a mensagem na tela de leads pra levá-la preenchida)"
+                  ? "Abre WhatsApp con el mensaje generado ya cargado"
+                  : "Abre WhatsApp (generá el mensaje en la pantalla de leads para llevarlo cargado)"
               }
             >
               <MessageCircle className="size-3.5" />
@@ -151,7 +151,7 @@ function LinhaLeadQuente({
         )}
         <Button size="sm" className="h-8 text-xs" onClick={onContatado} disabled={desabilitado}>
           <Check className="size-3.5" />
-          Marcar contatado
+          Marcar contactado
         </Button>
       </div>
     </div>
@@ -187,28 +187,28 @@ export function TarefasPage() {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          Voltar para o dashboard
+          Volver al dashboard
         </Link>
 
         <PageHero
           icone={<ListTodo className="size-6" />}
-          titulo="Tarefas de hoje"
-          descricao="Sua mesa de trabalho: follow-ups vencidos e os leads mais quentes, cada um com a abordagem a 1 clique de distância."
+          titulo="Tareas de hoy"
+          descricao="Tu mesa de trabajo: seguimientos vencidos y los leads más calientes, cada uno con el abordaje a 1 clic de distancia."
           gradiente="from-google-maps-start/85 via-primary/85 to-google-maps-end/85"
         />
 
         <section className="space-y-3">
           <div className="flex items-center gap-2">
             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Follow-ups para hoje
+              Seguimientos para hoy
             </h2>
             {followups.length > 0 && <Badge variant="outline">{followups.length}</Badge>}
           </div>
           {followups.length === 0 ? (
             <EmptyStateCard
               icone={<PartyPopper className="size-5" />}
-              titulo="Nenhum follow-up pendente"
-              descricao="Nada vencido nem para hoje - caixa limpa."
+              titulo="Ningún seguimiento pendiente"
+              descricao="Nada vencido ni para hoy - bandeja limpia."
             />
           ) : (
             followups.map((tarefa) => (
@@ -225,20 +225,20 @@ export function TarefasPage() {
         <section className="space-y-3">
           <div className="flex items-center gap-2">
             <h2 className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-              Leads novos mais quentes
+              Leads nuevos más calientes
             </h2>
             {novosQuentes.length > 0 && <Badge variant="outline">{novosQuentes.length}</Badge>}
           </div>
           {novosQuentes.length === 0 ? (
             <EmptyStateCard
               icone={<MapPin className="size-5" />}
-              titulo="Nenhum lead novo esperando abordagem"
-              descricao="Rode uma busca no Google Maps para encher esta fila com leads priorizados por score."
+              titulo="Ningún lead nuevo esperando abordaje"
+              descricao="Corré una búsqueda en Google Maps para llenar esta cola con leads priorizados por score."
               acao={
                 <Button size="sm" variant="outline" asChild>
                   <Link to="/leads">
                     <MapPin className="size-4" />
-                    Ir para leads do Maps
+                    Ir a leads de Maps
                   </Link>
                 </Button>
               }

@@ -45,7 +45,7 @@ export function useSalvarMetaSemanal() {
     mutationFn: (meta: number) => combinadoService.salvarMetaSemanal(meta),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["meta-semanal"] })
-      toast.success("Meta semanal salva.")
+      toast.success("Meta semanal guardada.")
     },
   })
 }

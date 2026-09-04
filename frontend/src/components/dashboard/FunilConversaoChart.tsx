@@ -46,13 +46,13 @@ export function FunilConversaoChart({
   return (
     <div className="rounded-xl border border-border bg-card p-4">
       <h3 className="mb-4 text-sm font-medium text-muted-foreground">
-        Funil de conversão
+        Embudo de conversión
       </h3>
       {vazio ? (
         <EmptyStateCard
           icone={<Filter className="size-5" />}
-          titulo="Funil ainda vazio"
-          descricao="Quando você tiver leads e for movendo eles pelo funil (contatado, respondeu, fechou), o gráfico aparece aqui."
+          titulo="El embudo todavía está vacío"
+          descricao="Cuando tengas leads y los vayas moviendo por el embudo (contactado, respondió, cerró), el gráfico aparece acá."
           className="h-[240px] border-0 bg-transparent"
         />
       ) : (

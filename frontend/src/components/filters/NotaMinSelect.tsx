@@ -15,8 +15,8 @@ export function NotaMinSelect({ valor, onChange }: NotaMinSelectProps) {
       valor={valor}
       onChange={(v) => onChange(v as FiltrosLeads["nota_min"])}
       opcoes={opcoesSemVazio.map((o) => ({ valor: o.valor, label: o.label }))}
-      labelVazio="Qualquer nota"
-      placeholder="Nota mínima"
+      labelVazio="Cualquier puntuación"
+      placeholder="Puntuación mínima"
       className="w-[160px]"
     />
   )

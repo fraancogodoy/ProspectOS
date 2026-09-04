@@ -23,14 +23,14 @@ import { FaqDoc } from "@/components/documentacao/secoes/FaqDoc"
 import { SobreDoc } from "@/components/documentacao/secoes/SobreDoc"
 
 const TOPICOS = [
-  { id: "visao-geral", label: "Visão geral", icone: Info, Conteudo: VisaoGeralDoc },
+  { id: "visao-geral", label: "Visión general", icone: Info, Conteudo: VisaoGeralDoc },
   { id: "google-maps", label: "Google Maps", icone: MapPin, Conteudo: GoogleMapsDoc },
   { id: "instagram", label: "Instagram", icone: InstagramIcon, Conteudo: InstagramDoc },
-  { id: "dashboard", label: "Dashboard geral", icone: LayoutDashboard, Conteudo: DashboardDoc },
-  { id: "configuracoes", label: "Configurações de API", icone: Settings, Conteudo: ConfiguracoesDoc },
-  { id: "instalacao", label: "Instalação e requisitos", icone: BookOpen, Conteudo: InstalacaoDoc },
-  { id: "faq", label: "Perguntas comuns", icone: HelpCircle, Conteudo: FaqDoc },
-  { id: "sobre", label: "Sobre / Contato", icone: User, Conteudo: SobreDoc },
+  { id: "dashboard", label: "Dashboard general", icone: LayoutDashboard, Conteudo: DashboardDoc },
+  { id: "configuracoes", label: "Configuración de API", icone: Settings, Conteudo: ConfiguracoesDoc },
+  { id: "instalacao", label: "Instalación y requisitos", icone: BookOpen, Conteudo: InstalacaoDoc },
+  { id: "faq", label: "Preguntas comunes", icone: HelpCircle, Conteudo: FaqDoc },
+  { id: "sobre", label: "Acerca de / Contacto", icone: User, Conteudo: SobreDoc },
 ] as const
 
 export function DocumentacaoPage() {
@@ -48,7 +48,7 @@ export function DocumentacaoPage() {
           className="mb-4 inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          Voltar para o dashboard
+          Volver al dashboard
         </Link>
 
         <div className="grid grid-cols-1 gap-6 md:grid-cols-[220px_1fr]">

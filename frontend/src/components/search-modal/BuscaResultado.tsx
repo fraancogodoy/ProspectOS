@@ -6,9 +6,13 @@ interface BuscaResultadoProps {
 }
 
 function ehResultadoSemLeadsNovos(mensagem: string): boolean {
+  const m = mensagem.toLowerCase()
   return (
-    mensagem.includes("nenhum lead novo") ||
-    mensagem.includes("nenhuma empresa foi encontrada")
+    m.includes("ningún lead nuevo") ||
+    m.includes("no se encontró ningún negocio") ||
+    // compat: mensajes viejos en portugués
+    m.includes("nenhum lead novo") ||
+    m.includes("nenhuma empresa foi encontrada")
   )
 }
 
@@ -32,9 +36,9 @@ export function BuscaResultado({ estado }: BuscaResultadoProps) {
         <p className="font-medium">{estado.mensagem}</p>
         {semNovidade && (
           <p className="text-xs text-muted-foreground">
-            Isso costuma acontecer em cidades grandes, onde a maioria dos
-            negócios já tem site. Tente uma cidade menor (100-500 mil
-            habitantes) ou outro nicho.
+            Suele pasar en ciudades grandes, donde la mayoría de los negocios ya
+            tiene web. Probá una ciudad más chica (100-500 mil habitantes) u
+            otro rubro.
           </p>
         )}
       </div>

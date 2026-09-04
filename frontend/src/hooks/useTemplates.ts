@@ -20,7 +20,7 @@ export function useTemplateMutations() {
     mutationFn: templatesService.criar,
     onSuccess: () => {
       invalidar()
-      toast.success("Template salvo.")
+      toast.success("Plantilla guardada.")
     },
   })
 
@@ -33,7 +33,7 @@ export function useTemplateMutations() {
     }) => templatesService.atualizar(input.id, input),
     onSuccess: () => {
       invalidar()
-      toast.success("Template atualizado.")
+      toast.success("Plantilla actualizada.")
     },
   })
 
@@ -41,7 +41,7 @@ export function useTemplateMutations() {
     mutationFn: templatesService.excluir,
     onSuccess: () => {
       invalidar()
-      toast.success("Template excluído.")
+      toast.success("Plantilla eliminada.")
     },
   })
 

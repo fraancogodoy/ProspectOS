@@ -20,7 +20,7 @@ export function usePostInstagramMutations() {
     mutationFn: (postId: number) => instagramService.arquivarPost(postId),
     onSuccess: () => {
       invalidar()
-      toast.success("Post arquivado.")
+      toast.success("Post archivado.")
     },
   })
 
@@ -37,7 +37,7 @@ export function usePostInstagramMutations() {
       instagramService.excluirPostDefinitivamente(postId),
     onSuccess: () => {
       invalidar()
-      toast.success("Post excluído definitivamente.")
+      toast.success("Post eliminado definitivamente.")
     },
   })
 

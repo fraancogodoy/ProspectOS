@@ -19,11 +19,11 @@ interface PostCardProps {
 }
 
 const LABEL_ETAPA: Record<PostInstagram["etapa"], string> = {
-  pendente: "Pendente",
-  raspando: "Extraindo comentários...",
-  enriquecendo: "Enriquecendo perfis...",
-  concluido: "Concluído",
-  erro: "Erro",
+  pendente: "Pendiente",
+  raspando: "Extrayendo comentarios...",
+  enriquecendo: "Enriqueciendo perfiles...",
+  concluido: "Terminado",
+  erro: "Error",
 }
 
 function codigoDoPost(postUrl: string): string {
@@ -55,7 +55,7 @@ export function PostCard({
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") onClick()
       }}
-      aria-label={`Abrir leads do post ${post.post_url}`}
+      aria-label={`Abrir leads del post ${post.post_url}`}
       className={cn(
         "flex cursor-pointer flex-col gap-3 rounded-xl border border-border bg-gradient-to-br from-instagram-start/[0.06] via-card to-instagram-end/[0.06] p-4 text-left shadow-sm transition-colors hover:from-instagram-start/[0.1] hover:to-instagram-end/[0.1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         selecionado && "ring-2 ring-primary"
@@ -106,7 +106,7 @@ export function PostCard({
               }}
             >
               <Play className="size-3.5" />
-              Retomar análise
+              Retomar análisis
             </Button>
           )}
         </div>
@@ -119,16 +119,16 @@ export function PostCard({
           )}
           {(contagem.media ?? 0) > 0 && (
             <Badge variant="outline" className="bg-warning/15 text-warning border-warning/30">
-              {contagem.media} média
+              {contagem.media} media
             </Badge>
           )}
           {(contagem.baixa ?? 0) > 0 && (
             <Badge variant="outline" className="bg-muted text-muted-foreground">
-              {contagem.baixa} baixa
+              {contagem.baixa} baja
             </Badge>
           )}
           {(contagem.pendente ?? 0) > 0 && (
-            <Badge variant="outline">{contagem.pendente} pendente</Badge>
+            <Badge variant="outline">{contagem.pendente} pendiente</Badge>
           )}
           {(contagem.ignorado ?? 0) > 0 && (
             <Badge variant="outline" className="bg-muted text-muted-foreground">
@@ -151,7 +151,7 @@ export function PostCard({
               onClick={onArquivar}
             >
               <Archive className="size-3.5" />
-              Arquivar
+              Archivar
             </Button>
           )}
           {onDesarquivar && (
@@ -167,7 +167,7 @@ export function PostCard({
           )}
           {onExcluirDefinitivamente && (
             <DeleteLeadButton
-              nomeLead={`o post ${codigoDoPost(post.post_url)}`}
+              nomeLead={`el post ${codigoDoPost(post.post_url)}`}
               definitivo
               onConfirmar={onExcluirDefinitivamente}
             />

@@ -14,15 +14,15 @@ function formatarDia(iso: string) {
   const hoje = new Date()
   const ehHoje = data.toDateString() === hoje.toDateString()
   return ehHoje
-    ? "Hoje"
-    : data.toLocaleDateString("pt-BR", { day: "2-digit", month: "long", year: "numeric" })
+    ? "Hoy"
+    : data.toLocaleDateString("es-AR", { day: "2-digit", month: "long", year: "numeric" })
 }
 
 function formatarHora(iso: string) {
   const data = new Date(iso)
   return Number.isNaN(data.getTime())
     ? ""
-    : data.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" })
+    : data.toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })
 }
 
 export function ThreadConversa({ mensagens, onRemover }: ThreadConversaProps) {
@@ -37,8 +37,8 @@ export function ThreadConversa({ mensagens, onRemover }: ThreadConversaProps) {
     return (
       <div className="flex h-full items-center justify-center p-8 text-center">
         <p className="max-w-sm text-sm text-muted-foreground">
-          Nenhuma mensagem ainda. Abra o WhatsApp para conversar (as mensagens
-          aparecem aqui automaticamente) ou registre à mão o que já foi trocado.
+          Todavía no hay mensajes. Abrí WhatsApp para conversar (los mensajes
+          aparecen acá automáticamente) o registrá a mano lo que ya se habló.
         </p>
       </div>
     )
@@ -84,14 +84,14 @@ export function ThreadConversa({ mensagens, onRemover }: ThreadConversaProps) {
                     )}
                   >
                     {formatarHora(mensagem.enviada_em)}
-                    {mensagem.origem === "manual" && " · registrada à mão"}
+                    {mensagem.origem === "manual" && " · registrada a mano"}
                   </span>
                 </div>
 
                 <button
                   type="button"
                   onClick={() => onRemover(mensagem.id)}
-                  aria-label="Remover mensagem do histórico"
+                  aria-label="Quitar mensaje del historial"
                   className="rounded p-1 text-muted-foreground opacity-0 transition-opacity hover:text-destructive group-hover:opacity-100"
                 >
                   <Trash2 className="size-3.5" />

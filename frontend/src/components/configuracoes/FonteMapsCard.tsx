@@ -18,14 +18,14 @@ const OPCOES: Array<{
     valor: "scraper",
     titulo: "Scraper local",
     subtitulo: "gosom/google-maps-scraper",
-    descricao: "Executa no seu computador e não consome chamadas de uma API paga.",
+    descricao: "Corre en tu computadora y no consume llamadas de una API paga.",
     Icone: MonitorCog,
   },
   {
     valor: "places",
     titulo: "Google Places API (New)",
-    subtitulo: "Integração oficial do Google",
-    descricao: "Mais estável, com cotas e cobrança controladas pelo Google Cloud.",
+    subtitulo: "Integración oficial de Google",
+    descricao: "Más estable, con cuotas y cobro controlados por Google Cloud.",
     Icone: Sparkles,
   },
 ]
@@ -54,7 +54,7 @@ export function FonteMapsCard() {
 
   return (
     <div className="flex flex-col gap-5 rounded-xl border border-border bg-card p-5">
-      <h3 className="font-medium">Escolha como os negócios serão encontrados</h3>
+      <h3 className="font-medium">Elegí cómo se encuentran los negocios</h3>
 
       <div className="grid gap-3 sm:grid-cols-2">
         {OPCOES.map(({ valor, titulo, subtitulo, descricao, Icone }) => {
@@ -90,7 +90,7 @@ export function FonteMapsCard() {
           <div className="flex items-center justify-between gap-2">
             <span className="inline-flex items-center gap-2 text-sm font-medium">
               <KeyRound className="size-4 text-muted-foreground" />
-              Chave da Google Places API
+              Clave de la Google Places API
             </span>
             {data.chave_configurada ? (
               <span className="inline-flex items-center gap-1 rounded-full bg-success/15 px-2 py-0.5 text-xs font-medium text-success">
@@ -99,7 +99,7 @@ export function FonteMapsCard() {
               </span>
             ) : (
               <span className="rounded-full bg-muted px-2 py-0.5 text-xs font-medium text-muted-foreground">
-                Não configurada
+                No configurada
               </span>
             )}
           </div>
@@ -111,13 +111,13 @@ export function FonteMapsCard() {
             onChange={(e) => setChave(e.target.value)}
             placeholder={
               data.chave_configurada
-                ? "Digite somente para substituir a chave"
-                : "Cole aqui a chave criada no Google Cloud"
+                ? "Escribí sólo para reemplazar la clave"
+                : "Pegá acá la clave creada en Google Cloud"
             }
           />
           <p className="text-xs text-muted-foreground">
-            A chave fica protegida no cofre de credenciais do Windows e nunca é
-            enviada ao navegador depois de salva.
+            La clave queda protegida en el cofre de credenciales de Windows y
+            nunca se manda al navegador después de guardarla.
           </p>
 
           <a
@@ -126,7 +126,7 @@ export function FonteMapsCard() {
             rel="noreferrer"
             className="inline-flex w-fit items-center gap-1 text-xs font-medium text-success hover:underline"
           >
-            Abrir credenciais no Google Cloud
+            Abrir credenciales en Google Cloud
             <ExternalLink className="size-3" />
           </a>
         </div>
@@ -134,14 +134,14 @@ export function FonteMapsCard() {
 
       <div className="flex items-center justify-between gap-3 border-t border-border pt-4">
         <p className="text-xs text-muted-foreground">
-          A mudança vale apenas para novas buscas.
+          El cambio vale sólo para búsquedas nuevas.
         </p>
         <Button
           size="sm"
           disabled={salvar.isPending || precisaDeChave}
           onClick={handleSalvar}
         >
-          {salvar.isPending ? "Validando..." : "Validar e salvar fonte"}
+          {salvar.isPending ? "Validando..." : "Validar y guardar fuente"}
         </Button>
       </div>
     </div>

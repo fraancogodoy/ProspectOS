@@ -19,28 +19,28 @@ export function MetricsDashboard() {
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
       <StatTile
-        rotulo="Leads ativos"
+        rotulo="Leads activos"
         valor={metricas.total}
         icone={<Users className="size-4" />}
       />
       <StatTile
-        rotulo="Contatados"
+        rotulo="Contactados"
         valor={metricas.por_status.contatado ?? 0}
         icone={<CheckCircle2 className="size-4" />}
       />
       <StatTile
-        rotulo="Responderam"
+        rotulo="Respondieron"
         valor={metricas.por_status.respondeu ?? 0}
         icone={<MessageCircle className="size-4" />}
       />
       <StatTile
-        rotulo="Fechados"
+        rotulo="Cerrados"
         valor={metricas.por_status.fechou ?? 0}
         variante="destaque"
         icone={<Handshake className="size-4" />}
       />
       <StatTile
-        rotulo="Conversão"
+        rotulo="Conversión"
         valor={`${metricas.taxa_conversao}%`}
         variante="destaque"
         icone={<Percent className="size-4" />}

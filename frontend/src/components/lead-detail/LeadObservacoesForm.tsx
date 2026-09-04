@@ -23,12 +23,12 @@ export function LeadObservacoesForm({
 
   return (
     <div className="space-y-1.5">
-      <Label>Observações</Label>
+      <Label>Notas</Label>
       <Textarea
         rows={3}
         value={observacoes}
         onChange={(e) => setObservacoes(e.target.value)}
-        placeholder="Anotações sobre esse contato..."
+        placeholder="Anotaciones sobre este contacto..."
       />
       <Button
         size="sm"
@@ -36,7 +36,7 @@ export function LeadObservacoesForm({
         disabled={salvando}
         onClick={() => onSalvar(observacoes)}
       >
-        {salvando ? "Salvando..." : "Salvar observações"}
+        {salvando ? "Guardando..." : "Guardar notas"}
       </Button>
     </div>
   )

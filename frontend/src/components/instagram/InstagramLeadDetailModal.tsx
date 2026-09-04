@@ -61,7 +61,7 @@ export function InstagramLeadDetailModal({
               `${resposta.avisos.join(" ")} (usado: ${resposta.provedor ?? "?"})`
             )
           } else {
-            toast.success("Mensagem gerada com sucesso.")
+            toast.success("Mensaje generado.")
           }
         },
       }
@@ -82,7 +82,7 @@ export function InstagramLeadDetailModal({
             <PrioridadeBadge prioridade={lead.prioridade} />
           </div>
           <p className="text-sm text-muted-foreground">
-            {lead.full_name || "Sem nome"} · {lead.seguidores ?? 0} seguidores
+            {lead.full_name || "Sin nombre"} · {lead.seguidores ?? 0} seguidores
           </p>
         </DialogHeader>
 
@@ -131,7 +131,7 @@ export function InstagramLeadDetailModal({
             {(lead.biography || lead.comentarios.length > 0 || lead.justificativa) && (
               <details className="text-sm">
                 <summary className="cursor-pointer select-none text-sm font-medium text-muted-foreground hover:text-foreground">
-                  Bio, comentários e detalhes da análise
+                  Bio, comentarios y detalles del análisis
                 </summary>
                 <div className="mt-2 flex flex-col gap-3">
                   {lead.biography && (
@@ -146,7 +146,7 @@ export function InstagramLeadDetailModal({
                   {lead.comentarios.length > 0 && (
                     <div>
                       <p className="mb-1 text-xs font-medium text-muted-foreground">
-                        Comentários
+                        Comentarios
                       </p>
                       <div className="rounded-md bg-muted/40 p-2">
                         {lead.comentarios.map((comentario, i) => (
@@ -161,7 +161,7 @@ export function InstagramLeadDetailModal({
                   {lead.justificativa && (
                     <div>
                       <p className="mb-1 text-xs font-medium text-muted-foreground">
-                        Justificativa da análise
+                        Justificación del análisis
                       </p>
                       <p className="italic">{lead.justificativa}</p>
                     </div>
@@ -173,13 +173,13 @@ export function InstagramLeadDetailModal({
             <div className="flex flex-col gap-3 rounded-lg bg-accent/40 p-3">
               <div>
                 <p className="mb-1 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Sugestão de DM
+                  Sugerencia de DM
                 </p>
                 <Textarea
                   value={sugestaoDm}
                   onChange={(e) => setSugestaoDm(e.target.value)}
                   onBlur={handleSalvarSugestaoDm}
-                  placeholder="Nenhuma sugestão de DM ainda"
+                  placeholder="Todavía no hay una sugerencia de DM"
                   className="min-h-[100px] resize-none border-none bg-transparent p-0 shadow-none focus-visible:ring-0"
                 />
                 <div className="mt-2 flex flex-wrap gap-2">
@@ -190,8 +190,8 @@ export function InstagramLeadDetailModal({
                   >
                     <Sparkles className="size-4" />
                     {mutations.gerarMensagem.isPending
-                      ? "Gerando..."
-                      : "Gerar copy de contato"}
+                      ? "Generando..."
+                      : "Generar copy de contacto"}
                   </Button>
                   <Button
                     size="sm"
@@ -200,7 +200,7 @@ export function InstagramLeadDetailModal({
                     disabled={mutations.gerarMensagem.isPending}
                   >
                     <MessageCircleReply className="size-4" />
-                    Gerar copy de follow-up
+                    Generar copy de seguimiento
                   </Button>
                   <Button
                     size="sm"
@@ -209,7 +209,7 @@ export function InstagramLeadDetailModal({
                     onClick={() => copiar(ajustarSaudacao(sugestaoDm))}
                   >
                     <Copy className="size-4" />
-                    {copiado ? "Copiado!" : "Copiar sugestão de DM"}
+                    {copiado ? "¡Copiado!" : "Copiar sugerencia de DM"}
                   </Button>
                 </div>
               </div>
@@ -218,7 +218,7 @@ export function InstagramLeadDetailModal({
 
               <div>
                 <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Follow-up
+                  Seguimiento
                 </p>
                 <div className="flex flex-wrap items-center gap-2">
                   <Button
@@ -233,13 +233,13 @@ export function InstagramLeadDetailModal({
                     }
                     disabled={mutations.marcarFollowupEnviado.isPending}
                   >
-                    Marquei follow-up
+                    Marqué seguimiento
                   </Button>
                   {lead.follow_ups_enviados > 0 && (
                     <p className="text-xs text-muted-foreground">
-                      {lead.follow_ups_enviados} follow-up(s) enviado(s)
+                      {lead.follow_ups_enviados} seguimiento(s) enviado(s)
                       {lead.ultimo_followup_em &&
-                        ` · último em ${formatarTempoRelativo(lead.ultimo_followup_em)}`}
+                        ` · último ${formatarTempoRelativo(lead.ultimo_followup_em)}`}
                     </p>
                   )}
                 </div>
@@ -249,7 +249,7 @@ export function InstagramLeadDetailModal({
 
               <div>
                 <p className="mb-1.5 text-xs font-medium uppercase tracking-wide text-muted-foreground">
-                  Templates
+                  Plantillas
                 </p>
                 <TemplateSelector
                   textoAtual={sugestaoDm}

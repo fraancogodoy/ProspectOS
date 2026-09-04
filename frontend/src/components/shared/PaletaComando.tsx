@@ -19,12 +19,12 @@ import { cn } from "@/lib/utils"
 import { FILTROS_VAZIOS } from "@/types/lead"
 
 const PAGINAS = [
-  { rotulo: "Sessão de prospecção", rota: "/sessao", icone: <Zap className="size-4" /> },
-  { rotulo: "Tarefas de hoje", rota: "/tarefas", icone: <ListTodo className="size-4" /> },
-  { rotulo: "Leads do Maps", rota: "/leads", icone: <MapPin className="size-4" /> },
-  { rotulo: "Leads do Instagram", rota: "/instagram", icone: <InstagramIcon className="size-4" /> },
+  { rotulo: "Sesión de prospección", rota: "/sessao", icone: <Zap className="size-4" /> },
+  { rotulo: "Tareas de hoy", rota: "/tarefas", icone: <ListTodo className="size-4" /> },
+  { rotulo: "Leads de Maps", rota: "/leads", icone: <MapPin className="size-4" /> },
+  { rotulo: "Leads de Instagram", rota: "/instagram", icone: <InstagramIcon className="size-4" /> },
   { rotulo: "Analytics", rota: "/analytics", icone: <BarChart3 className="size-4" /> },
-  { rotulo: "Configurações", rota: "/configuracoes", icone: <Settings className="size-4" /> },
+  { rotulo: "Configuración", rota: "/configuracoes", icone: <Settings className="size-4" /> },
 ]
 
 interface ItemPaleta {
@@ -88,7 +88,7 @@ export function PaletaComando() {
         detalhe: (
           <span className="flex items-center gap-2">
             <span className="truncate text-xs text-muted-foreground">
-              {lead.categoria || "sem categoria"}
+              {lead.categoria || "sin rubro"}
               {lead.cidade ? ` · ${lead.cidade}` : ""}
             </span>
             <StatusBadge status={lead.status} />
@@ -112,7 +112,7 @@ export function PaletaComando() {
   return (
     <Dialog open={aberta} onOpenChange={setAberta}>
       <DialogContent className="top-[20%] translate-y-0 gap-0 p-0 sm:max-w-lg">
-        <DialogTitle className="sr-only">Busca global</DialogTitle>
+        <DialogTitle className="sr-only">Búsqueda global</DialogTitle>
         <div className="flex items-center gap-2 border-b border-border px-3">
           <Search className="size-4 shrink-0 text-muted-foreground" />
           <input
@@ -131,7 +131,7 @@ export function PaletaComando() {
                 selecionar(itens[indice])
               }
             }}
-            placeholder="Buscar lead pelo nome, ou ir para uma página..."
+            placeholder="Buscar un lead por nombre, o ir a una página..."
             className="h-11 w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
           />
           <kbd className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[10px] text-muted-foreground">

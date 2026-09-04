@@ -16,7 +16,7 @@ export function AnalyticsPage() {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          Voltar para o dashboard
+          Volver al dashboard
         </Link>
 
         <h2 className="text-xl font-semibold tracking-tight">Analytics</h2>

@@ -34,7 +34,7 @@ export function useSairInstagram() {
     mutationFn: instagramService.sairSessao,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["sessao-instagram"] })
-      toast.success("Sessão do Instagram encerrada.")
+      toast.success("Sesión de Instagram cerrada.")
     },
   })
 }

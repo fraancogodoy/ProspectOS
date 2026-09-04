@@ -30,7 +30,7 @@ export function useInstagramLeadMutations(leadId: number, postId: number) {
     onSuccess: (_dados, status) => {
       invalidar()
       if (status === "fechou") tocarSom("lead-fechou")
-      toast.success("Status atualizado.")
+      toast.success("Estado actualizado.")
     },
   })
 
@@ -42,14 +42,14 @@ export function useInstagramLeadMutations(leadId: number, postId: number) {
       ]),
     onSuccess: () => {
       invalidar()
-      toast.success("Tags e follow-up salvos.")
+      toast.success("Etiquetas y seguimiento guardados.")
     },
   })
 
   const salvarObservacoes = useMutation({
     mutationFn: (observacoes: string) =>
       instagramService.atualizarObservacoes(leadId, observacoes),
-    onSuccess: () => toast.success("Observações salvas."),
+    onSuccess: () => toast.success("Notas guardadas."),
   })
 
   const gerarMensagem = useMutation({
@@ -78,15 +78,15 @@ export function useInstagramLeadMutations(leadId: number, postId: number) {
     onSuccess: ({ resposta, estadoAnterior }) => {
       invalidar()
       tocarSom("followup-marcado")
-      toast.success(`Follow-up nº ${resposta.follow_ups_enviados} registrado.`, {
+      toast.success(`Seguimiento nº ${resposta.follow_ups_enviados} registrado.`, {
         action: {
-          label: "Desfazer",
+          label: "Deshacer",
           onClick: () => {
             instagramService
               .desfazerFollowupEnviado(leadId, estadoAnterior)
               .then(() => {
                 invalidar()
-                toast.success("Follow-up desfeito.")
+                toast.success("Seguimiento deshecho.")
               })
           },
         },
@@ -101,7 +101,7 @@ export function useInstagramLeadMutations(leadId: number, postId: number) {
       invalidar()
       toast("Lead ignorado.", {
         action: {
-          label: "Desfazer",
+          label: "Deshacer",
           onClick: () => {
             instagramService.atualizarStatus(leadId, statusAnterior).then(() => {
               invalidar()
@@ -118,7 +118,7 @@ export function useInstagramLeadMutations(leadId: number, postId: number) {
     onSuccess: () => {
       invalidar()
       tocarSom("apagar-lead")
-      toast.success("Lead excluído definitivamente.")
+      toast.success("Lead eliminado definitivamente.")
     },
   })
 

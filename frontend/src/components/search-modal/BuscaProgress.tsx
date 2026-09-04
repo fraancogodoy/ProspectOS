@@ -24,14 +24,14 @@ export function BuscaProgress({ estado }: BuscaProgressProps) {
         <span className="min-w-0 flex-1">{estado.mensagem}</span>
         {estado.total_areas > 0 && estado.area_atual > 0 && (
           <span className="shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-medium tabular-nums text-primary">
-            Área {estado.area_atual}/{estado.total_areas}
+            Zona {estado.area_atual}/{estado.total_areas}
           </span>
         )}
       </div>
 
       {estado.etapa === "scraping" && (
         <p className="text-xs text-muted-foreground">
-          Encontradas {estado.empresas_encontradas} · Processadas{" "}
+          Encontradas {estado.empresas_encontradas} · Procesadas{" "}
           {estado.empresas_processadas}
         </p>
       )}

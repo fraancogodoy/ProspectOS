@@ -16,8 +16,8 @@ export function StatusSelect({ valor, onChange }: StatusSelectProps) {
         valor: status,
         label: LABEL_STATUS[status],
       }))}
-      labelVazio="Todos os status"
-      placeholder="Status"
+      labelVazio="Todos los estados"
+      placeholder="Estado"
       className="w-[160px]"
     />
   )

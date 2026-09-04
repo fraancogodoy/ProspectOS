@@ -23,7 +23,7 @@ export function useBulkMutationsInstagram(postId: number) {
       instagramService.atualizarStatusEmLote(input.leadIds, input.status),
     onSuccess: (resposta) => {
       invalidar()
-      toast.success(`${resposta.atualizados} lead(s) atualizado(s).`)
+      toast.success(`${resposta.atualizados} lead(s) actualizado(s).`)
     },
   })
 
@@ -41,7 +41,7 @@ export function useBulkMutationsInstagram(postId: number) {
     onSuccess: (resposta) => {
       invalidar()
       tocarSom("apagar-lead")
-      toast.success(`${resposta.excluidos} lead(s) excluído(s) definitivamente.`)
+      toast.success(`${resposta.excluidos} lead(s) eliminado(s) definitivamente.`)
     },
   })
 

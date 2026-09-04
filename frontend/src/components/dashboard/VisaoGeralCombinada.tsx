@@ -29,43 +29,43 @@ export function VisaoGeralCombinada() {
 
       <div>
         <h2 className="mb-2 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
-          Visão geral · Google Maps + Instagram
+          Visión general · Google Maps + Instagram
         </h2>
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
           <StatTile
-            rotulo="Leads ativos"
+            rotulo="Leads activos"
             valor={metricas.total}
             icone={<Users className="size-4" />}
           />
           <StatTile
-            rotulo="No Maps"
+            rotulo="En Maps"
             valor={metricas.maps.total}
             icone={<MapPin className="size-4" />}
           />
           <StatTile
-            rotulo="No Instagram"
+            rotulo="En Instagram"
             valor={metricas.instagram.total}
             icone={<InstagramIcon className="size-4" />}
           />
           <StatTile
-            rotulo="Contatados"
+            rotulo="Contactados"
             valor={metricas.por_status.contatado ?? 0}
             icone={<CheckCircle2 className="size-4" />}
           />
           <StatTile
-            rotulo="Fechados"
+            rotulo="Cerrados"
             valor={metricas.por_status.fechou ?? 0}
             variante="destaque"
             icone={<Handshake className="size-4" />}
           />
           <StatTile
-            rotulo="Conversão"
+            rotulo="Conversión"
             valor={`${metricas.taxa_conversao}%`}
             variante="destaque"
             icone={<Percent className="size-4" />}
           />
           <StatTile
-            rotulo="Follow-ups hoje"
+            rotulo="Seguimientos hoy"
             valor={metricas.lembretes_hoje}
             variante={metricas.lembretes_hoje > 0 ? "alerta" : "default"}
             icone={<Clock className="size-4" />}
@@ -77,7 +77,7 @@ export function VisaoGeralCombinada() {
         <div className="rounded-xl border border-warning/40 bg-warning/10 p-4">
           <h3 className="mb-3 flex items-center gap-1.5 text-sm font-medium">
             <Clock className="size-4 text-warning" />
-            Follow-ups de hoje ({followUps.length})
+            Seguimientos de hoy ({followUps.length})
           </h3>
           <div className="space-y-2">
             {followUps.map((lead) => (
@@ -90,9 +90,9 @@ export function VisaoGeralCombinada() {
                   <p className="text-xs text-muted-foreground">
                     {lead.canal === "maps" ? "Google Maps" : "Instagram"} ·{" "}
                     {LABEL_STATUS[lead.status]} ·{" "}
-                    {formatarTempoRelativo(lead.proximo_followup) === "hoje"
-                      ? "vence hoje"
-                      : `venceu ${formatarTempoRelativo(lead.proximo_followup)}`}
+                    {formatarTempoRelativo(lead.proximo_followup) === "hoy"
+                      ? "vence hoy"
+                      : `venció ${formatarTempoRelativo(lead.proximo_followup)}`}
                   </p>
                 </div>
                 <Link

@@ -26,7 +26,7 @@ export function InstagramProgress({ estado }: InstagramProgressProps) {
 
       {estado.etapa === "enriquecendo" && (
         <p className="text-xs text-muted-foreground">
-          Encontrados {estado.perfis_encontrados} · Processados{" "}
+          Encontrados {estado.perfis_encontrados} · Procesados{" "}
           {estado.perfis_processados}
         </p>
       )}

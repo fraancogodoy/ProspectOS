@@ -22,33 +22,33 @@ export function DashboardPage() {
         <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <NavCard
             to="/sessao"
-            titulo="Sessão de prospecção"
-            descricao="Um lead por vez, do mais quente ao mais frio - modo foco"
+            titulo="Sesión de prospección"
+            descricao="Un lead por vez, del más caliente al más frío - modo foco"
             icone={<Zap className="size-5" />}
           />
           <NavCard
             to="/tarefas"
-            titulo="Tarefas de hoje"
-            descricao="Follow-ups vencidos e leads quentes com abordagem em 1 clique"
+            titulo="Tareas de hoy"
+            descricao="Seguimientos vencidos y leads calientes con abordaje en 1 clic"
             icone={<ListTodo className="size-5" />}
           />
           <NavCard
             to="/leads"
-            titulo="Leads do Maps"
-            descricao="Lista, kanban e nova busca de leads do Google Maps"
+            titulo="Leads de Maps"
+            descricao="Lista, kanban y nueva búsqueda de leads de Google Maps"
             icone={<MapPin className="size-5" />}
           />
           <NavCard
             to="/instagram"
-            titulo="Leads do Instagram"
-            descricao="Analisar posts e gerenciar leads do Instagram"
+            titulo="Leads de Instagram"
+            descricao="Analizar posts y gestionar leads de Instagram"
             icone={<InstagramIcon className="size-5" />}
             destaqueInstagram
           />
           <NavCard
             to="/analytics"
-            titulo="Analytics do Maps"
-            descricao="Funil e conversão por nicho, só do Google Maps"
+            titulo="Analytics de Maps"
+            descricao="Embudo y conversión por rubro, sólo de Google Maps"
             icone={<BarChart3 className="size-5" />}
           />
         </div>

@@ -19,7 +19,7 @@ const MAX_AREAS = 5
 const RAIO_PADRAO_M = 5000
 const RAIO_MIN_M = 500
 const RAIO_MAX_M = 50000
-const CENTRO_BRASIL: [number, number] = [-15.78, -47.93]
+const CENTRO_ARGENTINA: [number, number] = [-38.42, -63.6]
 
 // cores fixas (o SVG do Leaflet não resolve var() do CSS)
 const COR_AREA = "#059669"
@@ -34,12 +34,12 @@ function iconePino(numero: number) {
   })
 }
 
-/** Nome amigável do lugar sob o pino ("Londrina - Paraná") via Nominatim/OSM.
- * Best-effort: falha vira null e o rótulo cai nas coordenadas. */
+/** Nombre amigable del lugar bajo el pin ("Tandil - Buenos Aires") vía Nominatim/OSM.
+ * Best-effort: si falla vuelve null y el rótulo cae en las coordenadas. */
 async function geocodificarReverso(lat: number, lng: number): Promise<string | null> {
   try {
     const resposta = await fetch(
-      `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=12&accept-language=pt-BR`
+      `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${lat}&lon=${lng}&zoom=12&accept-language=es`
     )
     if (!resposta.ok) return null
     const dados = await resposta.json()
@@ -61,7 +61,7 @@ interface ResultadoLocal {
 
 async function buscarLocais(consulta: string): Promise<ResultadoLocal[]> {
   const resposta = await fetch(
-    `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(consulta)}&countrycodes=br&limit=5&accept-language=pt-BR`
+    `https://nominatim.openstreetmap.org/search?format=jsonv2&q=${encodeURIComponent(consulta)}&countrycodes=ar&limit=5&accept-language=es`
   )
   if (!resposta.ok) return []
   const dados: { display_name: string; lat: string; lon: string }[] = await resposta.json()
@@ -107,7 +107,7 @@ function AjustarTamanhoDoMapa() {
 }
 
 function formatarRaio(raioM: number): string {
-  return raioM < 1000 ? `${raioM} m` : `${(raioM / 1000).toLocaleString("pt-BR")} km`
+  return raioM < 1000 ? `${raioM} m` : `${(raioM / 1000).toLocaleString("es-AR")} km`
 }
 
 interface MapaSeletorAreasProps {
@@ -130,7 +130,7 @@ export function MapaSeletorAreas({
   const adicionarArea = async (lat: number, lng: number) => {
     if (desabilitado) return
     if (areas.length >= MAX_AREAS) {
-      toast.warning(`Máximo de ${MAX_AREAS} áreas por busca.`)
+      toast.warning(`Máximo de ${MAX_AREAS} zonas por búsqueda.`)
       return
     }
     const id = String(proximoId.current++)
@@ -176,7 +176,7 @@ export function MapaSeletorAreas({
     try {
       const resultados = await buscarLocais(consulta)
       setResultadosLocal(resultados)
-      if (resultados.length === 0) toast.info("Nenhum lugar encontrado com esse nome.")
+      if (resultados.length === 0) toast.info("No se encontró ningún lugar con ese nombre.")
     } finally {
       setBuscandoLocal(false)
     }
@@ -195,7 +195,7 @@ export function MapaSeletorAreas({
       {/* Coluna do mapa - ocupa o máximo de largura disponível */}
       <div className="relative isolate z-0 h-[340px] overflow-hidden rounded-xl border border-border lg:h-[520px]">
         <MapContainer
-          center={CENTRO_BRASIL}
+          center={CENTRO_ARGENTINA}
           zoom={4}
           className="size-full"
           scrollWheelZoom
@@ -236,7 +236,7 @@ export function MapaSeletorAreas({
         {areas.length === 0 && (
           <div className="pointer-events-none absolute inset-x-0 bottom-2 z-[1000] flex justify-center">
             <span className="rounded-full bg-background/90 px-3 py-1 text-xs text-muted-foreground shadow-sm backdrop-blur">
-              Clique no mapa para adicionar um pino de busca
+              Hacé clic en el mapa para agregar un pin de búsqueda
             </span>
           </div>
         )}
@@ -255,7 +255,7 @@ export function MapaSeletorAreas({
                   handleBuscarLocal()
                 }
               }}
-              placeholder="Buscar cidade ou bairro..."
+              placeholder="Buscar ciudad o barrio..."
               disabled={desabilitado}
             />
             <Button
@@ -288,7 +288,7 @@ export function MapaSeletorAreas({
         <div className="min-h-0 flex-1 space-y-2 overflow-y-auto pr-0.5">
           {areas.length === 0 ? (
             <p className="rounded-lg border border-dashed border-border bg-muted/20 px-3 py-4 text-center text-xs text-muted-foreground">
-              Nenhuma área ainda - clique no mapa para soltar o primeiro pino.
+              Todavía no hay zonas - hacé clic en el mapa para soltar el primer pin.
             </p>
           ) : (
             areas.map((area, indice) => (
@@ -305,7 +305,7 @@ export function MapaSeletorAreas({
                     onChange={(e) => atualizarArea(area.id, { rotulo: e.target.value })}
                     disabled={desabilitado}
                     className="h-7 min-w-0 flex-1 text-sm"
-                    aria-label={`Rótulo da área ${indice + 1}`}
+                    aria-label={`Rótulo de la zona ${indice + 1}`}
                   />
                   <Button
                     type="button"
@@ -314,7 +314,7 @@ export function MapaSeletorAreas({
                     className="size-7 shrink-0 p-0 text-muted-foreground hover:text-destructive"
                     onClick={() => removerArea(area.id)}
                     disabled={desabilitado}
-                    aria-label={`Remover área ${indice + 1}`}
+                    aria-label={`Quitar zona ${indice + 1}`}
                   >
                     <X className="size-3.5" />
                   </Button>
@@ -329,7 +329,7 @@ export function MapaSeletorAreas({
                     onChange={(e) => atualizarArea(area.id, { raio_m: Number(e.target.value) })}
                     disabled={desabilitado}
                     className="min-w-0 flex-1 accent-emerald-600"
-                    aria-label={`Raio da área ${indice + 1}`}
+                    aria-label={`Radio de la zona ${indice + 1}`}
                   />
                   <span className="w-16 shrink-0 text-right text-xs font-medium tabular-nums text-muted-foreground">
                     {formatarRaio(area.raio_m)}

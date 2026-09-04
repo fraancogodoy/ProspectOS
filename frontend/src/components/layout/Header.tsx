@@ -53,7 +53,7 @@ export function Header({ onNovaBusca, onVerIgnorados }: HeaderProps) {
 
         <nav className="flex items-center gap-1">
           <ItemNav to="/tarefas" icone={<ListTodo className="size-4" />}>
-            Tarefas
+            Tareas
           </ItemNav>
           <ItemNav to="/leads" icone={<MapPin className="size-4" />}>
             Google Maps
@@ -62,7 +62,7 @@ export function Header({ onNovaBusca, onVerIgnorados }: HeaderProps) {
             Instagram
           </ItemNav>
           <ItemNav to="/documentacao" icone={<BookOpen className="size-4" />}>
-            Documentação
+            Documentación
           </ItemNav>
           {onVerIgnorados && (
             <Button variant="ghost" size="sm" onClick={onVerIgnorados}>
@@ -73,13 +73,13 @@ export function Header({ onNovaBusca, onVerIgnorados }: HeaderProps) {
           {onNovaBusca && (
             <Button size="sm" onClick={onNovaBusca}>
               <Plus className="size-4" />
-              <span className="hidden sm:inline">Nova busca</span>
+              <span className="hidden sm:inline">Nueva búsqueda</span>
             </Button>
           )}
           <ItemNav
             to="/configuracoes"
             icone={<Settings className="size-4" />}
-            ariaLabel="Configurações"
+            ariaLabel="Configuración"
           />
           <ThemeToggle />
         </nav>

@@ -53,7 +53,7 @@ export function ConversaPage() {
 
   const abrirWhatsapp = () => {
     if (!lead?.whatsapp_link) {
-      toast.error("Este lead não tem WhatsApp cadastrado.")
+      toast.error("Este lead no tiene WhatsApp cargado.")
       return
     }
     conversaService.registrarLeadAtivo(CANAL, placeId).catch(() => {})
@@ -87,10 +87,10 @@ export function ConversaPage() {
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="size-4" />
-              Voltar para os leads
+              Volver a los leads
             </Link>
             <h1 className="truncate text-xl font-semibold tracking-tight">
-              {lead?.nome ?? "Conversa"}
+              {lead?.nome ?? "Conversación"}
             </h1>
             {lead?.telefone && (
               <p className="text-sm text-muted-foreground">
@@ -135,7 +135,7 @@ export function ConversaPage() {
                         : "text-muted-foreground hover:bg-muted"
                     )}
                   >
-                    {autor === "lead" ? "Resposta do lead" : "Minha mensagem"}
+                    {autor === "lead" ? "Respuesta del lead" : "Mi mensaje"}
                   </button>
                 ))}
               </div>
@@ -144,7 +144,7 @@ export function ConversaPage() {
                 ref={composerRef}
                 value={rascunho}
                 onChange={(e) => setRascunho(e.target.value)}
-                placeholder="Escreva ou cole a mensagem aqui..."
+                placeholder="Escribí o pegá el mensaje acá..."
                 className="min-h-[76px] resize-none"
               />
 
@@ -156,11 +156,11 @@ export function ConversaPage() {
                   className="bg-success text-white hover:bg-success/90"
                 >
                   <MessageCircle className="size-4" />
-                  Abrir no WhatsApp
+                  Abrir en WhatsApp
                 </Button>
                 <Button size="sm" variant="outline" onClick={() => copiar(rascunho)} disabled={!rascunho.trim()}>
                   <Copy className="size-4" />
-                  {copiado ? "Copiado!" : "Copiar"}
+                  {copiado ? "¡Copiado!" : "Copiar"}
                 </Button>
                 <Button
                   size="sm"
@@ -169,12 +169,12 @@ export function ConversaPage() {
                   disabled={!rascunho.trim() || adicionarMensagem.isPending}
                 >
                   <Send className="size-4" />
-                  Registrar no histórico
+                  Registrar en el historial
                 </Button>
               </div>
               <p className="mt-2 text-[11px] text-muted-foreground">
-                O ProspectOS nunca envia mensagem sozinho: você revisa e envia pelo
-                WhatsApp.
+                ProspectOS nunca manda un mensaje solo: vos lo revisás y lo enviás
+                por WhatsApp.
               </p>
             </div>
           </section>

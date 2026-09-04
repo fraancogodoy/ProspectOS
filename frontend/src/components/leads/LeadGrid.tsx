@@ -87,7 +87,7 @@ export function LeadGrid({
     <div>
       <div className="mb-3 flex items-center justify-between gap-2">
         <p className="text-sm text-muted-foreground">
-          {leads.length} lead(s) carregado(s)
+          {leads.length} lead(s) cargado(s)
         </p>
         <div className="flex items-center gap-1 rounded-lg border border-border p-0.5">
           <Button
@@ -119,19 +119,19 @@ export function LeadGrid({
                 className="text-destructive hover:bg-destructive/10"
               >
                 <Trash2 className="size-4" />
-                Esvaziar ignorados
+                Vaciar ignorados
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>
-                  Excluir todos os {leads.length} lead(s) ignorado(s)?
+                  ¿Eliminar los {leads.length} lead(s) ignorado(s)?
                 </AlertDialogTitle>
                 <AlertDialogDescription>
-                  Isso apaga de vez todos os leads ignorados carregados nesta
-                  lista. Não tem como desfazer, e se a mesma busca rodar de
-                  novo no futuro, eles podem voltar a aparecer como leads
-                  novos.
+                  Esto borra para siempre todos los leads ignorados cargados en
+                  esta lista. No se puede deshacer, y si la misma búsqueda se
+                  corre de nuevo en el futuro, pueden volver a aparecer como
+                  leads nuevos.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <AlertDialogFooter>
@@ -143,7 +143,7 @@ export function LeadGrid({
                     )
                   }
                 >
-                  Excluir todos
+                  Eliminar todos
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -158,8 +158,8 @@ export function LeadGrid({
           </div>
           {leadsForaDoFunil > 0 && (
             <p className="mt-2 text-xs text-muted-foreground">
-              {leadsForaDoFunil} lead(s) recusado(s)/ignorado(s) não aparecem
-              no Kanban — use a visualização em Lista para vê-los.
+              {leadsForaDoFunil} lead(s) rechazado(s)/ignorado(s) no aparecen
+              en el Kanban — usá la vista de Lista para verlos.
             </p>
           )}
         </>

@@ -13,7 +13,7 @@ export function useBulkMutations() {
       leadsService.atualizarStatusEmLote(input.placeIds, input.status),
     onSuccess: (resposta) => {
       invalidarListaEMetricas()
-      toast.success(`${resposta.atualizados} lead(s) atualizado(s).`)
+      toast.success(`${resposta.atualizados} lead(s) actualizado(s).`)
     },
   })
 
@@ -31,7 +31,7 @@ export function useBulkMutations() {
     onSuccess: (resposta) => {
       invalidarListaEMetricas()
       tocarSom("apagar-lead")
-      toast.success(`${resposta.excluidos} lead(s) excluído(s) definitivamente.`)
+      toast.success(`${resposta.excluidos} lead(s) eliminado(s) definitivamente.`)
     },
   })
 

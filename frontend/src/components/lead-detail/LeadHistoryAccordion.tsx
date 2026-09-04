@@ -17,7 +17,7 @@ export function LeadHistoryAccordion({ placeId }: LeadHistoryAccordionProps) {
     <Accordion type="single" collapsible>
       <AccordionItem value="historico">
         <AccordionTrigger className="text-sm">
-          Histórico de status
+          Historial de estados
         </AccordionTrigger>
         <AccordionContent>
           <HistoricoConteudo placeId={placeId} />
@@ -31,13 +31,13 @@ function HistoricoConteudo({ placeId }: { placeId: string }) {
   const { data: historico, isLoading } = useLeadHistorico(placeId, true)
 
   if (isLoading) {
-    return <p className="text-sm text-muted-foreground">Carregando...</p>
+    return <p className="text-sm text-muted-foreground">Cargando...</p>
   }
 
   if (!historico || historico.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">
-        Nenhuma mudança de status registrada ainda.
+        Todavía no se registró ningún cambio de estado.
       </p>
     )
   }

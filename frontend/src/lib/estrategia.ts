@@ -5,9 +5,14 @@ export interface ObjecaoResposta {
   resposta: string
 }
 
-/** Playbook de abordagem montado a partir dos dados do lead - determinístico e
- * instantâneo (sem custo de IA). A IA gera a COPY; isto aqui é o plano de venda
- * que orienta você antes de apertar o botão. */
+/** Playbook de abordaje armado a partir de los datos del lead - determinístico e
+ * instantáneo (sin costo de IA). La IA genera la COPY; esto es el plan de venta
+ * que te orienta antes de apretar el botón.
+ *
+ * Adaptación PresencIA: ProspectOS detecta la situación de la web de cada
+ * negocio; acá se usa esa señal para inferir que el negocio maneja la atención
+ * a mano y el ángulo apunta a automatizar el WhatsApp (responder solo, agendar
+ * turnos, recordatorios, ficha del cliente), no a hacerle una página. */
 export interface EstrategiaLead {
   cenario: string
   angulo: string
@@ -16,39 +21,39 @@ export interface EstrategiaLead {
   proximoPasso: string
 }
 
-const OBJECOES_SEM_SITE: ObjecaoResposta[] = [
+const OBJECOES_MANUAL: ObjecaoResposta[] = [
   {
-    objecao: '"Já tenho Instagram/WhatsApp, não preciso de site"',
+    objecao: '"Ya contesto todo por WhatsApp, no necesito nada"',
     resposta:
-      "Instagram alcança quem já te segue; o site captura quem pesquisa no Google sem te conhecer. Um completa o outro - e o site dá o endereço profissional que passa confiança na hora de fechar.",
+      "Justamente por eso: hoy dependés de estar vos con el celular en la mano. El asistente contesta lo de siempre y agenda los turnos solo, también de noche y cuando estás atendiendo. Vos seguís con los casos que sí necesitan una persona.",
   },
   {
-    objecao: '"Site é caro / não é prioridade agora"',
+    objecao: '"Es un gasto / no es prioridad ahora"',
     resposta:
-      "Compare com o custo de UM cliente que pesquisou, não te achou e fechou com o concorrente. O site se paga com o primeiro cliente que ele trouxer - e dá pra começar simples e evoluir.",
+      "Compará con lo que vale UN turno que se pierde porque nadie contestó a tiempo, o un cliente que se fue con otro. Es un abono mensual, sin permanencia, y se paga con los turnos que deja de perder.",
   },
   {
-    objecao: '"Não tenho tempo pra cuidar disso"',
+    objecao: '"No tengo tiempo para configurar eso"',
     resposta:
-      "Você não vai cuidar de nada - eu cuido de tudo: textos, fotos, publicação e manutenção. Só preciso de uma conversa de 20 minutos pra entender o negócio.",
+      "No configurás nada vos - lo dejo andando yo sobre tu propio número de WhatsApp. Sólo necesito una charla de 20 minutos para entender cómo trabajás.",
   },
 ]
 
-const OBJECOES_SITE_RUIM: ObjecaoResposta[] = [
+const OBJECOES_TIENE_ALGO: ObjecaoResposta[] = [
   {
-    objecao: '"Já tenho site"',
+    objecao: '"Ya tengo una chica que contesta"',
     resposta:
-      "A questão não é ter site, é o site trabalhar a favor. Hoje ele está afastando cliente em vez de trazer - e quem pesquisa no celular desiste em segundos quando a página não carrega direito.",
+      "Perfecto, y ella sigue: el asistente le saca de encima las mismas 5 preguntas de siempre y le arma la agenda ordenada. Ella queda para lo que de verdad necesita una persona.",
   },
   {
-    objecao: '"Foi um conhecido que fez"',
+    objecao: '"Tengo un sistema de turnos"',
     resposta:
-      "Sem desmerecer o trabalho - tecnologia de site envelhece rápido. O que era bom há 5 anos hoje é penalizado pelo Google. Dá pra aproveitar o conteúdo e modernizar a base.",
+      "Bien, ¿y el cliente lo usa o igual te escribe por WhatsApp? PresencIA trabaja donde el cliente ya está: le contesta y le reserva el turno en la misma conversación, sin mandarlo a otra app.",
   },
   {
-    objecao: '"Vou ver com quem fez o site"',
+    objecao: '"Lo voy a pensar / lo hablo con mi socio"',
     resposta:
-      "Perfeito - e se quiser uma segunda opinião sem compromisso, posso mandar um diagnóstico gratuito do que está pegando. Aí você compara as propostas.",
+      "Dale. Si querés, te hago una prueba con tu propio número para que veas cómo responde, sin compromiso. Con eso lo charlan con algo concreto en la mano.",
   },
 ]
 
@@ -56,12 +61,12 @@ function ganchoDeReputacao(lead: Lead): string | null {
   const nota = lead.nota ?? 0
   const avaliacoes = lead.num_avaliacoes ?? 0
   if (nota >= 4.8 && avaliacoes >= 50) {
-    return `Nota ${nota} com ${avaliacoes} avaliações: reputação de sobra e negócio claramente estabelecido - é o cliente ideal, que colhe resultado rápido de um site.`
+    return `${nota} de puntuación con ${avaliacoes} reseñas: reputación de sobra y negocio bien establecido - es el cliente ideal, con volumen de consultas que hoy atiende a pulmón.`
   }
   if (nota >= 4.5 && avaliacoes >= 10) {
-    return `Nota ${nota} com ${avaliacoes} avaliações: a reputação já existe, só não está sendo aproveitada fora do Maps.`
+    return `${nota} de puntuación con ${avaliacoes} reseñas: ya tienen demanda y clientes fieles - el cuello de botella es la atención, no la falta de gente.`
   }
-  return `Nota ${nota} no Google - use como elogio de abertura, nunca como crítica.`
+  return `${nota} de puntuación en Google - usalo como elogio de apertura, nunca como crítica.`
 }
 
 export function montarEstrategia(lead: Lead): EstrategiaLead {
@@ -78,124 +83,125 @@ export function montarEstrategia(lead: Lead): EstrategiaLead {
 
   if (lead.site_status === "site_ok") {
     return {
-      cenario: "Site ok",
+      cenario: "Web ok",
       angulo:
-        "A reanálise mostrou que o site atual está tecnicamente ok - não há problema óbvio pra vender em cima. Se ainda quiser abordar, o ângulo muda: melhoria de resultado (mais contatos, melhor posição no Google), não conserto. Caso contrário, considere ignorar o lead e focar nos mais quentes.",
-      ganchos: [reputacao ?? "Use a reputação como abertura, se abordar."].filter(Boolean) as string[],
-      objecoes: [],
+        "La web actual está técnicamente bien, así que no hay un problema obvio de lo digital para usar de excusa. Si igual querés abordar, el ángulo es la atención: por más web que tengan, las consultas y los turnos siguen entrando por WhatsApp y los contestan a mano. Si no, considerá ignorar el lead y enfocarte en los más calientes.",
+      ganchos: [reputacao ?? "Usá la reputación como apertura, si abordás."].filter(Boolean) as string[],
+      objecoes: OBJECOES_MANUAL,
       proximoPasso:
-        "Prioridade baixa: este lead compete com leads sem site ou com site ruim na sua fila. Aborde só se a região/nicho for estratégico.",
+        "Prioridad baja: este lead compite con los que ni web tienen en tu cola. Abordá sólo si la zona o el rubro es estratégico.",
     }
   }
 
   if (!siteRuim) {
-    cenario = "Sem site"
+    cenario = "Sin web"
     angulo =
-      "Negócio bem avaliado mas invisível pra quem pesquisa no Google fora do Maps. O argumento: cada pesquisa sem resultado é um cliente indo pro concorrente que aparece. Venda o PRIMEIRO site como a peça que falta pra reputação virar clientes novos."
-    objecoes = OBJECOES_SEM_SITE
+      "Negocio bien valorado pero sin nada de sistema: si no tienen ni una web, casi seguro toda la atención pasa por el WhatsApp personal y la agenda es un cuaderno. El argumento: tienen la demanda (las reseñas lo muestran), lo que falta es algo que la sostenga sin depender de que vos estés con el celular."
+    objecoes = OBJECOES_MANUAL
     if (lead.instagram_url) {
       ganchos.push(
-        "Já tem Instagram ativo - sinal de que investe em presença digital. O site é o passo natural: dá resultado no Google e credibilidade que rede social sozinha não dá."
+        "Tienen Instagram activo - invierten en estar presentes. El paso natural es ordenar la atención que llega por ahí: que el bot conteste y agende, en vez de responder DM por DM."
       )
     } else {
       ganchos.push(
-        "Presença digital praticamente zero - quem chega, chega por indicação. Um site abre o canal de clientes que pesquisam por conta própria."
+        "Presencia digital casi nula - el que llega, llega por recomendación y escribe al WhatsApp. Un asistente que contesta y agenda solo ordena ese caos sin que ellos hagan nada."
       )
     }
-  } else if (problemas.includes("fora do ar")) {
-    cenario = "Site fora do ar"
+  } else if (problemas.includes("fora do ar") || problemas.includes("caíd") || problemas.includes("caid")) {
+    cenario = "Web caída"
     angulo =
-      "O site deles NÃO ABRE - quem clica hoje encontra erro. Abra a conversa como um AVISO de cortesia (gera gratidão, não parece venda) e ofereça reconstruir rápido. É o cenário de maior urgência e melhor taxa de resposta."
-    objecoes = OBJECOES_SITE_RUIM
+      "La web NO ABRE - señal de que nadie les está dando una mano con lo digital hace rato. Abrí la charla como un AVISO de cortesía (genera agradecimiento, no parece venta), y de ahí llevá la conversación a lo que de verdad les mueve la aguja: automatizar la atención por WhatsApp."
+    objecoes = OBJECOES_TIENE_ALGO
     ganchos.push(
-      "Diga que tentou acessar o site e ele está fora do ar - você está avisando, não vendendo. A oferta vem depois da reação."
+      "Decí que quisiste entrar a la web y está caída - estás avisando, no vendiendo. La oferta viene después de la reacción."
     )
-  } else if (problemas.includes("ssl") || problemas.includes("https") || problemas.includes("misto")) {
-    cenario = "Site inseguro"
+  } else if (problemas.includes("ssl") || problemas.includes("https") || problemas.includes("segur")) {
+    cenario = "Web insegura"
     angulo =
-      'O navegador marca o site deles como "não seguro" - isso espanta cliente na hora e derruba a posição no Google. Argumento: a reputação que construíram está sendo minada por um cadeado vermelho.'
-    objecoes = OBJECOES_SITE_RUIM
+      'El navegador marca la web como "no segura" - otra señal de que lo digital quedó abandonado. Más que la web, el punto es que con esa reputación siguen atendiendo cada consulta a mano y perdiendo turnos fuera de horario.'
+    objecoes = OBJECOES_TIENE_ALGO
     ganchos.push(
-      'Mande um print do aviso de "não seguro" do navegador - é visual, indiscutível e ninguém quer isso associado à marca.'
+      'Mencioná el cartel de "no seguro" al pasar, como señal de que nadie les está mirando lo digital, y llevá la charla al WhatsApp.'
     )
-  } else if (problemas.includes("celular")) {
-    cenario = "Site não-mobile"
+  } else if (problemas.includes("celular") || problemas.includes("mobile") || problemas.includes("móvil")) {
+    cenario = "Web no adaptada al celular"
     angulo =
-      "O site deles quebra no celular - e a imensa maioria das pesquisas locais é feita no celular. Argumento: o site atual atende bem justamente o público que quase não existe (desktop) e falha onde o cliente está."
-    objecoes = OBJECOES_SITE_RUIM
+      "La web se rompe en el celular - y casi toda la búsqueda local es desde el celular. Señal de que lo digital quedó viejo. El ángulo real: el cliente termina escribiéndoles al WhatsApp igual, y ahí contestan todo a mano."
+    objecoes = OBJECOES_TIENE_ALGO
     ganchos.push(
-      "Sugira que abram o próprio site no celular agora - a experiência ruim se vende sozinha como argumento."
+      "Sugerí que abran su propia web en el celular ahora - la mala experiencia se vende sola como señal de que hace falta ordenar lo digital."
     )
-  } else if (problemas.includes("lento")) {
-    cenario = "Site lento"
+  } else if (problemas.includes("lento") || problemas.includes("lenta")) {
+    cenario = "Web lenta"
     angulo =
-      "O site funciona, mas demora tanto pra carregar que boa parte dos visitantes desiste antes de ver qualquer coisa. Argumento: não é trocar por vaidade - é parar de perder quem já clicou. Um site rápido converte a mesma visita que hoje vai embora."
-    objecoes = OBJECOES_SITE_RUIM
+      "La web anda, pero tarda tanto en cargar que la mayoría se va antes de ver nada - y termina escribiendo al WhatsApp. El argumento: la web no les está resolviendo la atención, la resuelven ellos a mano, mensaje por mensaje."
+    objecoes = OBJECOES_TIENE_ALGO
     ganchos.push(
-      "Sugira que abram o próprio site no 4G, sem Wi-Fi - a espera se vende sozinha como argumento. Se tiver o diagnóstico em PDF, a nota oficial do Google fecha a questão."
+      "Mencioná que la web carga lenta como señal de que lo digital quedó relegado, y pasá a lo importante: cuántas consultas por WhatsApp contestan por día."
     )
-  } else if (problemas.includes("construtor")) {
-    cenario = "Site de construtor"
+  } else if (problemas.includes("construtor") || problemas.includes("wix") || problemas.includes("plantilla")) {
+    cenario = "Web de plantilla"
     angulo =
-      "O site é de modelo pronto (Wix/Canva e afins) - funciona, mas parece igual a milhares de outros e não passa a credibilidade que a reputação deles merece. Argumento: negócio com nota alta merece um site próprio, com cara própria, que apareça no Google pelo nome - não um modelo genérico."
+      "La web es de plantilla armada (Wix, Canva y afines) - funciona, pero es la señal de que lo digital lo resolvieron con lo mínimo. El punto fuerte no es la web: es que un negocio con esa reputación sigue agendando turnos a mano por WhatsApp."
     objecoes = [
       {
-        objecao: '"O Wix/Canva me atende"',
+        objecao: '"El Wix/la plantilla me alcanza"',
         resposta:
-          "Atende como um cartão improvisado atende: existe, mas não diferencia. Um site próprio tem domínio profissional, carrega mais rápido, posiciona melhor no Google e passa a impressão de negócio estabelecido - que é o que a nota de vocês já diz.",
+          "Para mostrarte alcanza, sí. Pero no te contesta un mensaje ni te agenda un turno. Eso lo seguís haciendo vos. PresencIA es esa parte: la atención por WhatsApp funcionando sola.",
       },
       {
-        objecao: '"Eu mesmo atualizo o meu, é prático"',
+        objecao: '"Yo mismo me lo actualizo, es práctico"',
         resposta:
-          "Isso continua igual - entrego com painel simples pra você editar o que quiser. A diferença está na base: design exclusivo, domínio próprio e estrutura que o Google leva a sério.",
+          "Buenísimo, eso queda igual. Lo que te propongo no toca la web: es que las consultas y los turnos que entran por WhatsApp los maneje un asistente en vez de vos a mano.",
       },
       {
-        objecao: '"Não quero pagar mensalidade de novo"',
+        objecao: '"No quiero pagar otra mensualidad"',
         resposta:
-          "O construtor também cobra mensalidade pra tirar a marca deles e usar domínio. Muitas vezes o site próprio custa parecido - só que o resultado é de outro nível.",
+          "Es un solo abono, sin permanencia, y reemplaza horas tuyas contestando lo mismo todos los días. Se paga con los turnos que hoy se pierden por no contestar a tiempo.",
       },
     ]
+    objecoes = OBJECOES_TIENE_ALGO.concat(objecoes)
     ganchos.push(
-      "Cite que dá pra notar que o site foi feito num construtor pronto - e emende com a reputação: \"um negócio com essa nota merece um site à altura\"."
+      'Comentá que se nota que la web es de plantilla y enganchá con la reputación: "un negocio con esta puntuación seguro recibe un montón de mensajes; ¿los contestás todos vos?".'
     )
-  } else if (problemas.includes("vazia")) {
-    cenario = "Site vazio"
+  } else if (problemas.includes("vazia") || problemas.includes("vacía") || problemas.includes("vacia")) {
+    cenario = "Web vacía"
     angulo =
-      "O site existe mas está praticamente vazio - não conta o que fazem, não mostra trabalho, não convence ninguém. Argumento: hoje é um cartão de visita em branco; a proposta é transformá-lo numa página que vende."
-    objecoes = OBJECOES_SITE_RUIM
+      "La web existe pero está prácticamente vacía - no cuenta qué hacen, no muestra nada. Señal de que lo digital nunca se terminó de armar. El cliente termina en el WhatsApp preguntando todo, y ahí responden a mano."
+    objecoes = OBJECOES_TIENE_ALGO
     ganchos.push(
-      "Cite algo específico que falta (serviços, fotos, botão de WhatsApp) pra mostrar que você realmente olhou o site deles."
+      "Citá algo concreto que falta (servicios, precios, botón de WhatsApp) para mostrar que de verdad miraste, y pasá a la atención."
     )
   } else {
-    cenario = "Site com problemas"
+    cenario = "Web con problemas"
     angulo =
-      "O site existe mas tem problemas técnicos que custam clientes. Aborde como diagnóstico: aponte o problema em linguagem leiga e ofereça a reformulação como solução direta."
-    objecoes = OBJECOES_SITE_RUIM
+      "La web tiene problemas técnicos - señal de que lo digital quedó abandonado. Abordá como diagnóstico: nombrá el problema en criollo, y de ahí llevá la charla a lo que de verdad les cuesta clientes: contestar cada consulta y agendar cada turno a mano por WhatsApp."
+    objecoes = OBJECOES_TIENE_ALGO
     if (lead.site_problemas) {
-      ganchos.push(`Problemas detectados: ${lead.site_problemas}.`)
+      ganchos.push(`Problemas detectados en la web: ${lead.site_problemas}.`)
     }
   }
 
   if (siteRuim && lead.instagram_url) {
     ganchos.push(
-      "O Instagram deles pode estar mais atualizado que o site - use isso: \"seu Instagram é ótimo, mas o site não acompanha\"."
+      'El Instagram puede estar más al día que la web - usalo: "el Instagram lo tienen impecable; ¿y los mensajes que les llegan por ahí, los contestás vos?".'
     )
   }
 
-  // ganchos concretos do raio-X: o que o site deles NÃO tem (dado real, não chute)
+  // ganchos concretos del raio-X: lo que la web NO tiene (dato real, no chute)
   const faltas = lead.site_checklist?.falta ?? []
   if (siteRuim && faltas.length > 0) {
     ganchos.push(
-      `Faltas concretas detectadas no site: ${faltas.slice(0, 3).join(", ")}${faltas.length > 3 ? "..." : ""} - cite uma delas como exemplo específico.`
+      `Faltantes concretos detectados en la web: ${faltas.slice(0, 3).join(", ")}${faltas.length > 3 ? "..." : ""} - citá uno como ejemplo específico.`
     )
   }
 
   const proximoPasso =
     lead.status === "novo"
-      ? "Gere a copy de contato (ela já usa essa estratégia), revise com seu tom e mande pelo WhatsApp - e quando o lead responder, anexe o diagnóstico em PDF. Depois marque como contatado."
+      ? "Generá la copy de contacto (ya usa esta estrategia), revisala con tu tono y mandala por WhatsApp - y cuando el lead responda, ofrecele una prueba con su propio número. Después marcá como contactado."
       : (lead.follow_ups_enviados ?? 0) > 0
-        ? `Já foram ${lead.follow_ups_enviados} follow-up(s). Gere a copy de follow-up trazendo um elemento NOVO (prazo, exemplo pronto, diagnóstico) - repetir o mesmo argumento queima o lead.`
-        : "Lead já contatado sem resposta: gere a copy de follow-up com tom leve de lembrete e um pedido de ação fechado."
+        ? `Ya van ${lead.follow_ups_enviados} seguimiento(s). Generá la copy de seguimiento con un elemento NUEVO (un plazo, un ejemplo, una prueba) - repetir el mismo argumento quema el lead.`
+        : "Lead ya contactado sin respuesta: generá la copy de seguimiento con tono liviano de recordatorio y un pedido de acción cerrado."
 
   return { cenario, angulo, ganchos, objecoes, proximoPasso }
 }

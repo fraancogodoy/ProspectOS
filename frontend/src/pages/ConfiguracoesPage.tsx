@@ -30,14 +30,14 @@ export function ConfiguracoesPage() {
           className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="size-4" />
-          Voltar para o dashboard
+          Volver al dashboard
         </Link>
 
         <div>
-          <h2 className="text-xl font-semibold tracking-tight">Seu perfil</h2>
+          <h2 className="text-xl font-semibold tracking-tight">Tu perfil</h2>
           <p className="text-sm text-muted-foreground">
-            Quem envia as mensagens de prospecção - as copies geradas por IA
-            saem assinadas e na sua voz.
+            Quién manda los mensajes de prospección - las copias generadas por IA
+            salen firmadas y con tu voz.
           </p>
         </div>
 
@@ -45,12 +45,12 @@ export function ConfiguracoesPage() {
 
         <div>
           <h2 className="text-xl font-semibold tracking-tight">
-            Configurações de API
+            Configuración de API
           </h2>
           <p className="text-sm text-muted-foreground">
-            As chaves abaixo são usadas para gerar mensagens por IA. O sistema
-            tenta cada provedor na ordem Gemini → Groq → NVIDIA, e passa para
-            o próximo automaticamente se algum falhar ou ficar sem cota.
+            Las claves de abajo se usan para generar mensajes por IA. El sistema
+            prueba cada proveedor en el orden Gemini → Groq → NVIDIA, y pasa al
+            siguiente automáticamente si alguno falla o se queda sin cuota.
           </p>
         </div>
 
@@ -71,19 +71,19 @@ export function ConfiguracoesPage() {
               />
             ))}
             <p className="text-xs text-muted-foreground">
-              A chave do PageSpeed é opcional: adiciona a nota oficial de
-              desempenho do Google no diagnóstico em PDF (funciona sem chave
-              para uso leve, mas com limites).
+              La clave de PageSpeed es opcional: agrega la nota oficial de
+              rendimiento de Google en el diagnóstico en PDF (funciona sin clave
+              para uso liviano, pero con límites).
             </p>
           </div>
         )}
 
         <div>
           <h2 className="text-xl font-semibold tracking-tight">
-            Fonte de dados do Google Maps
+            Fuente de datos de Google Maps
           </h2>
           <p className="text-sm text-muted-foreground">
-            Escolha entre o coletor local e a integração oficial do Google
+            Elegí entre el recolector local y la integración oficial de Google
             Places.
           </p>
         </div>
@@ -92,11 +92,11 @@ export function ConfiguracoesPage() {
 
         <div>
           <h2 className="text-xl font-semibold tracking-tight">
-            Conta do Instagram
+            Cuenta de Instagram
           </h2>
           <p className="text-sm text-muted-foreground">
-            Conecte sua conta para analisar posts e enriquecer perfis. O login
-            substitui o antigo script de linha de comando.
+            Conectá tu cuenta para analizar posts y enriquecer perfiles. El login
+            reemplaza al viejo script de línea de comandos.
           </p>
         </div>
 
@@ -104,19 +104,19 @@ export function ConfiguracoesPage() {
 
         <div>
           <h2 className="text-xl font-semibold tracking-tight">
-            Busca no Google Maps
+            Búsqueda en Google Maps
           </h2>
           <p className="text-sm text-muted-foreground">
-            Configurações avançadas do scraper de leads.
+            Configuración avanzada del scraper de leads.
           </p>
         </div>
 
         <ScraperProxyCard />
 
         <div>
-          <h2 className="text-xl font-semibold tracking-tight">Sons</h2>
+          <h2 className="text-xl font-semibold tracking-tight">Sonidos</h2>
           <p className="text-sm text-muted-foreground">
-            Controle os sons de feedback do sistema.
+            Controlá los sonidos de feedback del sistema.
           </p>
         </div>
 

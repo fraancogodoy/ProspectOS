@@ -11,7 +11,7 @@ export function formatarData(data: string | null): string {
 
 export function formatarDataHora(iso: string): string {
   try {
-    return new Date(iso).toLocaleString("pt-BR")
+    return new Date(iso).toLocaleString("es-AR")
   } catch {
     return iso
   }
@@ -28,19 +28,19 @@ export function formatarTempoRelativo(data: string): string {
   if (diffMin < 0) {
     return data.length === 10 ? formatarData(data) : formatarDataHora(data)
   }
-  if (diffMin < 1) return "agora"
-  if (diffMin < 60) return `há ${diffMin} minuto${diffMin === 1 ? "" : "s"}`
+  if (diffMin < 1) return "ahora"
+  if (diffMin < 60) return `hace ${diffMin} minuto${diffMin === 1 ? "" : "s"}`
 
   const diffHoras = Math.round(diffMin / 60)
-  if (diffHoras < 24) return `há ${diffHoras} hora${diffHoras === 1 ? "" : "s"}`
+  if (diffHoras < 24) return `hace ${diffHoras} hora${diffHoras === 1 ? "" : "s"}`
 
   const inicioHoje = new Date(agora.getFullYear(), agora.getMonth(), agora.getDate())
   const inicioAlvo = new Date(alvo.getFullYear(), alvo.getMonth(), alvo.getDate())
   const diffDias = Math.round((inicioHoje.getTime() - inicioAlvo.getTime()) / 86_400_000)
 
-  if (diffDias === 0) return "hoje"
-  if (diffDias === 1) return "ontem"
-  if (diffDias < 7) return `há ${diffDias} dias`
+  if (diffDias === 0) return "hoy"
+  if (diffDias === 1) return "ayer"
+  if (diffDias < 7) return `hace ${diffDias} días`
 
   return data.length === 10 ? formatarData(data) : formatarDataHora(data)
 }

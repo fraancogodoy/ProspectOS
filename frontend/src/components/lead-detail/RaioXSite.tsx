@@ -12,12 +12,12 @@ export function RaioXSite({ checklist }: RaioXSiteProps) {
     <div className="space-y-2 rounded-xl border border-border bg-card p-4">
       <h3 className="flex items-center gap-1.5 text-sm font-semibold">
         <ScanSearch className="size-4 text-primary" />
-        Raio-X do site atual
+        Radiografía de la web actual
       </h3>
       <div className="grid gap-3 sm:grid-cols-2">
         <div>
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-success">
-            Já tem
+            Ya tiene
           </p>
           {checklist.tem.length === 0 ? (
             <p className="text-xs text-muted-foreground">nada detectado</p>
@@ -34,10 +34,10 @@ export function RaioXSite({ checklist }: RaioXSiteProps) {
         </div>
         <div>
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-warning">
-            Está faltando
+            Falta
           </p>
           {checklist.falta.length === 0 ? (
-            <p className="text-xs text-muted-foreground">nada - estrutura completa</p>
+            <p className="text-xs text-muted-foreground">nada - estructura completa</p>
           ) : (
             <ul className="space-y-1">
               {checklist.falta.map((item) => (

@@ -113,9 +113,9 @@ export function KanbanBoard({ leads, onSelecionarLead }: KanbanBoardProps) {
       () => {
         invalidarListaEMetricas()
         tocarSom(novoStatus === "fechou" ? "lead-fechou" : "card-movido")
-        toast.success(`Movido para ${LABEL_STATUS[novoStatus]}.`)
+        toast.success(`Movido a ${LABEL_STATUS[novoStatus]}.`)
       },
-      () => toast.error("Não foi possível mover o lead. Tente novamente.")
+      () => toast.error("No se pudo mover el lead. Probá de nuevo.")
     )
   }
 

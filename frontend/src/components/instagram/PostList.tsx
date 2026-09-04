@@ -33,7 +33,7 @@ export function PostList({
   if (posts.length === 0) {
     return arquivados ? (
       <p className="py-8 text-center text-sm text-muted-foreground">
-        Nenhum post arquivado.
+        No hay posts archivados.
       </p>
     ) : (
       <InstagramEmptyState />

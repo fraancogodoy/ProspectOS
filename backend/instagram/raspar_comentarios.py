@@ -35,8 +35,8 @@ def carregar_sessao() -> Client:
     arquivos_sessao = list(PASTA_SESSAO.glob("session-*.json"))
     if not arquivos_sessao:
         raise RuntimeError(
-            "Nenhuma sessão do Instagram encontrada. "
-            "Faça login em Configurações → Conta do Instagram."
+            "No se encontró ninguna sesión de Instagram. "
+            "Iniciá sesión en Configuración → Cuenta de Instagram."
         )
     cliente = Client()
     cliente.load_settings(arquivos_sessao[0])
@@ -103,7 +103,7 @@ def main() -> None:
         sys.exit(1)
     except LoginRequired:
         print(
-            "Erro: a sessão expirou ou foi invalidada. Rode de novo: "
+            "Error: la sesión expiró o fue invalidada. Corré de nuevo: "
             "py login.py <seu_usuario>"
         )
         sys.exit(1)

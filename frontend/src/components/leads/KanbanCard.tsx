@@ -37,7 +37,7 @@ export function KanbanCard({ lead, onClick }: KanbanCardProps) {
       onKeyDown={(e) => {
         if (e.key === "Enter" || e.key === " ") onClick()
       }}
-      aria-label={`Abrir detalhes de ${lead.nome}`}
+      aria-label={`Abrir detalle de ${lead.nome}`}
       className={cn(
         "cursor-grab flex flex-col gap-1.5 rounded-lg border border-border bg-card p-3 text-left text-sm shadow-sm transition-colors hover:bg-accent/40 active:cursor-grabbing",
         vencido && "ring-2 ring-warning"
@@ -51,7 +51,7 @@ export function KanbanCard({ lead, onClick }: KanbanCardProps) {
         </div>
       </div>
       <p className="text-xs text-muted-foreground">
-        {lead.categoria || "Sem categoria"}
+        {lead.categoria || "Sin rubro"}
       </p>
       <TagChips tags={lead.tags} />
       <div className="flex items-center gap-1 text-xs text-muted-foreground">

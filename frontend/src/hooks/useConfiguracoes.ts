@@ -22,7 +22,7 @@ export function useSalvarConfiguracao() {
       configService.salvar(chave, valor),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["configuracoes"] })
-      toast.success("Chave de API salva.")
+      toast.success("Clave de API guardada.")
     },
   })
 }
@@ -41,7 +41,7 @@ export function useSalvarPerfilVendedor() {
     mutationFn: (perfil: PerfilVendedor) => configService.salvarPerfilVendedor(perfil),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["perfil-vendedor"] })
-      toast.success("Perfil salvo - as próximas copies já saem na sua voz.")
+      toast.success("Perfil guardado - las próximas copias ya salen con tu voz.")
     },
   })
 }
@@ -60,7 +60,7 @@ export function useSalvarProxiesScraper() {
     mutationFn: (proxies: string) => configService.salvarProxiesScraper(proxies),
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["scraper-proxies"] })
-      toast.success("Configuração de proxy salva.")
+      toast.success("Configuración de proxy guardada.")
     },
   })
 }
@@ -82,8 +82,8 @@ export function useSalvarFonteMaps() {
       queryClient.invalidateQueries({ queryKey: ["fonte-maps"] })
       toast.success(
         dados.fonte === "places"
-          ? "Fonte salva: Google Places API (chave validada)."
-          : "Fonte salva: scraper local."
+          ? "Fuente guardada: Google Places API (clave validada)."
+          : "Fuente guardada: scraper local."
       )
     },
     onError: (erro: Error) => {

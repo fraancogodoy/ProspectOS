@@ -31,7 +31,7 @@ export function useTarefasHoje() {
       invalidar()
       tocarSom("followup-marcado")
       toast.success(
-        `Follow-up registrado. Próximo sugerido: ${resposta.proximo_followup_sugerido}`
+        `Seguimiento registrado. Próximo sugerido: ${resposta.proximo_followup_sugerido}`
       )
     },
   })
@@ -41,7 +41,7 @@ export function useTarefasHoje() {
     onSuccess: () => {
       invalidar()
       tocarSom("card-movido")
-      toast.success("Lead marcado como contatado.")
+      toast.success("Lead marcado como contactado.")
     },
   })
 

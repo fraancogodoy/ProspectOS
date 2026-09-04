@@ -17,27 +17,27 @@ export function InstagramMetricsDashboard() {
 
   return (
     <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-      <StatTile rotulo="Leads ativos" valor={metricas.total} />
+      <StatTile rotulo="Leads activos" valor={metricas.total} />
       <StatTile
-        rotulo="Contatados"
+        rotulo="Contactados"
         valor={metricas.por_status.contatado ?? 0}
       />
       <StatTile
-        rotulo="Responderam"
+        rotulo="Respondieron"
         valor={metricas.por_status.respondeu ?? 0}
       />
       <StatTile
-        rotulo="Fechados"
+        rotulo="Cerrados"
         valor={metricas.por_status.fechou ?? 0}
         variante="destaque"
       />
       <StatTile
-        rotulo="Taxa de conversão"
+        rotulo="Tasa de conversión"
         valor={`${metricas.taxa_conversao}%`}
         variante="destaque"
       />
       <StatTile
-        rotulo="Follow-ups p/ hoje"
+        rotulo="Seguimientos para hoy"
         valor={metricas.lembretes_hoje ?? 0}
         variante={(metricas.lembretes_hoje ?? 0) > 0 ? "alerta" : "default"}
       />

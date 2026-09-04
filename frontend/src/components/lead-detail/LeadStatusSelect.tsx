@@ -17,7 +17,7 @@ interface LeadStatusSelectProps {
 export function LeadStatusSelect({ status, onChange }: LeadStatusSelectProps) {
   return (
     <div className="space-y-1.5">
-      <Label>Status</Label>
+      <Label>Estado</Label>
       <Select value={status} onValueChange={(v) => onChange(v as StatusLead)}>
         <SelectTrigger className="w-full">
           <SelectValue />

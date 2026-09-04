@@ -327,19 +327,19 @@ class TestChecklistDoSite:
     def test_site_completo_tem_tudo(self):
         checklist, _ano = processar.montar_checklist_site(HTML_COMPLETO, "https://sorriso.com.br/")
         assert checklist["falta"] == []
-        assert "botão de WhatsApp" in checklist["tem"]
-        assert "telefone clicável" in checklist["tem"]
-        assert "fotos do negócio" in checklist["tem"]
-        assert "descrição para aparecer no Google" in checklist["tem"]
+        assert "botón de WhatsApp" in checklist["tem"]
+        assert "teléfono cliqueable" in checklist["tem"]
+        assert "fotos del negocio" in checklist["tem"]
+        assert "descripción para aparecer en Google" in checklist["tem"]
 
     def test_site_pelado_falta_quase_tudo(self):
         html = "<html><head><title>Home</title></head><body><p>oi</p></body></html>"
         checklist, _ano = processar.montar_checklist_site(html, "https://x.com.br/")
-        assert "botão de WhatsApp" in checklist["falta"]
-        assert "telefone clicável" in checklist["falta"]
-        assert "fotos do negócio" in checklist["falta"]
-        assert "título descritivo na aba" in checklist["falta"]  # "Home" não conta
-        assert "descrição para aparecer no Google" in checklist["falta"]
+        assert "botón de WhatsApp" in checklist["falta"]
+        assert "teléfono cliqueable" in checklist["falta"]
+        assert "fotos del negocio" in checklist["falta"]
+        assert "título descriptivo en la pestaña" in checklist["falta"]  # "Home" não conta
+        assert "descripción para aparecer en Google" in checklist["falta"]
 
     def test_copyright_antigo_vira_problema(self, monkeypatch):
         import requests
@@ -481,7 +481,7 @@ class TestPipelineComSiteRuim:
                             lambda nome, endereco="": "https://www.instagram.com/achado/")
         monkeypatch.setattr(
             processar, "avaliar_site_completo",
-            lambda url: (*avaliacoes_por_url[url], {"tem": ["fotos do negócio"], "falta": ["botão de WhatsApp"]}),
+            lambda url: (*avaliacoes_por_url[url], {"tem": ["fotos del negocio"], "falta": ["botón de WhatsApp"]}),
         )
 
         contagens = processar.processar(caminho_csv, caminho_queries=None)

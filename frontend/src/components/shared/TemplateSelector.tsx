@@ -56,7 +56,7 @@ export function TemplateSelector({
         {templates.length > 0 && (
           <Select onValueChange={handleUsar}>
             <SelectTrigger className="h-8 w-[200px] text-xs">
-              <SelectValue placeholder="Usar template salvo" />
+              <SelectValue placeholder="Usar plantilla guardada" />
             </SelectTrigger>
             <SelectContent>
               {templates.map((template) => (
@@ -75,7 +75,7 @@ export function TemplateSelector({
           onClick={() => setModalAberto(true)}
         >
           <BookmarkPlus className="size-4" />
-          Salvar como template
+          Guardar como plantilla
         </Button>
       </div>
 
@@ -84,16 +84,16 @@ export function TemplateSelector({
           <DialogHeader>
             <DialogTitle className="flex items-center gap-2">
               <FileText className="size-4" />
-              Salvar como template
+              Guardar como plantilla
             </DialogTitle>
           </DialogHeader>
           <div className="space-y-3">
             <div className="space-y-1.5">
-              <Label>Título do template</Label>
+              <Label>Título de la plantilla</Label>
               <Input
                 value={titulo}
                 onChange={(e) => setTitulo(e.target.value)}
-                placeholder="Ex: Primeiro contato - advogados"
+                placeholder="Ej: Primer contacto - abogados"
               />
             </div>
             <p className="rounded-md bg-muted/40 p-2 text-xs text-muted-foreground">
@@ -104,7 +104,7 @@ export function TemplateSelector({
               disabled={!titulo.trim() || criar.isPending}
               onClick={handleSalvar}
             >
-              {criar.isPending ? "Salvando..." : "Salvar template"}
+              {criar.isPending ? "Guardando..." : "Guardar plantilla"}
             </Button>
           </div>
         </DialogContent>
