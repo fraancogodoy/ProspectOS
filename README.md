@@ -2,16 +2,26 @@
 
 <img src="frontend/public/logo-icon.svg" width="96" alt="ProspectOS logo" />
 
-# ProspectOS
+# ProspectOS (fork en español — adaptado para PresencIA)
 
-### Prospecção de leads no piloto automático: do Google Maps e Instagram direto pro seu CRM
+### Prospección de leads en piloto automático: de Google Maps e Instagram directo a tu CRM
 
-Encontre pequenos negócios locais **sem site ou com site ruim**, receba a estratégia
-de abordagem e a mensagem prontas por IA, gere um diagnóstico em PDF e acompanhe tudo
-num CRM visual — do primeiro contato ao fechamento.
+Encontrá negocios chicos locales **sin web o con web mala**, recibí la estrategia
+de abordaje y el mensaje listos por IA, generá un diagnóstico en PDF y seguí todo
+en un CRM visual — desde el primer contacto hasta el cierre.
+
+> 🇦🇷 **Este es un fork traducido al español rioplatense** del original
+> [nando0x/ProspectOS](https://github.com/nando0x/ProspectOS) (en portugués),
+> adaptado para prospectar clientes de **[PresencIA](https://presenciaia.com.ar)**
+> (automatización de atención por WhatsApp) en vez de venta de sitios web. La
+> lógica y el stack son los mismos; lo que cambió es el idioma de toda la
+> interfaz y de los mensajes generados por IA, el catálogo de rubros (términos
+> de búsqueda en español rioplatense) y el idioma/región del scraper de Google
+> Maps (`es` / `AR` en vez de `pt` / `BR`). Detalle completo de la adaptación
+> en el historial de commits.
 
 ![Version](https://img.shields.io/badge/version-2.0.0-107a4a)
-![Tests](https://img.shields.io/badge/tests-230%20passing-22c55e)
+![Tests](https://img.shields.io/badge/tests-375%20passing-22c55e)
 ![Python](https://img.shields.io/badge/Python-3.11+-3776AB?logo=python&logoColor=white)
 ![Flask](https://img.shields.io/badge/Flask-3.1-000000?logo=flask&logoColor=white)
 ![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white)
@@ -22,12 +32,9 @@ num CRM visual — do primeiro contato ao fechamento.
 ![Platform](https://img.shields.io/badge/platform-Windows-0078D6?logo=windows&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
-[![GitHub stars](https://img.shields.io/github/stars/nando0x/ProspectOS?style=social)](https://github.com/nando0x/ProspectOS)
+[![GitHub stars](https://img.shields.io/github/stars/fraancogodoy/ProspectOS?style=social)](https://github.com/fraancogodoy/ProspectOS)
 
-<img src="https://res.cloudinary.com/doqqbpc2u/image/upload/v1783540529/ProspecOS_Print_pfnrc9.png" alt="Dashboard do ProspectOS" width="800" />
-
-<!-- 🎬 Placeholder: GIF de demo (buscar, filtrar, gerar mensagem, mover no Kanban) -->
-<!-- <img src="docs/demo.gif" alt="Demo do ProspectOS" width="800" /> -->
+<img src="https://res.cloudinary.com/doqqbpc2u/image/upload/v1783540529/ProspecOS_Print_pfnrc9.png" alt="Dashboard de ProspectOS" width="800" />
 
 </div>
 
@@ -35,89 +42,87 @@ num CRM visual — do primeiro contato ao fechamento.
 
 ## 📋 Índice
 
-- [O que é](#-o-que-é)
+- [Qué es](#-qué-es)
 - [⚠️ Antes de usar](#️-antes-de-usar)
 - [Features](#-features)
-- [Quickstart](#-quickstart)
-- [Uso no dia a dia](#-uso-no-dia-a-dia)
+- [Instalación rápida](#-instalación-rápida)
+- [Uso del día a día](#-uso-del-día-a-día)
 - [Stack](#-stack)
-- [Estrutura do projeto](#-estrutura-do-projeto)
-- [Filosofia do projeto](#-filosofia-do-projeto)
-- [Perguntas comuns](#-perguntas-comuns)
-- [Contribuindo](#-contribuindo)
-- [Licença](#-licença)
-- [Agradecimentos](#-agradecimentos)
+- [Estructura del proyecto](#-estructura-del-proyecto)
+- [Filosofía del proyecto](#-filosofía-del-proyecto)
+- [Preguntas frecuentes](#-preguntas-frecuentes)
+- [Este fork vs. el original](#-este-fork-vs-el-original)
+- [Licencia](#-licencia)
+- [Agradecimientos](#-agradecimientos)
 
 ---
 
-## 🎯 O que é
+## 🎯 Qué es
 
-**ProspectOS** é uma ferramenta de prospecção de leads para quem vende sites, landing pages ou serviços digitais para pequenos negócios locais.
+**ProspectOS** es una herramienta de prospección de leads para quien vende un servicio digital a negocios chicos locales — en este fork, pensada para **PresencIA** (automatización de atención por WhatsApp para peluquerías, canchas, inmobiliarias y comercios similares).
 
-Ela resolve um problema específico de ponta a ponta: encontrar empresas que **precisam de um site** e transformá-las em conversas de venda. O ProspectOS varre o **Google Maps** (por nicho + cidade, ou por pino e raio num mapa) e os **comentários de posts do Instagram**, **analisa o site de cada empresa** para separar quem não tem site de quem tem um site ruim/lento/inseguro, prioriza por um score, e para cada lead entrega a **estratégia de abordagem**, a **mensagem pronta por IA** e um **diagnóstico em PDF** para mandar no WhatsApp — tudo num CRM visual com funil, follow-up e analytics.
+Resuelve un problema puntual de punta a punta: encontrar negocios que **necesitan digitalizar su atención** y transformarlos en conversaciones de venta. ProspectOS recorre **Google Maps** (por rubro + ciudad, o por pin y radio en un mapa) y los **comentarios de posts de Instagram**, **analiza la web de cada negocio** para separar quién no tiene web de quién la tiene mala/lenta/insegura, prioriza por un score, y para cada lead entrega la **estrategia de abordaje**, el **mensaje listo por IA** y un **diagnóstico en PDF** para mandar por WhatsApp — todo en un CRM visual con embudo, seguimiento y analytics.
 
-**Para quem é:**
-- Freelancers e agências de web design/landing pages que fazem a própria prospecção
-- Devs e estudantes que querem estudar scraping, integração com IA e um CRM full-stack na prática
-- Qualquer pessoa curiosa sobre como automatizar geração de leads locais
+**Para quién es:**
+- Vendedores o agencias que hacen su propia prospección de comercios locales
+- Devs que quieren estudiar scraping, integración con IA y un CRM full-stack en la práctica
+- Cualquiera con curiosidad por automatizar la generación de leads locales
 
-**Por que foi criado:** nasceu como ferramenta pessoal para simplificar um processo manual e repetitivo (abrir o Maps, checar site por site, anotar em planilha) e cresceu até virar uma ferramenta de prospecção completa. É uma base de código real e funcional, aberta para você aprender, adaptar e usar por sua conta.
-
-> 💡 Continua sendo software que você roda localmente, na sua máquina, por sua conta e risco — não um SaaS pronto. Leia os avisos abaixo antes de usar.
+> 💡 Sigue siendo software que corrés localmente, en tu máquina, por tu cuenta y riesgo — no es un SaaS armado. Leé los avisos de abajo antes de correr nada.
 
 ---
 
 ## ⚠️ Antes de usar
 
-Leia isto com atenção antes de rodar qualquer coisa:
+Leé esto con atención antes de correr cualquier cosa:
 
-- 🕷️ **Isto é uma ferramenta de scraping.** Raspar o Google Maps e o Instagram pode violar os Termos de Uso dessas plataformas. Use por sua conta e risco.
-- 📸 **O módulo do Instagram usa sua conta pessoal** (via [instagrapi](https://github.com/subzeroid/instagrapi)) para logar e consultar dados. Isso pode resultar em **checkpoint de segurança ou banimento temporário/permanente da conta**. Recomendado: use uma conta secundária, rode com moderação, e nunca compartilhe o arquivo de sessão gerado.
-- 💬 **O cockpit de conversa lê a janela do WhatsApp Web do app.** A leitura é **passiva** (só observa o chat que *você* abriu, nunca navega nem varre conversas) e **nenhuma mensagem é enviada automaticamente** — você revisa e envia sempre. Ainda assim, automatizar o WhatsApp Web contra os Termos de Uso da Meta traz **risco de bloqueio do seu número**. Não existe implementação "indetectável": quem promete isso está mentindo. Se preferir risco zero, o cockpit funciona 100% no modo manual (você cola as mensagens) — inclusive no navegador, sem o app de desktop.
-- 🔧 **Sem garantia de funcionamento contínuo.** Instagram e Google mudam suas proteções com frequência. Se algo parar de funcionar, é provavelmente por isso.
-- 🚫 **Sem afiliação** com Google, Meta/Instagram, nem com os projetos de terceiros usados (`gosom/google-maps-scraper`, `instagrapi`).
-- 📄 Fornecido **"como está"**, sem garantias. Veja [`LICENSE`](LICENSE) (MIT).
-- 🪟 **Windows apenas.** Os scripts de conveniência (`.bat`) e o binário do scraper de Maps são específicos para Windows.
+- 🕷️ **Esto es una herramienta de scraping.** Raspar Google Maps e Instagram puede violar los Términos de Uso de esas plataformas. Usalo por tu cuenta y riesgo.
+- 📸 **El módulo de Instagram usa tu cuenta personal** (vía [instagrapi](https://github.com/subzeroid/instagrapi)) para loguearse y consultar datos. Esto puede resultar en **checkpoint de seguridad o baneo temporal/permanente de la cuenta**. Recomendado: usá una cuenta secundaria, corré con moderación, y nunca compartas el archivo de sesión generado.
+- 💬 **El cockpit de conversación lee la ventana de WhatsApp Web de la app.** La lectura es **pasiva** (sólo observa el chat que *vos* abriste, nunca navega ni recorre conversaciones) y **ningún mensaje se envía automáticamente** — vos siempre revisás y enviás. Aun así, automatizar WhatsApp Web va contra los Términos de Uso de Meta y trae **riesgo de bloqueo de tu número**. No existe una implementación "indetectable": quien lo promete miente. Si preferís riesgo cero, el cockpit funciona 100% en modo manual (pegás los mensajes vos), incluso en el navegador, sin la app de escritorio.
+- 🔧 **Sin garantía de funcionamiento continuo.** Instagram y Google cambian sus protecciones seguido. Si algo deja de andar, es probablemente por eso.
+- 🚫 **Sin afiliación** con Google, Meta/Instagram, ni con los proyectos de terceros usados (`gosom/google-maps-scraper`, `instagrapi`).
+- 📄 Provisto **"tal cual"**, sin garantías. Ver [`LICENSE`](LICENSE) (MIT).
+- 🪟 **Sólo Windows.** Los scripts de conveniencia (`.bat`) y el binario del scraper de Maps son específicos de esa plataforma.
 
 ---
 
 ## ✨ Features
 
-| Área | O que faz |
+| Área | Qué hace |
 |---|---|
-| 🗺️ **Canal Google Maps** | Busca por nicho + cidade **ou por pino e raio num mapa** (estilo segmentação do Facebook Ads), com catálogo de 170+ nichos clicáveis |
-| 🔎 **Análise de site real** | Abre o site de cada empresa e detecta **sem site, site fora do ar, sem HTTPS, SSL inválido, não-mobile, lento ou feito em construtor pronto** (Wix, Canva...) — site ruim também é lead |
-| 🩻 **Raio-X do site** | Extrai do HTML o que o site **tem e o que falta** (WhatsApp, telefone, e-mail, mapa, fotos, meta description, favicon) — dado real, não chute |
-| 📄 **Diagnóstico em PDF** | Relatório de uma página pronto pra mandar no WhatsApp: reputação, problemas em linguagem leiga, raio-X e **nota oficial do Google PageSpeed** |
-| 📸 **Canal Instagram** | Extrai comentários de um post, enriquece o perfil de cada autor e classifica prioridade com IA, com retomada de análises interrompidas |
-| 🧠 **Mensagens com IA** | Copy de abordagem e follow-up **na sua voz** (perfil do vendedor), citando detalhes reais do site, com fallback entre 3 provedores gratuitos (Gemini, Groq, NVIDIA) |
-| 🎯 **Estratégia por lead** | Cada lead vem com cenário detectado, ângulo de venda, ganchos concretos e objeções com respostas prontas |
-| 🔥 **Score de priorização** | Nota + volume de avaliações + situação do site num score 0-100 para ordenar a fila de abordagem |
-| ⚡ **Sessão de prospecção** | Modo foco: um lead por vez do mais quente ao mais frio (follow-ups primeiro), abordagem em um clique com atalhos de teclado |
-| 📋 **Tarefas de hoje** | Follow-ups vencidos + leads quentes, cada um com o WhatsApp já preenchido |
-| 📊 **CRM visual + Kanban** | Funil de status com histórico, drag-and-drop, tags, observações e follow-up com cadência crescente (+3/+5/+7 dias) |
-| 📈 **Analytics** | Funil de conversão e desempenho por nicho, para os dois canais separados e combinados |
-| 🧰 **Produtividade** | Filtros (inclusive por situação do site), histórico de buscas, busca global (Ctrl+K), exportação CSV, ações em lote, tema claro/escuro |
-| 🔐 **Segurança** | Chaves de API guardadas no cofre de credenciais do sistema (Windows/DPAPI), nunca em texto puro |
+| 🗺️ **Canal Google Maps** | Busca por rubro + ciudad **o por pin y radio en un mapa** (estilo segmentación de Facebook Ads), con catálogo de 170+ rubros clicables (en español rioplatense) |
+| 🔎 **Análisis de web real** | Abre la web de cada negocio y detecta **sin web, web caída, sin HTTPS, SSL inválido, no-mobile, lenta o hecha en un constructor genérico** (Wix, Canva...) — web mala también es lead |
+| 🩻 **Radiografía de la web** | Extrae del HTML lo que la web **tiene y lo que falta** (WhatsApp, teléfono, e-mail, mapa, fotos, meta description, favicon) — dato real, no chamuyo |
+| 📄 **Diagnóstico en PDF** | Informe de una página listo para mandar por WhatsApp: reputación, problemas en criollo, radiografía y **nota oficial de Google PageSpeed** |
+| 📸 **Canal Instagram** | Extrae comentarios de un post, enriquece el perfil de cada autor y clasifica prioridad con IA, con retomada de análisis interrumpidos |
+| 🧠 **Mensajes con IA** | Copy de abordaje y seguimiento **con tu voz** (perfil de vendedor), citando detalles reales de la web, con fallback entre 3 proveedores gratuitos (Gemini, Groq, NVIDIA) |
+| 🎯 **Estrategia por lead** | Cada lead trae escenario detectado, ángulo de venta, ganchos concretos y objeciones con respuestas listas |
+| 🔥 **Score de priorización** | Puntuación + volumen de reseñas + situación de la web en un score 0-100 para ordenar la cola de abordaje |
+| ⚡ **Sesión de prospección** | Modo foco: un lead por vez del más caliente al más frío (seguimientos primero), abordaje en un clic con atajos de teclado |
+| 📋 **Tareas de hoy** | Seguimientos vencidos + leads calientes, cada uno con el WhatsApp ya cargado |
+| 📊 **CRM visual + Kanban** | Embudo de estados con historial, drag-and-drop, etiquetas, notas y seguimiento con cadencia creciente (+3/+5/+7 días) |
+| 📈 **Analytics** | Embudo de conversión y desempeño por rubro, para los dos canales separados y combinados |
+| 🧰 **Productividad** | Filtros (incluida la situación de la web), historial de búsquedas, búsqueda global (Ctrl+K), exportación CSV, acciones en lote, tema claro/oscuro |
+| 🔐 **Seguridad** | Claves de API guardadas en el cofre de credenciales del sistema (Windows/DPAPI), nunca en texto plano |
 
 ---
 
-## 🚀 Quickstart
+## 🚀 Instalación rápida
 
-### Pré-requisitos
+### Requisitos previos
 
 - [Python 3.11+](https://www.python.org/downloads/)
 - [Node.js 20+](https://nodejs.org/)
-- Windows (scripts `.bat` e o scraper de Maps são específicos da plataforma)
+- Windows (los scripts `.bat` y el scraper de Maps son específicos de esta plataforma)
 
-### 1. Clone o repositório
+### 1. Cloná el repositorio
 
 ```powershell
-git clone https://github.com/nando0x/ProspectOS.git
+git clone https://github.com/fraancogodoy/ProspectOS.git
 cd ProspectOS
 ```
 
-### 2. Configure o backend
+### 2. Configurá el backend
 
 ```powershell
 cd backend
@@ -125,81 +130,81 @@ py -m pip install -r requirements.txt
 copy .env.example .env
 ```
 
-Você vai precisar de **ao menos uma** chave de IA gratuita (usada para gerar as mensagens de abordagem e classificar leads do Instagram):
+Vas a necesitar **al menos una** clave de IA gratuita (se usa para generar los mensajes de abordaje y clasificar leads de Instagram):
 
-| Provedor | Onde pegar a chave |
+| Proveedor | Dónde conseguir la clave |
 |---|---|
 | Gemini | https://aistudio.google.com/apikey |
 | Groq | https://console.groq.com/keys |
 | NVIDIA Build | https://build.nvidia.com |
 
-Tem duas formas de configurar, escolha a que for mais fácil pra você:
+Hay dos formas de configurarla, elegí la que te resulte más fácil:
 
-- **Pela interface do sistema (mais fácil):** depois de rodar o projeto (veja o passo 6), acesse **Configurações** no menu e cole a chave direto lá. Fica guardada com segurança no cofre de credenciais do sistema (nunca em texto puro), sem precisar mexer em nenhum arquivo nem reiniciar o servidor.
-- **Editando o `.env` manualmente:** abra o arquivo `backend/.env` num editor de texto e preencha o valor da chave correspondente (`GEMINI_API_KEY`, `GROQ_API_KEY` ou `NVIDIA_API_KEY`).
+- **Desde la interfaz del sistema (más fácil):** después de correr el proyecto (ver paso 6), entrá a **Configuración** en el menú y pegá la clave ahí directo. Queda guardada de forma segura en el cofre de credenciales del sistema (nunca en texto plano), sin tocar ningún archivo ni reiniciar el servidor.
+- **Editando el `.env` a mano:** abrí el archivo `backend/.env` en un editor de texto y completá el valor de la clave correspondiente (`GEMINI_API_KEY`, `GROQ_API_KEY` o `NVIDIA_API_KEY`).
 
-> Se você configurar dos dois jeitos, o que estiver salvo pela interface tem prioridade sobre o `.env`.
+> Si lo configurás de las dos formas, lo guardado desde la interfaz tiene prioridad sobre el `.env`.
 
-> 💡 **Opcional — Google PageSpeed:** para incluir a nota oficial de desempenho do Google no diagnóstico em PDF, adicione uma chave do [PageSpeed Insights](https://developers.google.com/speed/docs/insights/v5/get-started) em Configurações. É gratuita e funciona sem chave para uso leve.
+> 💡 **Opcional — Google PageSpeed:** para incluir la nota oficial de rendimiento de Google en el diagnóstico en PDF, agregá una clave de [PageSpeed Insights](https://developers.google.com/speed/docs/insights/v5/get-started) en Configuración. Es gratis y funciona sin clave para uso liviano.
 
-> 💡 **Recomendado — Seu perfil:** ainda em Configurações, preencha "Seu perfil" (nome e o que você faz). As mensagens geradas por IA saem assinadas e na sua voz, em vez de genéricas.
+> 💡 **Recomendado — Tu perfil:** también en Configuración, completá "Tu perfil" (nombre y a qué te dedicás). Los mensajes generados por IA salen firmados y con tu voz, en vez de genéricos.
 
-### 3. Baixe a dependência externa do scraper
+### 3. Bajá la dependencia externa del scraper
 
-O `google-maps-scraper.exe` **não vem no repositório** (é um binário de terceiros, ~60MB, de outro projeto open source, então não faz sentido versionar binário compilado dentro de um repo git). Passo a passo completo, sem pular nada:
+El `google-maps-scraper.exe` **no viene en el repositorio** (es un binario de terceros, ~60MB, de otro proyecto open source, así que no tiene sentido versionarlo dentro de un repo git). Paso a paso completo, sin saltear nada:
 
-1. Acesse **[a página de releases mais recente](https://github.com/gosom/google-maps-scraper/releases/latest)**.
-2. Role até a seção **"Assets"** (fica perto do final da página, às vezes precisa clicar para expandir).
-3. Procure o arquivo para **Windows**. O nome muda a cada versão nova, mas segue sempre o padrão `google_maps_scraper-<versão>-windows-amd64.exe`, por exemplo: `google_maps_scraper-1.16.1-windows-amd64.exe`.
+1. Entrá a **[la página de releases más reciente](https://github.com/gosom/google-maps-scraper/releases/latest)**.
+2. Bajá hasta la sección **"Assets"** (está cerca del final de la página; a veces hay que hacer clic para expandirla).
+3. Buscá el archivo para **Windows**. El nombre cambia en cada versión, pero sigue siempre el patrón `google_maps_scraper-<versión>-windows-amd64.exe`, por ejemplo: `google_maps_scraper-1.16.1-windows-amd64.exe`.
 
-   > ⚠️ Não baixe as versões `linux` ou `darwin` (essas são para Linux/Mac). Você quer especificamente a que tem `windows` no nome.
-4. Depois de baixado, **renomeie o arquivo para exatamente `google-maps-scraper.exe`** (tudo minúsculo, com hífens).
-   - No Windows, se você não estiver vendo a extensão `.exe` no nome do arquivo, isso é normal (o Windows esconde extensões conhecidas por padrão). Não precisa se preocupar, só renomeie a parte visível do nome.
-5. Mova esse arquivo para dentro da pasta `backend/` deste projeto, **no mesmo nível** do arquivo `app.py` (não dentro de nenhuma subpasta).
-6. Para conferir se deu certo, a pasta `backend/` deve conter, lado a lado: `app.py`, `processar.py` e `google-maps-scraper.exe`.
+   > ⚠️ No bajes las versiones `linux` ni `darwin` (esas son para Linux/Mac). Necesitás específicamente la que tiene `windows` en el nombre.
+4. Una vez bajado, **renombrá el archivo a exactamente `google-maps-scraper.exe`** (todo en minúscula, con guiones).
+   - En Windows, si no ves la extensión `.exe` en el nombre del archivo, es normal (Windows oculta extensiones conocidas por defecto). No hace falta preocuparse, sólo renombrá la parte visible del nombre.
+5. Movés ese archivo a la carpeta `backend/` de este proyecto, **al mismo nivel** que el archivo `app.py` (no dentro de ninguna subcarpeta).
+6. Para verificar que salió bien, la carpeta `backend/` tiene que tener, uno al lado del otro: `app.py`, `processar.py` y `google-maps-scraper.exe`.
 
-> ✅ **Como saber se funcionou:** ao clicar em "Nova busca" no canal Google Maps do ProspectOS, a busca deve iniciar normalmente. Se aparecer um erro dizendo que o programa não foi encontrado, revise o nome do arquivo (passo 4) e o local onde ele está (passo 5). São os dois erros mais comuns.
+> ✅ **Cómo saber si funcionó:** al hacer clic en "Nueva búsqueda" en el canal Google Maps de ProspectOS, la búsqueda tiene que arrancar normalmente. Si aparece un error diciendo que no se encontró el programa, revisá el nombre del archivo (paso 4) y dónde está ubicado (paso 5). Son los dos errores más comunes.
 >
-> Sem esse arquivo, **só o canal Google Maps fica indisponível**. O canal Instagram funciona normalmente sem ele.
+> Sin este archivo, **sólo el canal Google Maps queda no disponible**. El canal Instagram funciona normalmente sin él.
 
-> ⚠️ **Erro de "Playwright/driver não disponível"?** Na primeira busca, o scraper baixa um componente (driver do Playwright) dos servidores da Microsoft — numa versão fixa, gravada dentro do `.exe`. A Microsoft remove versões antigas desse componente, então um `google-maps-scraper.exe` baixado há muito tempo pode procurar um driver que **não existe mais**. Solução: baixe de novo a [release mais recente](https://github.com/gosom/google-maps-scraper/releases/latest) e substitua o `.exe` — ou, se preferir não depender do scraper, use a **Google Places API oficial** em *Configurações → Fonte de dados*.
+> ⚠️ **¿Error de "Playwright/driver no disponible"?** En la primera búsqueda, el scraper baja un componente (driver de Playwright) de los servidores de Microsoft — en una versión fija, grabada dentro del `.exe`. Microsoft saca versiones viejas de ese componente de sus servidores, así que un `google-maps-scraper.exe` bajado hace tiempo puede buscar un driver que **ya no existe**. Solución: bajá de nuevo la [release más reciente](https://github.com/gosom/google-maps-scraper/releases/latest) y reemplazá el `.exe` — o, si preferís no depender del scraper, usá la **Google Places API oficial** en *Configuración → Fuente de datos*.
 
-### 4. Faça login no Instagram (só se for usar esse canal)
+### 4. Iniciá sesión en Instagram (sólo si vas a usar ese canal)
 
-O canal Instagram não usa a API oficial: ele automatiza sua **própria conta pessoal** (via `instagrapi`) para ler comentários e perfis, exatamente como se você estivesse navegando manualmente. Por isso, antes de usar esse canal pela primeira vez, é preciso logar uma única vez pelo terminal:
+El canal Instagram no usa la API oficial: automatiza tu **propia cuenta personal** (vía `instagrapi`) para leer comentarios y perfiles, igual que si estuvieras navegando manualmente. Por eso, antes de usar este canal por primera vez, hay que loguearse una vez desde la terminal:
 
 ```powershell
 cd backend
-py instagram\login.py SEU_USUARIO
+py instagram\login.py TU_USUARIO
 ```
 
-O que acontece ao rodar isso:
+Qué pasa al correr esto:
 
-1. O terminal pede sua **senha do Instagram** (a digitação fica invisível na tela, isso é normal, é assim que o `getpass` funciona).
-2. Se sua conta tiver **verificação em duas etapas (2FA)** ativada, o terminal vai pausar e pedir o código que chegar no seu celular ou app autenticador.
-3. Se o login der certo, aparece a mensagem `Login feito com sucesso` e é criado um arquivo em `backend/instagram/sessao/session-SEU_USUARIO.json`. Esse arquivo guarda sua sessão logada, então você **não precisa repetir esse passo toda vez**, só quando a sessão expirar.
+1. La terminal pide tu **contraseña de Instagram** (la escritura queda invisible en pantalla, es normal, así funciona `getpass`).
+2. Si tu cuenta tiene **verificación en dos pasos (2FA)** activada, la terminal se pausa y pide el código que llegue a tu celular o app autenticadora.
+3. Si el login sale bien, aparece el mensaje `Login feito com sucesso` y se crea un archivo en `backend/instagram/sessao/session-TU_USUARIO.json`. Ese archivo guarda tu sesión logueada, así que **no hace falta repetir este paso cada vez**, sólo cuando la sesión expire.
 
-> ⚠️ **Este é o passo de maior risco do projeto.** Como é sua conta pessoal fazendo essa automação, o Instagram pode detectar o comportamento como suspeito e aplicar um checkpoint de segurança ou banimento temporário/permanente. Recomendado: use uma **conta secundária**, criada só para isso, nunca a sua conta principal. Veja `backend/instagram/LEIA-ME.md` para mais contexto.
+> ⚠️ **Este es el paso de mayor riesgo del proyecto.** Como es tu cuenta personal haciendo esta automatización, Instagram puede detectar el comportamiento como sospechoso y aplicar un checkpoint de seguridad o baneo temporal/permanente. Recomendado: usá una **cuenta secundaria**, creada sólo para esto, nunca tu cuenta principal. Ver `backend/instagram/LEIA-ME.md` para más contexto.
 >
-> Não existe forma de "testar" ou simular esse login sem uma conta real do Instagram. Não pule este passo se você não pretende usar o canal Instagram, ele é totalmente independente do canal Google Maps.
+> No hay forma de "probar" o simular este login sin una cuenta real de Instagram. No te saltees este paso si no pensás usar el canal Instagram — es totalmente independiente del canal Google Maps.
 
-### 5. Configure o frontend
+### 5. Configurá el frontend
 
 ```powershell
 cd ../frontend
 npm install
 ```
 
-### 6. Rode tudo
+### 6. Corré todo
 
-Use o atalho que sobe backend + frontend juntos e abre o navegador automaticamente:
+Usá el atajo que levanta backend + frontend juntos y abre el navegador automáticamente:
 
 ```powershell
 cd ..
 iniciar.bat
 ```
 
-Ou manualmente, em dois terminais:
+O manualmente, en dos terminales:
 
 ```powershell
 # Terminal 1: backend
@@ -211,37 +216,37 @@ cd frontend
 npm run dev
 ```
 
-Acesse **http://localhost:5173** 🎉
+Entrá a **http://localhost:5173** 🎉
 
 ---
 
-## 🛠️ Uso no dia a dia
+## 🛠️ Uso del día a día
 
 **Canal Google Maps:**
 ```
-Clique em "Nova busca" e escolha o modo:
-- Por texto: nicho + cidade, um por linha (ex: corretor de imóveis em Curitiba)
-- Por mapa: solte pinos, ajuste o raio de cada um e selecione os nichos no catálogo
+Hacé clic en "Nueva búsqueda" y elegí el modo:
+- Por texto: rubro + ciudad, uno por línea (ej: peluquería en Tandil)
+- Por mapa: soltá pines, ajustá el radio de cada uno y elegí los rubros del catálogo
 ```
-A ferramenta analisa o site de cada empresa e mantém no CRM quem **não tem site ou tem site ruim** (fora do ar, inseguro, lento, não-mobile, construtor pronto...), descartando quem já tem um site decente.
+La herramienta analiza la web de cada negocio y mantiene en el CRM a quien **no tiene web o la tiene mala** (caída, insegura, lenta, no-mobile, constructor genérico...), descartando a quien ya tiene una web decente.
 
 **Canal Instagram:**
 ```
-Cole o link de um post. A ferramenta extrai os comentários,
-enriquece o perfil de cada autor e classifica a prioridade com IA
+Pegá el link de un post. La herramienta extrae los comentarios,
+enriquece el perfil de cada autor y clasifica la prioridad con IA
 ```
 
-**Prospecção em ritmo:** abra a **Sessão de prospecção** — um lead por vez, do mais quente ao mais frio (follow-ups vencidos primeiro), com a estratégia e a mensagem prontas e abordagem em um clique. Ou a tela **Tarefas de hoje** para os follow-ups do dia.
+**Prospección en ritmo:** abrí la **Sesión de prospección** — un lead por vez, del más caliente al más frío (seguimientos vencidos primero), con la estrategia y el mensaje listos y abordaje en un clic. O la pantalla **Tareas de hoy** para los seguimientos del día.
 
-**Em cada lead**, você tem:
-- A **estratégia de abordagem** (cenário, ângulo, ganchos e objeções)
-- O **raio-X do site** (o que tem e o que falta)
-- A **mensagem por IA** na sua voz, e o **diagnóstico em PDF** para mandar no WhatsApp
-- Funil de status (Kanban ou lista), tags, observações, follow-up com data e exportação CSV
+**En cada lead** tenés:
+- La **estrategia de abordaje** (escenario, ángulo, ganchos y objeciones)
+- La **radiografía de la web** (qué tiene y qué falta)
+- El **mensaje por IA** con tu voz, y el **diagnóstico en PDF** para mandar por WhatsApp
+- Embudo de estados (Kanban o lista), etiquetas, notas, seguimiento con fecha y exportación CSV
 
-> 💡 Aperte **Ctrl+K** de qualquer lugar para achar um lead pelo nome ou pular para uma tela.
+> 💡 Apretá **Ctrl+K** desde cualquier lado para buscar un lead por nombre o saltar a una pantalla.
 
-**Quer usar sem interface visual?** O fluxo antigo de linha de comando continua funcionando:
+**¿Querés usarlo sin interfaz visual?** El flujo viejo de línea de comandos sigue funcionando:
 ```powershell
 cd backend
 .\buscar.ps1
@@ -254,101 +259,102 @@ py processar.py
 
 **Backend**
 - Python 3.11+ · Flask 3.1 (blueprints) · SQLite
-- [instagrapi](https://github.com/subzeroid/instagrapi) (Instagram) · [gosom/google-maps-scraper](https://github.com/gosom/google-maps-scraper) (Maps, via Playwright)
-- Gemini / Groq / NVIDIA Build (geração de texto e classificação por IA, com fallback automático)
-- fpdf2 (diagnóstico em PDF) · keyring (cofre de credenciais) · PageSpeed Insights (opcional)
+- [instagrapi](https://github.com/subzeroid/instagrapi) (Instagram) · [gosom/google-maps-scraper](https://github.com/gosom/google-maps-scraper) (Maps, vía Playwright)
+- Gemini / Groq / NVIDIA Build (generación de texto y clasificación por IA, con fallback automático)
+- fpdf2 (diagnóstico en PDF) · keyring (cofre de credenciales) · PageSpeed Insights (opcional)
 
 **Frontend**
 - React 19 · TypeScript · Vite 8 · Tailwind CSS 4
-- shadcn/ui (Radix primitives) · TanStack React Query · React Router 7
-- Recharts (analytics) · Leaflet + OpenStreetMap (busca por mapa) · Framer Motion (animações) · Sonner (toasts) · dnd-kit (Kanban)
+- shadcn/ui (primitivas de Radix) · TanStack React Query · React Router 7
+- Recharts (analytics) · Leaflet + OpenStreetMap (búsqueda por mapa) · Framer Motion (animaciones) · Sonner (toasts) · dnd-kit (Kanban)
 
 ---
 
-## 📁 Estrutura do projeto
+## 📁 Estructura del proyecto
 
 ```
 ProspectOS/
-├── iniciar.bat              # sobe backend + frontend juntos
+├── iniciar.bat              # levanta backend + frontend juntos
 ├── backend/
-│   ├── app.py                # monta o Flask e registra os blueprints
-│   ├── rotas_*.py            # rotas por domínio (leads, instagram, analytics, config)
-│   ├── ia.py                 # provedores de IA, prompts e fallback
-│   ├── jobs.py               # jobs de background (scraper e análise do Instagram)
-│   ├── processar.py          # análise de site + filtro/dedupe + schema do banco
-│   ├── diagnostico.py        # geração do diagnóstico em PDF
-│   ├── db.py                 # conexão, cofre de credenciais e backup
-│   ├── instagram/            # login, raspagem e enriquecimento de perfis
-│   └── tests/                # suíte de testes (pytest, 230 testes)
+│   ├── app.py                # arma Flask y registra los blueprints
+│   ├── rotas_*.py             # rutas por dominio (leads, instagram, analytics, config)
+│   ├── ia.py                  # proveedores de IA, prompts y fallback
+│   ├── jobs.py                # jobs de background (scraper y análisis de Instagram)
+│   ├── processar.py           # análisis de web + filtro/dedupe + schema de la base
+│   ├── diagnostico.py         # generación del diagnóstico en PDF
+│   ├── db.py                  # conexión, cofre de credenciales y backup
+│   ├── instagram/             # login, scraping y enriquecimiento de perfiles
+│   └── tests/                 # suite de tests (pytest, 375 tests)
 └── frontend/
     ├── src/
-    │   ├── pages/            # telas (dashboard, leads, sessão, tarefas, analytics...)
-    │   ├── components/       # UI por domínio (leads/, instagram/, dashboard/, search-modal/...)
-    │   ├── hooks/            # data-fetching e mutations (React Query)
-    │   ├── services/         # chamadas HTTP para a API do backend
-    │   ├── lib/              # estratégia, catálogo de nichos, utilitários
-    │   └── types/            # tipos TypeScript espelhando o schema do backend
+    │   ├── pages/             # pantallas (dashboard, leads, sesión, tareas, analytics...)
+    │   ├── components/        # UI por dominio (leads/, instagram/, dashboard/, search-modal/...)
+    │   ├── hooks/              # data-fetching y mutations (React Query)
+    │   ├── services/           # llamadas HTTP a la API del backend
+    │   ├── lib/                # estrategia, catálogo de rubros, utilidades
+    │   └── types/               # tipos TypeScript espejo del schema del backend
     └── public/
 ```
 
 ---
 
-## 💭 Filosofia do projeto
+## 💭 Filosofía del proyecto
 
-- **Dois canais, uma experiência.** Google Maps e Instagram têm fluxos de dados bem diferentes, mas o produto final (funil, tags, follow-up, IA) é espelhado nos dois. O que funciona num canal deveria funcionar igual no outro.
-- **IA com fallback, nunca bloqueante.** Toda geração de texto por IA tenta múltiplos provedores gratuitos em sequência antes de desistir, porque depender de uma única API gratuita é assumir que ela vai falhar (cota, instabilidade) em algum momento.
-- **Honestidade sobre os riscos.** Scraping e automação de contas pessoais têm risco real de banimento/bloqueio. O projeto não esconde isso em letra miúda: os avisos ficam no topo do README, não no rodapé.
-- **Simples de rodar localmente.** Sem Docker, sem infraestrutura complexa, só Python, Node e SQLite. A barreira de entrada pra testar o projeto deveria ser a menor possível.
+- **Dos canales, una sola experiencia.** Google Maps e Instagram tienen flujos de datos bien distintos, pero el producto final (embudo, etiquetas, seguimiento, IA) es un espejo en los dos. Lo que funciona en un canal debería funcionar igual en el otro.
+- **IA con fallback, nunca bloqueante.** Toda generación de texto por IA prueba varios proveedores gratuitos en secuencia antes de rendirse, porque depender de una sola API gratis es asumir que en algún momento va a fallar (cuota, inestabilidad).
+- **Honestidad sobre los riesgos.** El scraping y la automatización de cuentas personales tienen riesgo real de baneo/bloqueo. El proyecto no lo esconde en letra chica: los avisos están arriba de todo en el README, no al pie.
+- **Simple de correr localmente.** Sin Docker, sin infraestructura compleja, sólo Python, Node y SQLite. La barrera de entrada para probar el proyecto tiene que ser la mínima posible.
 
 ---
 
-## ❓ Perguntas comuns
+## ❓ Preguntas frecuentes
 
-**Quero apagar tudo e começar do zero.**
-Feche o backend, apague `backend/leads.db` e rode de novo (recria o banco vazio). Há backup automático em `backend/backups/`.
+**Quiero borrar todo y arrancar de cero.**
+Cerrá el backend, borrá `backend/leads.db` y corré de nuevo (recrea la base vacía). Hay backup automático en `backend/backups/`.
 
-**Quero rodar os testes automatizados.**
+**Quiero correr los tests automatizados.**
 ```powershell
 cd backend
 py -m pytest
 ```
 
-**O canal Instagram não depende do `google-maps-scraper.exe`?**
-Não. Os dois canais são independentes. Falta de um não trava o outro.
+**¿El canal Instagram depende del `google-maps-scraper.exe`?**
+No. Los dos canales son independientes. La falta de uno no traba al otro.
 
-**Minha conta do Instagram foi bloqueada, e agora?**
-Rode `py instagram\login.py SEU_USUARIO` de novo. Veja `backend/instagram/LEIA-ME.md` para mais contexto sobre esse risco.
-
----
-
-## 🤝 Contribuindo
-
-Contribuições são bem-vindas! Este é um projeto mantido nas horas vagas, então o processo é leve. Veja o guia completo em **[CONTRIBUTING.md](CONTRIBUTING.md)** — setup de dev, como rodar os testes e as convenções de código.
-
-Resumo:
-
-1. Abra uma [issue](../../issues) descrevendo o bug ou a ideia antes de codar algo grande. Isso evita retrabalho.
-2. Para PRs pequenos (fix de bug, melhoria de doc), pode mandar direto.
-3. Mantenha o padrão de código existente (nomes em português no domínio do negócio, testes com `pytest` no backend).
-4. Seja respeitoso nas discussões. Sem necessidade de um processo formal, só bom senso.
+**Me bloquearon la cuenta de Instagram, ¿y ahora?**
+Corré `py instagram\login.py TU_USUARIO` de nuevo. Ver `backend/instagram/LEIA-ME.md` para más contexto sobre ese riesgo.
 
 ---
 
-## 📄 Licença
+## 🔀 Este fork vs. el original
 
-[MIT](LICENSE). Use, modifique e redistribua livremente, mas por sua conta e risco (veja os avisos no topo deste README).
+Este repositorio es un fork traducido de [nando0x/ProspectOS](https://github.com/nando0x/ProspectOS) con estos cambios:
+
+- **Interfaz completa en español rioplatense** (con voseo): todas las páginas, componentes, mensajes de error y de progreso del panel y del backend. Queda en portugués sólo la sección de ayuda dentro de la app (Documentación) y algún mensaje de error puntual del canal Instagram que menciona comandos de terminal.
+- **Prompts de IA y estrategia de venta re-orientados**: de "vendo la creación de un sitio web" a "automatizo la atención por WhatsApp" (PresencIA). El detector de sitio sin web/con web mala se mantiene igual — sólo cambió a qué se lo lleva la conversación de venta.
+- **Catálogo de rubros en español rioplatense** (`frontend/src/lib/nichos.ts`): términos de búsqueda como se usan en Argentina, en vez de portugués de Brasil.
+- **Scraper e idioma de búsqueda en español/Argentina** (`-lang es`, `languageCode: es-419`, `regionCode: AR`) en vez de portugués/Brasil, para que Google Maps devuelva rubros y descripciones en español.
+
+Si el proyecto original recibe actualizaciones, este fork las tiene disponibles con `git remote add upstream https://github.com/nando0x/ProspectOS.git` y `git fetch upstream`, pero un merge directo probablemente choque con casi todo lo traducido — conviene revisarlo a mano, cambio por cambio.
 
 ---
 
-## 🙏 Agradecimentos
+## 📄 Licencia
 
-- [gosom/google-maps-scraper](https://github.com/gosom/google-maps-scraper): scraper de Google Maps usado como dependência externa
-- [subzeroid/instagrapi](https://github.com/subzeroid/instagrapi): biblioteca usada para o canal Instagram
-- [shadcn/ui](https://ui.shadcn.com/): componentes base do frontend
-- Google Gemini, Groq e NVIDIA Build: provedores de IA gratuitos usados na geração de texto
+[MIT](LICENSE). Usalo, modificalo y redistribuilo libremente, pero por tu cuenta y riesgo (ver los avisos arriba de todo en este README).
+
+---
+
+## 🙏 Agradecimientos
+
+- [nando0x/ProspectOS](https://github.com/nando0x/ProspectOS): proyecto original del que sale este fork
+- [gosom/google-maps-scraper](https://github.com/gosom/google-maps-scraper): scraper de Google Maps usado como dependencia externa
+- [subzeroid/instagrapi](https://github.com/subzeroid/instagrapi): librería usada para el canal Instagram
+- [shadcn/ui](https://ui.shadcn.com/): componentes base del frontend
+- Google Gemini, Groq y NVIDIA Build: proveedores de IA gratuitos usados en la generación de texto
 
 <div align="center">
 
-Feito com foco em resolver um problema real de prospecção. Se ajudou você, considere deixar uma ⭐.
+Hecho con foco en resolver un problema real de prospección para PresencIA.
 
 </div>
