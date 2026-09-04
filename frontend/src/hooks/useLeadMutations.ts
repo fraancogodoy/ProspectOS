@@ -42,6 +42,15 @@ export function useLeadMutations(placeId: string) {
     onSuccess: () => toast.success("Notas guardadas."),
   })
 
+  const salvarContato = useMutation({
+    mutationFn: (dados: Parameters<typeof leadsService.atualizarContato>[1]) =>
+      leadsService.atualizarContato(placeId, dados),
+    onSuccess: () => {
+      invalidarListaEMetricas()
+      toast.success("Datos de contacto guardados.")
+    },
+  })
+
   const gerarMensagem = useMutation({
     mutationFn: ({
       forcarNova,
@@ -118,6 +127,7 @@ export function useLeadMutations(placeId: string) {
     atualizarStatus,
     salvarTagsFollowup,
     salvarObservacoes,
+    salvarContato,
     gerarMensagem,
     marcarFollowupEnviado,
     ignorar,

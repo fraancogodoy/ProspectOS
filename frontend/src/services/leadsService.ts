@@ -67,6 +67,21 @@ export const leadsService = {
       { proximo_followup: proximoFollowup }
     ),
 
+  atualizarContato: (
+    placeId: string,
+    dados: Partial<{
+      telefone: string
+      endereco: string
+      instagram_url: string
+      facebook_url: string
+      email: string
+    }>
+  ) =>
+    httpClient.post<{ ok: true }>(
+      `/api/leads/${encodeURIComponent(placeId)}/contato`,
+      dados
+    ),
+
   gerarMensagem: (
     placeId: string,
     forcarNova: boolean,

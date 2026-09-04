@@ -43,6 +43,8 @@ export interface Lead {
   site_problemas: string | null
   site_checklist: { tem: string[]; falta: string[] } | null
   instagram_url: string | null
+  facebook_url: string | null
+  email: string | null
 }
 
 export interface HistoricoStatusItem {

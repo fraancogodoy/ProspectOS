@@ -419,8 +419,6 @@ def buscar_site_da_empresa(nome, cidade_ou_endereco=""):
 
     return None
 
-# DDDs que precisam do "9" extra na frente do número local (regra do WhatsApp/E.164 para o Brasil)
-DDDS_COM_NOVE = {"11", "12", "13", "14", "15", "16", "17", "18", "19", "21", "22", "24", "27", "28"}
 
 
 def preparar_banco(conexao):
@@ -466,6 +464,8 @@ def migrar_banco(conexao):
         "site_problemas": "TEXT",
         "site_checklist": "TEXT",  # JSON {"tem": [...], "falta": [...]} - raio-X do site
         "instagram_url": "TEXT",
+        "facebook_url": "TEXT",
+        "email": "TEXT",
     }
     for nome, tipo in novas_colunas.items():
         if nome not in colunas_existentes:
@@ -772,31 +772,38 @@ def mapear_queries_por_input_id(caminho_csv_bruto, caminho_queries):
 
 
 def telefone_para_whatsapp(telefone_bruto):
-    """Converte um telefone brasileiro (como vem do Google Maps) num link wa.me. Retorna None se não der pra usar."""
+    """Converte um telefone argentino (como vem do Google Maps) num link wa.me.
+    Retorna None se não der pra usar.
+
+    Formato de WhatsApp pra Argentina: 54 9 <código de área><número>, sem o "0" de
+    discagem nacional nem o "15" de celular (esses só existem na discagem local -
+    https://faq.whatsapp.com/general/verification/how-to-add-an-international-phone-number).
+    Como não há uma lista oficial e curta de códigos de área (variam de 2 a 4
+    dígitos), a extração do "15" é heurística: funciona pro formato mais comum
+    do Google Maps ("0xxx 15-xxxxxxx"), não é infalível pra todos os formatos."""
     digitos = re.sub(r"\D", "", telefone_bruto or "")
 
     if not digitos:
         return None
 
-    # remove o "0" de discagem interurbana, se vier na frente (ex: 0xx41...)
+    # já vem com o código do país (54) -> normaliza tirando ele e o "9" opcional
+    if digitos.startswith("54"):
+        digitos = digitos[2:]
+        if digitos.startswith("9"):
+            digitos = digitos[1:]
+
+    # remove o "0" de discagem nacional, se vier na frente (ex: 0xxx...)
     if digitos.startswith("0"):
         digitos = digitos[1:]
 
-    # remove o DDI 55 se já vier incluso, pra normalizar sempre a partir do DDD
-    if digitos.startswith("55") and len(digitos) > 11:
-        digitos = digitos[2:]
+    # remove o "15" de celular que só existe na discagem local (código de área
+    # de 2 a 4 dígitos + "15" + número de 6 a 8 dígitos)
+    digitos = re.sub(r"^(\d{2,4})15(\d{6,8})$", r"\1\2", digitos)
 
-    if len(digitos) not in (10, 11):
-        return None  # não parece um telefone brasileiro válido (DDD + número)
+    if not re.fullmatch(r"\d{8,11}", digitos):
+        return None  # não parece um telefone argentino válido
 
-    ddd = digitos[:2]
-    numero = digitos[2:]
-
-    # celular sem o "9" na frente, em DDD que exige o "9" -> adiciona
-    if len(numero) == 8 and ddd in DDDS_COM_NOVE:
-        numero = "9" + numero
-
-    return f"https://wa.me/55{ddd}{numero}"
+    return f"https://wa.me/549{digitos}"
 
 
 def linha_qualifica(linha):

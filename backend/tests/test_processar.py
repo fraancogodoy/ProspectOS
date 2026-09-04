@@ -19,30 +19,25 @@ from processar import (
 
 
 class TestTelefoneParaWhatsapp:
-    def test_celular_com_nove_digitos_e_ddd_curitiba(self):
-        assert telefone_para_whatsapp("(41) 98480-1109") == "https://wa.me/5541984801109"
+    def test_formato_local_com_zero_e_quinze_tandil(self):
+        # "0<área> 15-<número>": el formato más común del Google Maps argentino
+        assert telefone_para_whatsapp("0249 15-465-2660") == "https://wa.me/5492494652660"
 
-    def test_ja_vem_com_ddi_55(self):
-        assert telefone_para_whatsapp("5541984801109") == "https://wa.me/5541984801109"
+    def test_ya_viene_en_formato_internacional(self):
+        assert telefone_para_whatsapp("+54 9 249 465-2660") == "https://wa.me/5492494652660"
 
-    def test_celular_sem_o_nove_em_ddd_que_exige(self):
-        # DDD 11 (São Paulo) está na lista DDDS_COM_NOVE; número de 8 dígitos deve ganhar o "9"
-        assert telefone_para_whatsapp("(11) 8480-1109") == "https://wa.me/5511984801109"
+    def test_sin_cero_ni_quince(self):
+        assert telefone_para_whatsapp("249 465-2660") == "https://wa.me/5492494652660"
 
-    def test_com_zero_de_discagem_interurbana(self):
-        assert telefone_para_whatsapp("041984801109") == "https://wa.me/5541984801109"
-
-    def test_ddd_que_nao_exige_o_nove_fica_como_esta(self):
-        # DDD 47 (Santa Catarina) não está na lista DDDS_COM_NOVE
-        resultado = telefone_para_whatsapp("(47) 3222-1109")
-        assert resultado == "https://wa.me/554732221109"
+    def test_con_cero_de_discado_nacional_sin_quince(self):
+        assert telefone_para_whatsapp("011 4555-1234") == "https://wa.me/5491145551234"
 
     def test_vazio_retorna_none(self):
         assert telefone_para_whatsapp("") is None
         assert telefone_para_whatsapp(None) is None
 
     def test_so_letras_retorna_none(self):
-        assert telefone_para_whatsapp("não tem telefone") is None
+        assert telefone_para_whatsapp("no tiene teléfono") is None
 
     def test_numero_muito_curto_retorna_none(self):
         assert telefone_para_whatsapp("12345") is None

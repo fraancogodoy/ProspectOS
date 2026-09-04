@@ -53,7 +53,7 @@ export function LeadFilterBar({
       {filtrosEmUso && (
         <Button variant="ghost" size="sm" onClick={onLimpar}>
           <X className="size-4" />
-          Limpar filtros
+          Limpiar filtros
         </Button>
       )}
     </div>

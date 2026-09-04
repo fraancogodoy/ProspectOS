@@ -5,6 +5,7 @@ import csv
 import io
 import json
 import logging
+import re
 from datetime import date, datetime, timedelta
 
 from flask import Blueprint, Response, jsonify, request
@@ -19,6 +20,7 @@ from validacao import validar_ids_bulk
 from constantes import (
     DIAS_PARA_LEAD_DIFICIL,
     MAX_AREAS_BUSCA_MAPA,
+    MAX_CARACTERES_CONTATO,
     MAX_CARACTERES_NICHO_BUSCA,
     MAX_CARACTERES_OBSERVACOES,
     MAX_CARACTERES_POR_LINHA_QUERY,
@@ -164,8 +166,19 @@ def listar_leads():
         condicoes.append("nota >= ?")
         parametros.append(nota_min)
     if busca_texto:
-        condicoes.append("(nome LIKE ? OR endereco LIKE ?)")
-        parametros.extend([f"%{busca_texto}%", f"%{busca_texto}%"])
+        # o telefone busca por dígitos, ignorando espaços/parênteses/hífens salvos
+        # no banco - assim "465-2660" e "4652660" acham o mesmo lead
+        condicoes_busca = ["nome LIKE ?", "endereco LIKE ?"]
+        parametros_busca = [f"%{busca_texto}%", f"%{busca_texto}%"]
+        busca_digitos = re.sub(r"\D", "", busca_texto)
+        if busca_digitos:
+            condicoes_busca.append(
+                "REPLACE(REPLACE(REPLACE(REPLACE(REPLACE(telefone, ' ', ''), "
+                "'-', ''), '(', ''), ')', ''), '+', '') LIKE ?"
+            )
+            parametros_busca.append(f"%{busca_digitos}%")
+        condicoes.append("(" + " OR ".join(condicoes_busca) + ")")
+        parametros.extend(parametros_busca)
     if site_status_filtro:
         condicoes.append("site_status = ?")
         parametros.append(site_status_filtro)
@@ -490,6 +503,49 @@ def atualizar_followup(place_id):
     return jsonify({"ok": True})
 
 
+CAMPOS_CONTATO_EDITAVEIS = ("telefone", "endereco", "instagram_url", "facebook_url", "email")
+
+
+@bp.route("/api/leads/<place_id>/contato", methods=["POST"])
+def atualizar_contato(place_id):
+    """Edita à mão os dados de contato do lead (telefone/celular, endereço,
+    Instagram, Facebook, e-mail) - útil quando o scraper não capturou algum
+    deles ou quando o vendedor descobre um dado a mais durante a prospecção.
+    Ao mudar o telefone, o link do WhatsApp é regerado a partir dele."""
+    corpo = request.json or {}
+
+    valores = {}
+    for campo in CAMPOS_CONTATO_EDITAVEIS:
+        if campo not in corpo:
+            continue
+        valor = str(corpo[campo] or "").strip()
+        if len(valor) > MAX_CARACTERES_CONTATO:
+            return jsonify({"erro": f"{campo} muito longo (máximo {MAX_CARACTERES_CONTATO} caracteres)"}), 400
+        valores[campo] = valor or None
+
+    if not valores:
+        return jsonify({"erro": "nenhum campo de contato enviado"}), 400
+
+    if "telefone" in valores:
+        valores["whatsapp_link"] = processar.telefone_para_whatsapp(valores["telefone"])
+
+    conexao = db.conectar()
+    try:
+        colunas = ", ".join(f"{campo} = ?" for campo in valores)
+        parametros = [*valores.values(), datetime.now().isoformat(timespec="seconds"), place_id]
+        cursor = conexao.execute(
+            f"UPDATE leads SET {colunas}, atualizado_em = ? WHERE place_id = ?",
+            parametros,
+        )
+        conexao.commit()
+        if cursor.rowcount == 0:
+            return jsonify({"erro": "lead não encontrado"}), 404
+    finally:
+        conexao.close()
+
+    return jsonify({"ok": True, **valores})
+
+
 @bp.route("/api/leads/<place_id>/gerar-mensagem", methods=["POST"])
 def gerar_mensagem(place_id):
     corpo = request.json or {}
@@ -774,6 +830,7 @@ def exportar_csv():
             "query_origem", "proximo_followup", "follow_ups_enviados",
             "ultimo_followup_em", "mensagem_gerada",
             "site_status", "site_url", "site_problemas", "instagram_url",
+            "facebook_url", "email",
         ]
     )
     for lead in linhas:
@@ -800,6 +857,8 @@ def exportar_csv():
                 lead["site_url"] or "",
                 lead["site_problemas"] or "",
                 lead["instagram_url"] or "",
+                lead["facebook_url"] or "",
+                lead["email"] or "",
             ]
         )
 

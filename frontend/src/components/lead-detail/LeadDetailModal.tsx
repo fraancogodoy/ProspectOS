@@ -17,6 +17,7 @@ import { RaioXSite } from "@/components/lead-detail/RaioXSite"
 import { LeadStatusSelect } from "@/components/lead-detail/LeadStatusSelect"
 import { LeadTagsFollowupForm } from "@/components/lead-detail/LeadTagsFollowupForm"
 import { LeadObservacoesForm } from "@/components/lead-detail/LeadObservacoesForm"
+import { LeadContatoForm } from "@/components/lead-detail/LeadContatoForm"
 import { LeadMessageGenerator } from "@/components/lead-detail/LeadMessageGenerator"
 import { LeadHistoryAccordion } from "@/components/lead-detail/LeadHistoryAccordion"
 import { DeleteLeadButton } from "@/components/lead-detail/DeleteLeadButton"
@@ -75,6 +76,17 @@ export function LeadDetailModal({ lead, onClose }: LeadDetailModalProps) {
                 Instagram del negocio
               </a>
             )}
+            {lead.facebook_url && (
+              <a
+                href={lead.facebook_url}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-flex items-center gap-1 text-xs text-muted-foreground underline-offset-2 hover:text-foreground hover:underline"
+              >
+                <ExternalLink className="size-3" />
+                Facebook del negocio
+              </a>
+            )}
             <button
               type="button"
               onClick={() => mutations.reanalisarSite.mutate()}
@@ -109,6 +121,14 @@ export function LeadDetailModal({ lead, onClose }: LeadDetailModalProps) {
               lead={lead}
               onSalvar={(input) => mutations.salvarTagsFollowup.mutate(input)}
               salvando={mutations.salvarTagsFollowup.isPending}
+            />
+
+            <hr className="border-border" />
+
+            <LeadContatoForm
+              lead={lead}
+              onSalvar={(dados) => mutations.salvarContato.mutate(dados)}
+              salvando={mutations.salvarContato.isPending}
             />
 
             <hr className="border-border" />
