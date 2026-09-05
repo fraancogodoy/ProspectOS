@@ -21,6 +21,8 @@ from datetime import date, datetime
 from pathlib import Path
 from urllib.parse import urlparse
 
+import phonenumbers
+
 from paths import DIR_DADOS
 
 logger = logging.getLogger(__name__)
@@ -775,35 +777,32 @@ def telefone_para_whatsapp(telefone_bruto):
     """Converte um telefone argentino (como vem do Google Maps) num link wa.me.
     Retorna None se não der pra usar.
 
-    Formato de WhatsApp pra Argentina: 54 9 <código de área><número>, sem o "0" de
-    discagem nacional nem o "15" de celular (esses só existem na discagem local -
-    https://faq.whatsapp.com/general/verification/how-to-add-an-international-phone-number).
-    Como não há uma lista oficial e curta de códigos de área (variam de 2 a 4
-    dígitos), a extração do "15" é heurística: funciona pro formato mais comum
-    do Google Maps ("0xxx 15-xxxxxxx"), não é infalível pra todos os formatos."""
-    digitos = re.sub(r"\D", "", telefone_bruto or "")
+    Usa a `phonenumbers` (porta Python da libphonenumber do Google) pra validar
+    e extrair o número nacional - ela conhece os códigos de área reais da
+    Argentina (2 a 4 dígitos) e descarta lixo colado no telefone (extensão,
+    texto), coisa que uma regex não enxerga.
 
-    if not digitos:
+    Tem uma ambiguidade real no próprio plano de numeração da Argentina: um
+    número sem o "15" (discagem local) ou o "9" (formato internacional) pode
+    ser tanto fixo quanto celular - só o "15"/"9" desambigua, e a biblioteca
+    assume fixo na dúvida. Como a fonte aqui é sempre Google Maps de negócio
+    pequeno (o dono atende pelo celular via WhatsApp, quase nunca por fixo),
+    quando não vem essa marca explícita adiciona o "9" na mesma."""
+    if not telefone_bruto or not telefone_bruto.strip():
         return None
 
-    # já vem com o código do país (54) -> normaliza tirando ele e o "9" opcional
-    if digitos.startswith("54"):
-        digitos = digitos[2:]
-        if digitos.startswith("9"):
-            digitos = digitos[1:]
+    try:
+        numero = phonenumbers.parse(telefone_bruto, "AR")
+    except phonenumbers.NumberParseException:
+        return None
 
-    # remove o "0" de discagem nacional, se vier na frente (ex: 0xxx...)
-    if digitos.startswith("0"):
-        digitos = digitos[1:]
+    if not phonenumbers.is_valid_number(numero):
+        return None
 
-    # remove o "15" de celular que só existe na discagem local (código de área
-    # de 2 a 4 dígitos + "15" + número de 6 a 8 dígitos)
-    digitos = re.sub(r"^(\d{2,4})15(\d{6,8})$", r"\1\2", digitos)
-
-    if not re.fullmatch(r"\d{8,11}", digitos):
-        return None  # não parece um telefone argentino válido
-
-    return f"https://wa.me/549{digitos}"
+    nacional = str(numero.national_number)
+    if not nacional.startswith("9"):
+        nacional = "9" + nacional
+    return f"https://wa.me/54{nacional}"
 
 
 def linha_qualifica(linha):

@@ -125,7 +125,7 @@ class TestContadoresDoFunil:
             escritor.writerows(linhas)
         return caminho
 
-    def _linha(self, place_id, nota="4.8", fone="(65) 99999-0001"):
+    def _linha(self, place_id, nota="4.8", fone="0249 15-465-2660"):
         return {
             "input_id": "q1", "place_id": place_id, "title": f"Empresa {place_id}",
             "category": "Categoria", "address": "Rua X", "review_rating": nota,

@@ -490,9 +490,9 @@ class TestPipelineComSiteRuim:
 
     def test_classifica_sem_site_site_ruim_e_descarta_site_ok(self, tmp_path, monkeypatch):
         linhas = (
-            "i1,p1,Sem Site,cat,end,4.5,10,(41) 98480-1109,\n"
-            "i2,p2,Site Ruim,cat,end,4.8,50,(41) 98480-1108,https://ruim.com.br\n"
-            "i3,p3,Site Bom,cat,end,5.0,99,(41) 98480-1107,https://bom.com.br\n"
+            "i1,p1,Sem Site,cat,end,4.5,10,0249 15-465-2660,\n"
+            "i2,p2,Site Ruim,cat,end,4.8,50,0249 15-465-2661,https://ruim.com.br\n"
+            "i3,p3,Site Bom,cat,end,5.0,99,0249 15-465-2662,https://bom.com.br\n"
         )
         contagens, leads = self._rodar(tmp_path, monkeypatch, linhas, {
             "https://ruim.com.br": ("ruim", ["não adaptado para celular"]),
@@ -514,7 +514,7 @@ class TestPipelineComSiteRuim:
 
     def test_cidade_padrao_preenche_quando_query_nao_tem_cidade(self, tmp_path, monkeypatch):
         """Busca por mapa: a query é só o nicho, a cidade vem do rótulo do pino."""
-        linhas = "i1,p1,Empresa,cat,end,4.5,10,(41) 98480-1109,\n"
+        linhas = "i1,p1,Empresa,cat,end,4.5,10,0249 15-465-2660,\n"
         caminho_csv = tmp_path / "bruto.csv"
         caminho_csv.write_text(self.CABECALHO + linhas, encoding="utf-8")
         caminho_queries = tmp_path / "queries.txt"
@@ -540,7 +540,7 @@ class TestPipelineComSiteRuim:
         assert list((tmp_path / "saidas").glob("leads_novos_*_area1.csv"))
 
     def test_site_achado_na_busca_web_tambem_e_avaliado(self, tmp_path, monkeypatch):
-        linhas = "i1,p1,Empresa,cat,end,4.5,10,(41) 98480-1109,\n"
+        linhas = "i1,p1,Empresa,cat,end,4.5,10,0249 15-465-2660,\n"
         caminho_csv = tmp_path / "bruto.csv"
         caminho_csv.write_text(self.CABECALHO + linhas, encoding="utf-8")
 
