@@ -2,6 +2,7 @@ import { ArrowLeft } from "lucide-react"
 import { Link } from "react-router-dom"
 import { Header } from "@/components/layout/Header"
 import { Skeleton } from "@/components/ui/skeleton"
+import { CopiaDatosCard } from "@/components/configuracoes/CopiaDatosCard"
 import { FonteMapsCard } from "@/components/configuracoes/FonteMapsCard"
 import { InstagramContaCard } from "@/components/configuracoes/InstagramContaCard"
 import { PerfilVendedorCard } from "@/components/configuracoes/PerfilVendedorCard"
@@ -121,6 +122,15 @@ export function ConfiguracoesPage() {
         </div>
 
         <SomConfigCard />
+
+        <div>
+          <h2 className="text-xl font-semibold tracking-tight">Datos</h2>
+          <p className="text-sm text-muted-foreground">
+            Llevar los leads de una instalación a otra (por ejemplo, de tu PC a la nube).
+          </p>
+        </div>
+
+        <CopiaDatosCard />
       </main>
     </div>
   )

@@ -52,6 +52,7 @@ import auth
 import db
 import jobs
 import processar
+import rotas_admin
 import rotas_analytics
 import rotas_config
 import rotas_conversa
@@ -78,6 +79,7 @@ if MODO_NUVEM and not os.environ.get("SECRET_KEY"):
     )
 app.before_request(auth.exigir_login_em_apis)
 app.register_blueprint(auth.bp)
+app.register_blueprint(rotas_admin.bp)
 app.register_blueprint(rotas_leads.bp)
 app.register_blueprint(rotas_instagram.bp)
 app.register_blueprint(rotas_analytics.bp)
