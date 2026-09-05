@@ -1,9 +1,10 @@
 import { Link, NavLink } from "react-router-dom"
-import { BookOpen, ListTodo, MapPin, Plus, Settings, Trash2 } from "lucide-react"
+import { BookOpen, ListTodo, LogOut, MapPin, Plus, Settings, Trash2 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { ThemeToggle } from "@/components/layout/ThemeToggle"
 import { InstagramIcon } from "@/components/icons/InstagramIcon"
+import { useAuth } from "@/hooks/useAuth"
 
 interface HeaderProps {
   onNovaBusca?: () => void
@@ -41,6 +42,8 @@ function ItemNav({
 }
 
 export function Header({ onNovaBusca, onVerIgnorados }: HeaderProps) {
+  const { authHabilitada, usuario, logout } = useAuth()
+
   return (
     <header className="sticky top-0 z-20 border-b border-border/60 bg-background/80 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="mx-auto flex w-full max-w-6xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
@@ -82,6 +85,16 @@ export function Header({ onNovaBusca, onVerIgnorados }: HeaderProps) {
             ariaLabel="Configuración"
           />
           <ThemeToggle />
+          {authHabilitada && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={logout}
+              title={usuario ? `Salir (${usuario})` : "Salir"}
+            >
+              <LogOut className="size-4" />
+            </Button>
+          )}
         </nav>
       </div>
     </header>

@@ -66,6 +66,48 @@ def _keyring_apagar(chave):
         pass  # a chave pode simplesmente não existir no cofre
 
 
+# Fallback de criptografia pra quando NÃO há cofre de credenciais do sistema
+# disponível (ex.: servidor Linux na nuvem, sem Secret Service/DPAPI). Sem uma
+# ENCRYPTION_KEY configurada, as chaves secretas caem em texto puro na tabela
+# `configuracoes` (comportamento antigo) - com ela, ficam cifradas (Fernet/AES).
+_PREFIXO_CIFRADO = "fernet:"
+
+
+def _obter_fernet():
+    chave = os.environ.get("ENCRYPTION_KEY")
+    if not chave:
+        return None
+    try:
+        from cryptography.fernet import Fernet
+        return Fernet(chave.encode())
+    except Exception:
+        logger.exception("ENCRYPTION_KEY inválida - não foi possível montar o cifrador")
+        return None
+
+
+def _cifrar_para_banco(valor):
+    fernet = _obter_fernet()
+    if not fernet:
+        return valor
+    return _PREFIXO_CIFRADO + fernet.encrypt(valor.encode()).decode()
+
+
+def _decifrar_do_banco(valor):
+    if not valor or not valor.startswith(_PREFIXO_CIFRADO):
+        return valor  # texto puro (chave antiga, ou ENCRYPTION_KEY nunca configurada)
+    fernet = _obter_fernet()
+    if not fernet:
+        # tem valor cifrado no banco mas não tem mais a chave pra abrir - melhor
+        # devolver None (força reconfigurar) do que devolver o texto cifrado
+        logger.error("valor cifrado no banco, mas ENCRYPTION_KEY não está configurada")
+        return None
+    try:
+        return fernet.decrypt(valor[len(_PREFIXO_CIFRADO):].encode()).decode()
+    except Exception:
+        logger.exception("falha ao decifrar valor do banco (ENCRYPTION_KEY mudou?)")
+        return None
+
+
 def conectar():
     conexao = sqlite3.connect(CAMINHO_BANCO, timeout=10)
     conexao.row_factory = sqlite3.Row
@@ -98,7 +140,11 @@ def obter_config(chave, default=None):
         conexao.close()
 
     if linha and linha["valor"]:
-        return linha["valor"]
+        valor_banco = linha["valor"]
+        if chave in CHAVES_SECRETAS:
+            valor_banco = _decifrar_do_banco(valor_banco)
+        if valor_banco:
+            return valor_banco
 
     chave_env = CHAVES_CONFIG_VALIDAS.get(chave, chave)
     return os.environ.get(chave_env, default)
@@ -120,6 +166,8 @@ def salvar_config(chave, valor):
         _apagar_config_db(chave)
         return
 
+    valor_para_gravar = _cifrar_para_banco(valor) if chave in CHAVES_SECRETAS else valor
+
     conexao = conectar()
     try:
         conexao.execute(
@@ -127,7 +175,7 @@ def salvar_config(chave, valor):
             INSERT INTO configuracoes (chave, valor, atualizado_em) VALUES (?, ?, ?)
             ON CONFLICT(chave) DO UPDATE SET valor = excluded.valor, atualizado_em = excluded.atualizado_em
             """,
-            (chave, valor, datetime.now().isoformat(timespec="seconds")),
+            (chave, valor_para_gravar, datetime.now().isoformat(timespec="seconds")),
         )
         conexao.commit()
     finally:
@@ -151,6 +199,8 @@ def migrar_chaves_para_keyring():
         conexao.close()
 
     for linha in linhas:
+        if linha["valor"].startswith(_PREFIXO_CIFRADO):
+            continue  # já está no formato cifrado (fallback do ENCRYPTION_KEY) - não é plaintext antigo
         if _keyring_salvar(linha["chave"], linha["valor"]):
             _apagar_config_db(linha["chave"])
             logger.info("chave %s migrada do banco para o cofre de credenciais", linha["chave"])

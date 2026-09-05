@@ -35,6 +35,14 @@ else:
     DIR_RECURSOS = _DIR_FONTE
     DIR_DADOS = _DIR_FONTE
 
+# Terceiro modo: servidor na nuvem (Railway e afins). Nenhum dos dois modos
+# acima serve - não é instalação desktop (sem %APPDATA%) nem dev local
+# gravando na própria pasta do projeto (sem disco persistente entre deploys).
+# Setar PROSPECTOS_DIR_DADOS aponta os dados graváveis pro volume montado.
+_dir_dados_nuvem = os.environ.get("PROSPECTOS_DIR_DADOS")
+if _dir_dados_nuvem:
+    DIR_DADOS = Path(_dir_dados_nuvem)
+
 
 def caminho_recurso(*partes):
     """Caminho de um recurso read-only distribuído junto com o app."""

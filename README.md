@@ -47,6 +47,7 @@ en un CRM visual — desde el primer contacto hasta el cierre.
 - [Features](#-features)
 - [Instalación rápida](#-instalación-rápida)
 - [Uso del día a día](#-uso-del-día-a-día)
+- [Despliegue en la nube (opcional)](#-despliegue-en-la-nube-opcional)
 - [Stack](#-stack)
 - [Estructura del proyecto](#-estructura-del-proyecto)
 - [Filosofía del proyecto](#-filosofía-del-proyecto)
@@ -255,6 +256,62 @@ py processar.py
 
 ---
 
+## ☁️ Despliegue en la nube (opcional)
+
+Por defecto ProspectOS corre local, en una sola máquina. Si querés acceder
+desde varias PCs con los mismos datos siempre actualizados (buscaste algo en
+la notebook, aparece igual en la de escritorio), se puede desplegar como
+servidor compartido — el repo ya trae lo necesario para Railway (el mismo
+servicio que usa PresencIA):
+
+**Qué cambia respecto del uso local:**
+- **Login obligatorio.** Con `ADMIN_USER`/`ADMIN_PASSWORD` configurados, toda
+  la API queda atrás de una sesión (`backend/auth.py`). Sin esas variables
+  (el caso de uso local de siempre), no pide login — no rompe nada de cómo
+  ya lo usás en tu PC.
+- **Canal Google Maps por scraper local: no disponible.** El
+  `google-maps-scraper.exe` es un binario de Windows con Playwright; no corre
+  en un contenedor Linux. En la nube usá la **Google Places API oficial**
+  (Configuración → Fuente de datos → Google Places API, con tu propia clave de
+  https://console.cloud.google.com/apis/credentials). El canal Instagram
+  funciona igual que en local.
+- **Claves de API sin cofre de credenciales del sistema.** Windows Credential
+  Manager no existe en un servidor Linux; sin una `ENCRYPTION_KEY`
+  configurada, las claves (IA, Places) quedan en texto plano en la base -
+  configurala para que viajen cifradas (ver más abajo).
+- **Base de datos en un disco persistente.** Sin esto, cada redeploy borra
+  todos los leads - hay que apuntar `PROSPECTOS_DIR_DADOS` a un volumen
+  montado (ver más abajo).
+
+### Pasos en Railway
+
+1. **New Project → Deploy from GitHub repo** → elegí este repositorio. Railway
+   detecta el `Dockerfile` de la raíz solo.
+2. **Add a Volume** al servicio, con mount path `/data`.
+3. Variables de entorno del servicio (Settings → Variables):
+
+   | Variable | Valor | Para qué |
+   |---|---|---|
+   | `PROSPECTOS_DIR_DADOS` | `/data` | Apunta la base, los backups y la sesión de Instagram al volumen persistente |
+   | `ADMIN_USER` | el usuario que vas a usar para entrar | Habilita el login |
+   | `ADMIN_PASSWORD` | una contraseña fuerte | Habilita el login |
+   | `SECRET_KEY` | salida de `openssl rand -hex 32` | Firma la cookie de sesión - sin esto, cada redeploy desloguea a todos |
+   | `ENCRYPTION_KEY` | salida de `python -c "from cryptography.fernet import Fernet; print(Fernet.generate_key().decode())"` | Cifra las claves de API guardadas en la base |
+
+   Railway ya inyecta `PORT` solo - no hace falta configurarlo.
+4. Deploy. Cuando termine, entrá a la URL que Railway te da, iniciá sesión con
+   `ADMIN_USER`/`ADMIN_PASSWORD`, y cargá tus claves de IA y de Google Places
+   en Configuración (quedan guardadas en el volumen, cifradas).
+5. Desde cualquier PC (o el celular), entrás a esa misma URL y ves los mismos
+   leads, siempre al día - nada que instalar ni sincronizar a mano.
+
+> 💡 Podés seguir usando la instalación local en tu PC de escritorio en
+> paralelo (con el scraper local, sin login) para lo que quieras probar
+> rápido, y la de la nube para el uso real desde varios lugares - son bases
+> de datos completamente separadas, no se mezclan.
+
+---
+
 ## 🧱 Stack
 
 **Backend**
@@ -334,6 +391,9 @@ Este repositorio es un fork traducido de [nando0x/ProspectOS](https://github.com
 - **Prompts de IA y estrategia de venta re-orientados**: de "vendo la creación de un sitio web" a "automatizo la atención por WhatsApp" (PresencIA). El detector de sitio sin web/con web mala se mantiene igual — sólo cambió a qué se lo lleva la conversación de venta.
 - **Catálogo de rubros en español rioplatense** (`frontend/src/lib/nichos.ts`): términos de búsqueda como se usan en Argentina, en vez de portugués de Brasil.
 - **Scraper e idioma de búsqueda en español/Argentina** (`-lang es`, `languageCode: es-419`, `regionCode: AR`) en vez de portugués/Brasil, para que Google Maps devuelva rubros y descripciones en español.
+- **Teléfono a WhatsApp corregido para Argentina** (`telefone_para_whatsapp` en `processar.py`): el original armaba el link con el código de país de Brasil (+55); ahora arma `+54 9 <área><número>`.
+- **Buscador por teléfono y datos de contacto editables**: la lista de leads también busca por teléfono, y el detalle del lead permite cargar o corregir a mano teléfono, e-mail, Instagram, Facebook y dirección.
+- **Login opcional + despliegue en la nube**: con `ADMIN_USER`/`ADMIN_PASSWORD` configurados, el backend exige sesión (ver [Despliegue en la nube](#-despliegue-en-la-nube-opcional)) — pensado para acceder a la misma base desde varias PCs. Sin esas variables, sigue funcionando exactamente igual que en local, sin login.
 
 Si el proyecto original recibe actualizaciones, este fork las tiene disponibles con `git remote add upstream https://github.com/nando0x/ProspectOS.git` y `git fetch upstream`, pero un merge directo probablemente choque con casi todo lo traducido — conviene revisarlo a mano, cambio por cambio.
 

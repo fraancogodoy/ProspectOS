@@ -48,6 +48,7 @@ _nivel_log = os.environ.get("PROSPECCAO_LOG_LEVEL", "INFO").upper()
 logging.getLogger().setLevel(getattr(logging, _nivel_log, logging.INFO))
 logger = logging.getLogger(__name__)
 
+import auth
 import db
 import jobs
 import processar
@@ -57,7 +58,26 @@ import rotas_conversa
 import rotas_instagram
 import rotas_leads
 
+# Presença de $PORT é como o Railway (e afins) sinaliza "isto é um servidor
+# compartilhado na nuvem" - liga cookie de sessão seguro (só HTTPS) e o bind
+# em 0.0.0.0 mais abaixo. Em dev/desktop local essa variável não existe.
+MODO_NUVEM = bool(os.environ.get("PORT"))
+
 app = Flask(__name__)
+app.secret_key = os.environ.get("SECRET_KEY") or os.urandom(32)
+app.config.update(
+    SESSION_COOKIE_HTTPONLY=True,
+    SESSION_COOKIE_SAMESITE="Lax",
+    SESSION_COOKIE_SECURE=MODO_NUVEM,
+    PERMANENT_SESSION_LIFETIME=60 * 60 * 24 * 30,  # 30 dias
+)
+if MODO_NUVEM and not os.environ.get("SECRET_KEY"):
+    logger.warning(
+        "SECRET_KEY não configurada no ambiente - gerada aleatoriamente neste "
+        "processo, então cada reinício do servidor derruba todas as sessões."
+    )
+app.before_request(auth.exigir_login_em_apis)
+app.register_blueprint(auth.bp)
 app.register_blueprint(rotas_leads.bp)
 app.register_blueprint(rotas_instagram.bp)
 app.register_blueprint(rotas_analytics.bp)
@@ -144,6 +164,14 @@ if __name__ == "__main__":
     if modo_dev:
         # dev com auto-reload do Flask, comportamento de sempre
         app.run(debug=True, port=5000)
+    elif MODO_NUVEM:
+        # servidor compartilhado: escuta em todas as interfaces, na porta que
+        # a plataforma injeta - nunca escolhe uma porta livre sozinho aqui
+        porta_nuvem = int(os.environ["PORT"])
+        logger.info("servindo em modo nuvem, porta %s", porta_nuvem)
+        from waitress import serve
+
+        serve(app, host="0.0.0.0", port=porta_nuvem, threads=8)
     else:
         porta = escolher_porta(5000)
         # anuncia a porta pra quem iniciou o processo (shell do app de desktop lê

@@ -30,6 +30,14 @@ async function request<T>(url: string, options?: RequestInit): Promise<T> {
     } catch {
       // resposta não era JSON, mantém a mensagem genérica
     }
+    // 401 en cualquier llamada (menos el propio intento de login, que puede
+    // fallar por credenciales incorrectas y no por sesión vencida) recarga la
+    // página: RequireAuth vuelve a consultar /api/auth/me y muestra el login
+    // - así una sesión que expiró en el servidor no deja al usuario mirando
+    // una pantalla con errores silenciosos por todos lados
+    if (response.status === 401 && !url.includes("/api/auth/login") && !url.includes("/api/auth/me")) {
+      window.location.reload()
+    }
     throw new ApiError(mensagem, response.status)
   }
 
