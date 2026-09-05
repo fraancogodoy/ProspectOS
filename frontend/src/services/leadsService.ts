@@ -18,6 +18,7 @@ function montarQueryString(
   if (filtros.busca) params.set("busca", filtros.busca)
   if (filtros.status) params.set("status", filtros.status)
   if (filtros.nicho) params.set("nicho", filtros.nicho)
+  if (filtros.campana) params.set("campana", filtros.campana)
   if (filtros.nota_min) params.set("nota_min", filtros.nota_min)
   if (filtros.ordenar) params.set("ordenar", filtros.ordenar)
   if (filtros.site_status) params.set("site_status", filtros.site_status)
@@ -75,6 +76,7 @@ export const leadsService = {
       instagram_url: string
       facebook_url: string
       email: string
+      campana: string
     }>
   ) =>
     httpClient.post<{ ok: true }>(
@@ -154,6 +156,7 @@ export function urlExportarCsv(filtros: Partial<FiltrosLeads>): string {
   if (filtros.busca) params.set("busca", filtros.busca)
   if (filtros.status) params.set("status", filtros.status)
   if (filtros.nicho) params.set("nicho", filtros.nicho)
+  if (filtros.campana) params.set("campana", filtros.campana)
   if (filtros.nota_min) params.set("nota_min", filtros.nota_min)
   if (filtros.site_status) params.set("site_status", filtros.site_status)
   const query = params.toString()

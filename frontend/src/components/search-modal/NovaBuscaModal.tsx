@@ -8,12 +8,15 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog"
 import { Textarea } from "@/components/ui/textarea"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { cn } from "@/lib/utils"
 import { BuscaProgress } from "@/components/search-modal/BuscaProgress"
 import { BuscaResultado } from "@/components/search-modal/BuscaResultado"
 import { MapaSeletorAreas } from "@/components/search-modal/MapaSeletorAreas"
 import { SeletorNichos } from "@/components/search-modal/SeletorNichos"
+import { useCampanas } from "@/hooks/useCampanas"
 import type { useBusca } from "@/hooks/useBusca"
 import type { AreaBusca } from "@/types/busca"
 
@@ -36,6 +39,8 @@ export function NovaBuscaModal({
   const [queries, setQueries] = useState("")
   const [nichos, setNichos] = useState<string[]>([])
   const [areas, setAreas] = useState<AreaBusca[]>([])
+  const [campana, setCampana] = useState("")
+  const { data: campanasExistentes } = useCampanas()
   const {
     dispararBusca,
     dispararBuscaMapa,
@@ -53,18 +58,21 @@ export function NovaBuscaModal({
 
   const handleConfirmar = () => {
     if (!podeBuscar) return
+    const campanaLimpa = campana.trim() || undefined
     if (modo === "texto") {
-      dispararBusca.mutate(queries)
+      dispararBusca.mutate({ queries, campana: campanaLimpa })
     } else {
       dispararBuscaMapa.mutate({
         nichos,
         areas: areas.map(({ lat, lng, raio_m, rotulo }) => ({ lat, lng, raio_m, rotulo })),
+        campana: campanaLimpa,
       })
     }
   }
 
   const handleFechar = () => {
     limparResultado()
+    setCampana("")
     onFechar()
   }
 
@@ -138,6 +146,25 @@ export function NovaBuscaModal({
               onChange={setNichos}
               desabilitado={Boolean(rodando)}
             />
+          </div>
+        )}
+
+        {!rodando && !resultadoFinal && (
+          <div className="space-y-1.5">
+            <Label htmlFor="campana-busca">Campaña (opcional)</Label>
+            <Input
+              id="campana-busca"
+              list="campanas-existentes"
+              value={campana}
+              onChange={(e) => setCampana(e.target.value)}
+              placeholder='Ej.: "belleza", "inmobiliarias", "deportes"'
+            />
+            <datalist id="campanas-existentes">
+              {campanasExistentes?.map((c) => <option key={c} value={c} />)}
+            </datalist>
+            <p className="text-xs text-muted-foreground">
+              Agrupá esta búsqueda bajo un nombre para filtrarla después en la lista de leads.
+            </p>
           </div>
         )}
 

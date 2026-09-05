@@ -2,6 +2,7 @@ import { useEffect, useState } from "react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
+import { useCampanas } from "@/hooks/useCampanas"
 import type { Lead } from "@/types/lead"
 
 interface LeadContatoFormProps {
@@ -12,6 +13,7 @@ interface LeadContatoFormProps {
     instagram_url: string
     facebook_url: string
     email: string
+    campana: string
   }) => void
   salvando: boolean
 }
@@ -26,6 +28,8 @@ export function LeadContatoForm({ lead, onSalvar, salvando }: LeadContatoFormPro
   const [instagram, setInstagram] = useState(lead.instagram_url ?? "")
   const [facebook, setFacebook] = useState(lead.facebook_url ?? "")
   const [email, setEmail] = useState(lead.email ?? "")
+  const [campana, setCampana] = useState(lead.campana ?? "")
+  const { data: campanasExistentes } = useCampanas()
 
   useEffect(() => {
     setTelefone(lead.telefone ?? "")
@@ -33,7 +37,11 @@ export function LeadContatoForm({ lead, onSalvar, salvando }: LeadContatoFormPro
     setInstagram(lead.instagram_url ?? "")
     setFacebook(lead.facebook_url ?? "")
     setEmail(lead.email ?? "")
-  }, [lead.place_id, lead.telefone, lead.endereco, lead.instagram_url, lead.facebook_url, lead.email])
+    setCampana(lead.campana ?? "")
+  }, [
+    lead.place_id, lead.telefone, lead.endereco, lead.instagram_url,
+    lead.facebook_url, lead.email, lead.campana,
+  ])
 
   return (
     <div className="space-y-3">
@@ -79,6 +87,18 @@ export function LeadContatoForm({ lead, onSalvar, salvando }: LeadContatoFormPro
             placeholder="Calle 123, Tandil"
           />
         </div>
+        <div className="space-y-1.5 sm:col-span-2">
+          <Label>Campaña</Label>
+          <Input
+            list="campanas-existentes-contato"
+            value={campana}
+            onChange={(e) => setCampana(e.target.value)}
+            placeholder='Ej.: "belleza", "inmobiliarias"'
+          />
+          <datalist id="campanas-existentes-contato">
+            {campanasExistentes?.map((c) => <option key={c} value={c} />)}
+          </datalist>
+        </div>
       </div>
       <Button
         size="sm"
@@ -91,6 +111,7 @@ export function LeadContatoForm({ lead, onSalvar, salvando }: LeadContatoFormPro
             instagram_url: instagram,
             facebook_url: facebook,
             email,
+            campana,
           })
         }
       >

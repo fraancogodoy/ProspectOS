@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button"
 import { SearchInput } from "@/components/filters/SearchInput"
 import { StatusSelect } from "@/components/filters/StatusSelect"
 import { NichoSelect } from "@/components/filters/NichoSelect"
+import { CampanaSelect } from "@/components/filters/CampanaSelect"
 import { NotaMinSelect } from "@/components/filters/NotaMinSelect"
 import { OrdenacaoLeadsSelect } from "@/components/filters/OrdenacaoLeadsSelect"
 import { SituacaoSiteSelect } from "@/components/filters/SituacaoSiteSelect"
@@ -37,6 +38,10 @@ export function LeadFilterBar({
       <NichoSelect
         valor={filtros.nicho}
         onChange={(nicho) => setFiltros((f) => ({ ...f, nicho }))}
+      />
+      <CampanaSelect
+        valor={filtros.campana}
+        onChange={(campana) => setFiltros((f) => ({ ...f, campana }))}
       />
       <NotaMinSelect
         valor={filtros.nota_min}

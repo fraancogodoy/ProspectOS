@@ -181,10 +181,13 @@ def liberar_analise_instagram():
     estado_instagram["rodando"] = False
 
 
-def iniciar_thread_busca(areas=None):
+def iniciar_thread_busca(areas=None, campana=None):
     """`areas` (opcional) liga o modo mapa: lista de dicts {lat, lng, raio_m, rotulo} -
-    o scraper roda uma vez por área, com as flags de geolocalização."""
-    threading.Thread(target=_rodar_busca_em_background, args=(areas,), daemon=True).start()
+    o scraper roda uma vez por área, com as flags de geolocalização. `campana` é o
+    rótulo que o usuário deu a esta busca, pra agrupar vários nichos num mesmo filtro."""
+    threading.Thread(
+        target=_rodar_busca_em_background, args=(areas, campana), daemon=True
+    ).start()
 
 
 def iniciar_thread_analise_instagram(post_id, post_url, nicho_alvo, arquivo_comentarios=None):
@@ -456,7 +459,7 @@ def _capturar_dados_brutos(arquivo_bruto, ambiente, area=None):
     return _executar_scraper(arquivo_bruto, ambiente, flags_geo)
 
 
-def _buscar_por_areas(areas, ambiente, data):
+def _buscar_por_areas(areas, ambiente, data, campana=None):
     """Modo mapa: roda a fonte uma vez por área (pino + raio), processando cada
     resultado com a cidade/rótulo do pino. Uma área que falha não derruba as
     outras - vira um aviso no resultado final. Retorna as contagens somadas, ou
@@ -489,6 +492,7 @@ def _buscar_por_areas(areas, ambiente, data):
             callback_progresso=_callback_progresso_verificacao,
             cidade_padrao=rotulo,
             sufixo_saida=f"_{data}_area{i}",
+            campana=campana,
         )
         for chave in CHAVES_CONTAGENS_SOMADAS:
             total[chave] += contagens.get(chave, 0)
@@ -504,7 +508,7 @@ def _buscar_por_areas(areas, ambiente, data):
     return total
 
 
-def _rodar_busca_em_background(areas=None):
+def _rodar_busca_em_background(areas=None, campana=None):
     global _job_id_busca
     estado_busca["rodando"] = True
     estado_busca["mensagem"] = "Buscando en Google Maps..."
@@ -539,7 +543,7 @@ def _rodar_busca_em_background(areas=None):
         )
 
         if areas:
-            contagens = _buscar_por_areas(areas, ambiente, data)
+            contagens = _buscar_por_areas(areas, ambiente, data, campana=campana)
             if contagens is None:
                 return  # todas as áreas falharam - mensagem já definida
         else:
@@ -554,7 +558,9 @@ def _rodar_busca_em_background(areas=None):
             estado_busca["mensagem"] = "Filtrando leads y generando WhatsApp..."
             estado_busca["etapa"] = "verificando_sites"
             estado_busca["empresas_processadas"] = 0
-            contagens = processar.processar(arquivo_bruto, callback_progresso=_callback_progresso_verificacao)
+            contagens = processar.processar(
+                arquivo_bruto, callback_progresso=_callback_progresso_verificacao, campana=campana,
+            )
 
         fonte = db.obter_config("fonte_maps") or "scraper"
         if contagens["total_no_csv"] == 0:

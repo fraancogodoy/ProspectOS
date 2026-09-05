@@ -327,7 +327,10 @@ class TestBuscaPorMapa:
         disparos = []
         # o queries.txt é escrito na área de dados (paths.DIR_DADOS)
         monkeypatch.setattr(paths, "DIR_DADOS", tmp_path)
-        monkeypatch.setattr(jobs, "iniciar_thread_busca", lambda areas=None: disparos.append(areas))
+        monkeypatch.setattr(
+            jobs, "iniciar_thread_busca",
+            lambda areas=None, campana=None: disparos.append(areas),
+        )
         return cliente, tmp_path, disparos
 
     def test_dispara_busca_por_mapa(self, ambiente_busca):

@@ -468,6 +468,7 @@ def migrar_banco(conexao):
         "instagram_url": "TEXT",
         "facebook_url": "TEXT",
         "email": "TEXT",
+        "campana": "TEXT",
     }
     for nome, tipo in novas_colunas.items():
         if nome not in colunas_existentes:
@@ -864,11 +865,13 @@ def _verificar_candidata(indice, linha):
 
 
 def processar(caminho_csv_bruto, caminho_queries=CAMINHO_QUERIES_PADRAO, callback_progresso=None,
-              cidade_padrao=None, sufixo_saida=""):
+              cidade_padrao=None, sufixo_saida="", campana=None):
     """Processa o CSV bruto do scraper. `cidade_padrao` preenche a cidade quando a
     query não tem " em <cidade>" (busca por mapa: a query é só o nicho, e a cidade
     vem do pino). `sufixo_saida` diferencia o CSV de novos quando várias áreas são
-    processadas na mesma rodada (senão uma sobrescreveria a outra)."""
+    processadas na mesma rodada (senão uma sobrescreveria a outra). `campana` é o
+    rótulo livre que o usuário deu a esta busca (ex: "belleza", "inmobiliarias") -
+    agrupa buscas de vários nichos numa mesma campanha pro filtro do painel."""
     caminho_csv_bruto = Path(caminho_csv_bruto)
     PASTA_SAIDAS.mkdir(exist_ok=True)
 
@@ -966,9 +969,9 @@ def processar(caminho_csv_bruto, caminho_queries=CAMINHO_QUERIES_PADRAO, callbac
                         place_id, nome, categoria, endereco, nota, num_avaliacoes,
                         whatsapp_link, telefone, query_origem, nicho, cidade,
                         site_url, site_status, site_problemas, site_checklist, instagram_url,
-                        visto_em, atualizado_em
+                        campana, visto_em, atualizado_em
                     )
-                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                     ON CONFLICT(place_id) DO UPDATE SET
                         nome = excluded.nome,
                         categoria = excluded.categoria,
@@ -982,6 +985,7 @@ def processar(caminho_csv_bruto, caminho_queries=CAMINHO_QUERIES_PADRAO, callbac
                         site_problemas = excluded.site_problemas,
                         site_checklist = excluded.site_checklist,
                         instagram_url = COALESCE(excluded.instagram_url, instagram_url),
+                        campana = COALESCE(campana, excluded.campana),
                         atualizado_em = excluded.atualizado_em
                     """,
                     (
@@ -1001,6 +1005,7 @@ def processar(caminho_csv_bruto, caminho_queries=CAMINHO_QUERIES_PADRAO, callbac
                         site_problemas,
                         site_checklist,
                         verificacao["instagram_url"],
+                        campana,
                         hoje,
                         agora,
                     ),

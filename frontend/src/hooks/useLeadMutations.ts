@@ -1,4 +1,4 @@
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { leadsService } from "@/services/leadsService"
 import { useInvalidarLeads } from "@/hooks/useInvalidarLeads"
@@ -13,6 +13,7 @@ interface EstadoFollowupAnterior {
 
 export function useLeadMutations(placeId: string) {
   const invalidarListaEMetricas = useInvalidarLeads()
+  const queryClient = useQueryClient()
 
   const atualizarStatus = useMutation({
     mutationFn: (status: StatusLead) =>
@@ -47,6 +48,7 @@ export function useLeadMutations(placeId: string) {
       leadsService.atualizarContato(placeId, dados),
     onSuccess: () => {
       invalidarListaEMetricas()
+      queryClient.invalidateQueries({ queryKey: ["campanas"] })
       toast.success("Datos de contacto guardados.")
     },
   })

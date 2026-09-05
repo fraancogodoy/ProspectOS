@@ -23,13 +23,21 @@ export function useBusca() {
   }
 
   const dispararBusca = useMutation({
-    mutationFn: (queries: string) => buscaService.disparar(queries),
+    mutationFn: ({ queries, campana }: { queries: string; campana?: string }) =>
+      buscaService.disparar(queries, campana),
     onSuccess: aoDisparar,
   })
 
   const dispararBuscaMapa = useMutation({
-    mutationFn: ({ nichos, areas }: { nichos: string[]; areas: AreaBuscaPayload[] }) =>
-      buscaService.dispararPorMapa(nichos, areas),
+    mutationFn: ({
+      nichos,
+      areas,
+      campana,
+    }: {
+      nichos: string[]
+      areas: AreaBuscaPayload[]
+      campana?: string
+    }) => buscaService.dispararPorMapa(nichos, areas, campana),
     onSuccess: aoDisparar,
   })
 
@@ -46,6 +54,7 @@ export function useBusca() {
       setPoll(false)
       setResultadoFinal(statusBusca.data)
       queryClient.invalidateQueries({ queryKey: ["nichos"] })
+      queryClient.invalidateQueries({ queryKey: ["campanas"] })
       invalidarListaEMetricas()
       notificar("Búsqueda de leads terminada", statusBusca.data.mensagem)
       tocarSom("busca-maps-concluida")

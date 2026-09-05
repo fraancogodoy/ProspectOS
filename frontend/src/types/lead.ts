@@ -45,6 +45,7 @@ export interface Lead {
   instagram_url: string | null
   facebook_url: string | null
   email: string | null
+  campana: string | null
 }
 
 export interface HistoricoStatusItem {
@@ -57,6 +58,7 @@ export interface FiltrosLeads {
   busca: string
   status: StatusLead | ""
   nicho: string
+  campana: string
   nota_min: "" | "4" | "4.5" | "5"
   ordenar: "" | "score"
   site_status: "" | "sem_site" | "site_ruim" | "site_ok"
@@ -68,6 +70,7 @@ export const FILTROS_VAZIOS: FiltrosLeads = {
   busca: "",
   status: "",
   nicho: "",
+  campana: "",
   nota_min: "",
   ordenar: "",
   site_status: "",

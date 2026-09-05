@@ -20,6 +20,7 @@ from validacao import validar_ids_bulk
 from constantes import (
     DIAS_PARA_LEAD_DIFICIL,
     MAX_AREAS_BUSCA_MAPA,
+    MAX_CARACTERES_CAMPANA,
     MAX_CARACTERES_CONTATO,
     MAX_CARACTERES_NICHO_BUSCA,
     MAX_CARACTERES_OBSERVACOES,
@@ -121,6 +122,7 @@ def listar_leads():
     Paginado via limit/offset (padrão: 30 por página). Resposta: {leads, tem_mais}."""
     status = request.args.get("status", "").strip()
     nicho = request.args.get("nicho", "").strip()
+    campana = request.args.get("campana", "").strip()
     nota_min_bruta = request.args.get("nota_min", "").strip()
     busca_texto = request.args.get("busca", "").strip()
     ordenar = request.args.get("ordenar", "").strip()
@@ -158,6 +160,9 @@ def listar_leads():
     if nicho:
         condicoes.append("nicho = ?")
         parametros.append(nicho)
+    if campana:
+        condicoes.append("campana = ?")
+        parametros.append(campana)
     if nota_min_bruta:
         try:
             nota_min = float(nota_min_bruta)
@@ -231,6 +236,23 @@ def listar_nichos():
         conexao.close()
 
     return jsonify([linha["nicho"] for linha in linhas])
+
+
+@bp.route("/api/campanhas")
+def listar_campanhas():
+    """Lista os valores distintos de campana, pra popular o filtro."""
+    if not db.CAMINHO_BANCO.exists():
+        return jsonify([])
+
+    conexao = db.conectar()
+    try:
+        linhas = conexao.execute(
+            "SELECT DISTINCT campana FROM leads WHERE campana IS NOT NULL AND campana != '' ORDER BY campana"
+        ).fetchall()
+    finally:
+        conexao.close()
+
+    return jsonify([linha["campana"] for linha in linhas])
 
 
 @bp.route("/api/leads/<place_id>/status", methods=["POST"])
@@ -503,14 +525,15 @@ def atualizar_followup(place_id):
     return jsonify({"ok": True})
 
 
-CAMPOS_CONTATO_EDITAVEIS = ("telefone", "endereco", "instagram_url", "facebook_url", "email")
+CAMPOS_CONTATO_EDITAVEIS = ("telefone", "endereco", "instagram_url", "facebook_url", "email", "campana")
 
 
 @bp.route("/api/leads/<place_id>/contato", methods=["POST"])
 def atualizar_contato(place_id):
     """Edita à mão os dados de contato do lead (telefone/celular, endereço,
-    Instagram, Facebook, e-mail) - útil quando o scraper não capturou algum
-    deles ou quando o vendedor descobre um dado a mais durante a prospecção.
+    Instagram, Facebook, e-mail, campanha) - útil quando o scraper não capturou
+    algum deles, quando o vendedor descobre um dado a mais durante a prospecção,
+    ou quando quer mover o lead pra outra campanha depois de criado.
     Ao mudar o telefone, o link do WhatsApp é regerado a partir dele."""
     corpo = request.json or {}
 
@@ -794,6 +817,7 @@ def exportar_csv():
     """Exporta os leads (respeitando os mesmos filtros da tela) num CSV completo pra download."""
     status = request.args.get("status", "").strip()
     nicho = request.args.get("nicho", "").strip()
+    campana = request.args.get("campana", "").strip()
     site_status_filtro = request.args.get("site_status", "").strip()
 
     condicoes = []
@@ -806,6 +830,9 @@ def exportar_csv():
     if nicho:
         condicoes.append("nicho = ?")
         parametros.append(nicho)
+    if campana:
+        condicoes.append("campana = ?")
+        parametros.append(campana)
     if site_status_filtro in SITUACOES_SITE_VALIDAS:
         condicoes.append("site_status = ?")
         parametros.append(site_status_filtro)
@@ -830,7 +857,7 @@ def exportar_csv():
             "query_origem", "proximo_followup", "follow_ups_enviados",
             "ultimo_followup_em", "mensagem_gerada",
             "site_status", "site_url", "site_problemas", "instagram_url",
-            "facebook_url", "email",
+            "facebook_url", "email", "campana",
         ]
     )
     for lead in linhas:
@@ -859,6 +886,7 @@ def exportar_csv():
                 lead["instagram_url"] or "",
                 lead["facebook_url"] or "",
                 lead["email"] or "",
+                lead["campana"] or "",
             ]
         )
 
@@ -954,6 +982,8 @@ def disparar_busca():
     corpo = request.json or {}
     modo_mapa = "areas" in corpo or "nichos" in corpo
 
+    campana = str(corpo.get("campana") or "").strip()[:MAX_CARACTERES_CAMPANA] or None
+
     if modo_mapa:
         resultado, erro = _validar_busca_por_mapa(corpo)
         if erro:
@@ -972,7 +1002,7 @@ def disparar_busca():
         # queries.txt é escrito a cada busca - vai pra área de dados (gravável)
         caminho_queries = paths.caminho_dados("queries.txt", criar_pai=True)
         caminho_queries.write_text(queries_texto + "\n", encoding="utf-8")
-        jobs.iniciar_thread_busca(areas)
+        jobs.iniciar_thread_busca(areas, campana=campana)
     except Exception:
         jobs.liberar_busca()  # senão a flag ficaria presa em True pra sempre
         raise
