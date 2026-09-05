@@ -169,7 +169,7 @@ def buscar_com_places_api(queries, arquivo_csv, chave, area=None, callback_query
 def validar_chave_places(chave):
     """Faz uma busca mínima só pra validar a chave. Retorna (ok, mensagem_erro)."""
     try:
-        _consultar_pagina(chave, {"textQuery": "padaria em São Paulo", "pageSize": 1, "languageCode": "pt-BR"})
+        _consultar_pagina(chave, {"textQuery": "panadería en Tandil", "pageSize": 1, "languageCode": "es-419"})
         return True, None
     except ErroPlacesApi as erro:
         return False, str(erro)

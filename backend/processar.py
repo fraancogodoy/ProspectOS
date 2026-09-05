@@ -372,7 +372,7 @@ def buscar_instagram_da_empresa(nome, cidade_ou_endereco=""):
     consulta = f"{nome} {cidade_ou_endereco} instagram".strip()
     try:
         resultados = DDGS(timeout=BUSCA_TIMEOUT_SEGUNDOS).text(
-            consulta, max_results=5, region="br-pt", backend=BUSCA_BACKENDS
+            consulta, max_results=5, region="ar-es", backend=BUSCA_BACKENDS
         )
     except Exception:
         return None
@@ -403,11 +403,11 @@ def buscar_site_da_empresa(nome, cidade_ou_endereco=""):
     except ImportError:
         return None
 
-    consulta = f"{nome} {cidade_ou_endereco} site oficial".strip()
+    consulta = f"{nome} {cidade_ou_endereco} sitio web oficial".strip()
 
     try:
         resultados = DDGS(timeout=BUSCA_TIMEOUT_SEGUNDOS).text(
-            consulta, max_results=5, region="br-pt", backend=BUSCA_BACKENDS
+            consulta, max_results=5, region="ar-es", backend=BUSCA_BACKENDS
         )
     except Exception:
         return None  # falha na busca não deve travar o processamento do lead
