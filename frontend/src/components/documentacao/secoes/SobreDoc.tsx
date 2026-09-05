@@ -1,33 +1,40 @@
-import { X } from "lucide-react"
-import { InstagramIcon } from "@/components/icons/InstagramIcon"
 import { GitHubIcon } from "@/components/icons/GitHubIcon"
-import { DocSection, DocP } from "@/components/documentacao/DocSection"
+import { DocSection, DocP, DocH2 } from "@/components/documentacao/DocSection"
 
 const LINKS = [
   {
-    label: "X (Twitter)",
-    url: "https://x.com/nandoodev3",
-    icone: X,
+    label: "Este repositorio (fork)",
+    url: "https://github.com/fraancogodoy/ProspectOS",
+    icone: GitHubIcon,
   },
   {
-    label: "Instagram",
-    url: "https://www.instagram.com/nandoodev/",
-    icone: InstagramIcon,
-  },
-  {
-    label: "GitHub",
-    url: "https://github.com/nando0x",
+    label: "Proyecto original (nando0x/ProspectOS)",
+    url: "https://github.com/nando0x/ProspectOS",
     icone: GitHubIcon,
   },
 ]
 
 export function SobreDoc() {
   return (
-    <DocSection titulo="Sobre / Contato">
+    <DocSection titulo="Acerca de">
       <DocP>
-        Esta ferramenta foi criada para automatizar a prospecção de clientes
-        de serviços de criação de sites, combinando Google Maps e Instagram
-        num só fluxo de trabalho.
+        Esta herramienta prospecta clientes potenciales para PresencIA
+        (automatización de WhatsApp para negocios chicos: peluquerías,
+        canchas, inmobiliarias), combinando Google Maps e Instagram en un
+        solo flujo de trabajo. Es un fork traducido y adaptado del proyecto
+        original <strong>ProspectOS</strong>, pensado originalmente para
+        prospectar clientes de venta de sitios web.
+      </DocP>
+
+      <DocH2>Qué cambia en este fork</DocH2>
+      <DocP>
+        Interfaz completa en español, campañas para agrupar búsquedas,
+        búsqueda por teléfono, datos de contacto editables (celular,
+        Instagram, Facebook, e-mail, dirección), corrección del link de
+        WhatsApp para números argentinos, copia de seguridad exportable/
+        importable entre instalaciones, despliegue en la nube con login
+        opcional, y un botón para borrar todos los leads de una base de
+        prueba.
       </DocP>
 
       <div className="flex flex-col gap-2 pt-2 sm:flex-row">

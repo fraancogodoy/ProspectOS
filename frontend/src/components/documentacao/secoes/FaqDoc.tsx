@@ -2,42 +2,56 @@ import { DocSection, DocH2, DocP } from "@/components/documentacao/DocSection"
 
 export function FaqDoc() {
   return (
-    <DocSection titulo="Perguntas comuns">
-      <DocH2>Rodei a mesma busca de novo, os leads antigos vão duplicar?</DocH2>
+    <DocSection titulo="Preguntas comunes">
+      <DocH2>Corrí la misma búsqueda de nuevo, ¿los leads viejos se duplican?</DocH2>
       <DocP>
-        Não. Cada empresa é identificada pelo <code>place_id</code> do
-        Google, então rodar a mesma busca depois só atualiza dados "vivos"
-        (nome, nota, telefone) sem mexer no status, tags, observações ou
-        follow-up que você já tinha preenchido.
+        No. Cada negocio se identifica por el <code>place_id</code> de
+        Google, así que correr la misma búsqueda después solo actualiza los
+        datos "vivos" (nombre, puntuación, teléfono) sin tocar el estado,
+        etiquetas, notas o seguimiento que ya habías cargado. Tampoco te pisa
+        la campaña ya asignada si el lead ya existía.
       </DocP>
 
-      <DocH2>A busca no Maps não retornou nenhum resultado, o que houve?</DocH2>
+      <DocH2>La búsqueda en Maps no trajo ningún resultado, ¿qué pasó?</DocH2>
       <DocP>
-        Confira se o <code>google-maps-scraper.exe</code> está na pasta
-        correta e se o nicho/cidade está bem escrito. Nichos muito
-        específicos ou cidades pequenas podem realmente não ter resultado
-        qualificado (nota alta + sem site).
+        Fijate si el <code>google-maps-scraper.exe</code> está en la carpeta
+        correcta y si el rubro/ciudad está bien escrito. Rubros muy
+        específicos o ciudades chicas pueden de verdad no tener ningún
+        resultado que califique (buena puntuación + sin sitio web).
       </DocP>
 
-      <DocH2>Posso usar sem chave de IA configurada?</DocH2>
+      <DocH2>¿Puedo usarlo sin clave de IA configurada?</DocH2>
       <DocP>
-        Sim, para buscar e organizar leads. Só a geração de mensagem por IA
-        (copy de contato/follow-up) e a classificação automática do Instagram
-        precisam de pelo menos uma chave configurada em "Configurações".
+        Sí, para buscar y organizar leads. Solo la generación de mensajes por
+        IA (copy de contacto/seguimiento) y la clasificación automática de
+        Instagram necesitan al menos una clave configurada en
+        "Configuración".
       </DocP>
 
-      <DocH2>Excluí um lead sem querer, dá pra recuperar?</DocH2>
+      <DocH2>Eliminé un lead sin querer, ¿se puede recuperar?</DocH2>
       <DocP>
-        Se foi "ignorar", sim — ele só fica escondido, procure pelo filtro de
-        status "Ignorado". Se foi "excluir definitivamente", não — essa ação
-        apaga do banco de vez, por isso só é permitida em leads já ignorados
-        (uma proteção extra contra clique errado).
+        Si fue "ignorar", sí — solo queda escondido, buscalo con el filtro de
+        estado "Ignorado". Si fue "eliminar definitivamente", no — esa acción
+        borra de la base para siempre, por eso solo está permitida en leads
+        ya ignorados (una protección extra contra un clic por error). El
+        botón "Eliminar todos los leads" de Configuración es todavía más
+        radical: borra absolutamente todos los leads de Maps de una vez, sin
+        ninguna posibilidad de deshacerlo.
       </DocP>
 
-      <DocH2>O Instagram está pedindo login de novo, é normal?</DocH2>
+      <DocH2>Instagram me pide iniciar sesión de nuevo, ¿es normal?</DocH2>
       <DocP>
-        Sim, sessões expiram de tempos em tempos. Basta rodar o script de
-        login novamente (veja a seção "Instalação").
+        Sí, las sesiones vencen cada tanto. Alcanza con volver a iniciar
+        sesión desde Configuración → Cuenta de Instagram.
+      </DocP>
+
+      <DocH2>¿Para qué sirve la "campaña" de una búsqueda?</DocH2>
+      <DocP>
+        Es un rótulo opcional para agrupar leads de varias búsquedas bajo un
+        mismo nombre (ej.: todas las búsquedas de peluquerías, spas y
+        centros de estética bajo la campaña "belleza"), aunque sean rubros
+        distintos. Sirve para filtrar y organizar el trabajo de prospección
+        por tema, no cambia en nada cómo se buscan o procesan los leads.
       </DocP>
     </DocSection>
   )

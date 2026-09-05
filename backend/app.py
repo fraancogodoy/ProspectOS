@@ -102,7 +102,7 @@ def tratar_erro_generico(erro):
     if isinstance(erro, HTTPException):
         return erro  # 404, 405 etc. devem chegar como são, não virar erro interno
     logger.exception("erro não tratado numa rota")
-    return jsonify({"erro": "Ocorreu um erro interno. Veja detalhes em logs/prospeccao.log."}), 500
+    return jsonify({"erro": "Ocurrió un error interno. Mirá los detalles en logs/prospeccao.log."}), 500
 
 
 # ---------------------------------------------------------------------------
@@ -128,7 +128,7 @@ def servir_frontend(caminho):
         abort(404)  # rota de API inexistente não deve devolver HTML
     if not DIR_FRONTEND_DIST.exists():
         return (
-            jsonify({"erro": "Interface não encontrada. Em dev, use http://localhost:5173 (iniciar.bat)."}),
+            jsonify({"erro": "No se encontró la interfaz. En desarrollo, usá http://localhost:5173 (iniciar.bat)."}),
             404,
         )
     if (DIR_FRONTEND_DIST / caminho).is_file():

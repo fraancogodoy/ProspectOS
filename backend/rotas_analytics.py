@@ -345,7 +345,7 @@ def salvar_meta_semanal():
     meta = dados.get("meta")
 
     if not isinstance(meta, int) or meta < 0:
-        return jsonify({"erro": "meta deve ser um número inteiro maior ou igual a 0"}), 400
+        return jsonify({"erro": "meta debe ser un número entero mayor o igual a 0"}), 400
 
     db.salvar_config(CHAVE_CONFIG_META_SEMANAL, str(meta))
     return jsonify({"ok": True, "meta": meta})

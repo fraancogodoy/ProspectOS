@@ -582,7 +582,7 @@ def _rodar_busca_em_background(areas=None, campana=None):
 
         avisos_areas = contagens.get("avisos_areas") or []
         if avisos_areas:
-            estado_busca["mensagem"] += " Atenção: " + " | ".join(avisos_areas)
+            estado_busca["mensagem"] += " Atención: " + " | ".join(avisos_areas)
 
         status_final = "concluido"
         logger.info("busca concluída: %s", contagens)

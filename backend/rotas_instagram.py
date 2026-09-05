@@ -43,12 +43,12 @@ def analisar_post_instagram():
     post_url = corpo.get("post_url", "").strip()
     nicho_alvo = str(corpo.get("nicho_alvo") or "").strip() or None
     if not post_url or not REGEX_URL_POST_INSTAGRAM.match(post_url):
-        return jsonify({"erro": "informe uma URL válida de post do Instagram (ex: https://www.instagram.com/p/XXXXX/)"}), 400
+        return jsonify({"erro": "informá una URL válida de post de Instagram (ej.: https://www.instagram.com/p/XXXXX/)"}), 400
     if nicho_alvo and len(nicho_alvo) > MAX_CARACTERES_NICHO_ALVO:
-        return jsonify({"erro": f"nicho-alvo muito longo (máximo {MAX_CARACTERES_NICHO_ALVO} caracteres)"}), 400
+        return jsonify({"erro": f"rubro objetivo muy largo (máximo {MAX_CARACTERES_NICHO_ALVO} caracteres)"}), 400
 
     if not jobs.tentar_reservar_analise_instagram():
-        return jsonify({"erro": "já existe uma análise em andamento"}), 409
+        return jsonify({"erro": "ya existe un análisis en curso"}), 409
 
     try:
         conexao = db.conectar()
@@ -100,17 +100,17 @@ def retomar_analise_instagram(post_id):
         conexao.close()
 
     if post is None:
-        return jsonify({"erro": "post não encontrado"}), 404
+        return jsonify({"erro": "post no encontrado"}), 404
     if post["etapa"] == "concluido":
-        return jsonify({"erro": "esta análise já foi concluída"}), 400
+        return jsonify({"erro": "este análisis ya fue completado"}), 400
     if not _pode_retomar(post):
         return jsonify({
-            "erro": "não dá para retomar esta análise (os comentários raspados não foram "
-                    "encontrados) - inicie uma nova análise com a URL do post"
+            "erro": "no se puede retomar este análisis (no se encontraron los comentarios "
+                    "raspados) - iniciá un análisis nuevo con la URL del post"
         }), 400
 
     if not jobs.tentar_reservar_analise_instagram():
-        return jsonify({"erro": "já existe uma análise em andamento"}), 409
+        return jsonify({"erro": "ya existe un análisis en curso"}), 409
 
     try:
         conexao = db.conectar()
@@ -176,7 +176,7 @@ def arquivar_post_instagram(post_id):
         )
         conexao.commit()
         if cursor.rowcount == 0:
-            return jsonify({"erro": "post não encontrado"}), 404
+            return jsonify({"erro": "post no encontrado"}), 404
     finally:
         conexao.close()
 
@@ -192,7 +192,7 @@ def desarquivar_post_instagram(post_id):
         )
         conexao.commit()
         if cursor.rowcount == 0:
-            return jsonify({"erro": "post não encontrado"}), 404
+            return jsonify({"erro": "post no encontrado"}), 404
     finally:
         conexao.close()
 
@@ -210,9 +210,9 @@ def excluir_post_instagram_definitivamente(post_id):
             "SELECT arquivado_em FROM instagram_posts WHERE id = ?", (post_id,)
         ).fetchone()
         if post is None:
-            return jsonify({"erro": "post não encontrado"}), 404
+            return jsonify({"erro": "post no encontrado"}), 404
         if post["arquivado_em"] is None:
-            return jsonify({"erro": "só é possível excluir definitivamente posts já arquivados"}), 400
+            return jsonify({"erro": "solo se puede eliminar definitivamente posts que ya estén archivados"}), 400
 
         ids_leads = [
             linha["id"]
@@ -356,13 +356,13 @@ def gravar_analise_lead_instagram(lead_id):
     nicho = str(dados.get("nicho", ""))
 
     if prioridade not in PRIORIDADES_VALIDAS:
-        return jsonify({"erro": f"prioridade inválida (use: {', '.join(sorted(PRIORIDADES_VALIDAS))})"}), 400
+        return jsonify({"erro": f"prioridad inválida (usá: {', '.join(sorted(PRIORIDADES_VALIDAS))})"}), 400
     if len(justificativa) > MAX_CARACTERES_JUSTIFICATIVA:
-        return jsonify({"erro": f"justificativa muito longa (máximo {MAX_CARACTERES_JUSTIFICATIVA} caracteres)"}), 400
+        return jsonify({"erro": f"justificación muy larga (máximo {MAX_CARACTERES_JUSTIFICATIVA} caracteres)"}), 400
     if len(sugestao_dm) > MAX_CARACTERES_SUGESTAO_DM:
-        return jsonify({"erro": f"sugestão de DM muito longa (máximo {MAX_CARACTERES_SUGESTAO_DM} caracteres)"}), 400
+        return jsonify({"erro": f"sugerencia de DM muy larga (máximo {MAX_CARACTERES_SUGESTAO_DM} caracteres)"}), 400
     if len(nicho) > MAX_CARACTERES_NICHO_INSTAGRAM:
-        return jsonify({"erro": f"nicho muito longo (máximo {MAX_CARACTERES_NICHO_INSTAGRAM} caracteres)"}), 400
+        return jsonify({"erro": f"rubro muy largo (máximo {MAX_CARACTERES_NICHO_INSTAGRAM} caracteres)"}), 400
 
     conexao = db.conectar()
     try:
@@ -372,7 +372,7 @@ def gravar_analise_lead_instagram(lead_id):
         )
         conexao.commit()
         if cursor.rowcount == 0:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
     finally:
         conexao.close()
 
@@ -383,21 +383,21 @@ def gravar_analise_lead_instagram(lead_id):
 def gravar_analise_lead_instagram_em_lote():
     itens = (request.json or {}).get("leads", [])
     if not isinstance(itens, list) or not itens:
-        return jsonify({"erro": "envie {\"leads\": [{id, prioridade, justificativa, sugestao_dm, nicho}, ...]}"}), 400
+        return jsonify({"erro": "enviá {\"leads\": [{id, prioridade, justificativa, sugestao_dm, nicho}, ...]}"}), 400
     if len(itens) > MAX_IDS_BULK:
-        return jsonify({"erro": f"no máximo {MAX_IDS_BULK} leads por vez (você enviou {len(itens)})"}), 400
+        return jsonify({"erro": f"como máximo {MAX_IDS_BULK} leads por vez (enviaste {len(itens)})"}), 400
 
     for item in itens:
         if not isinstance(item, dict) or "id" not in item:
-            return jsonify({"erro": "cada lead precisa ter um 'id'"}), 400
+            return jsonify({"erro": "cada lead necesita tener un 'id'"}), 400
         if item.get("prioridade") not in PRIORIDADES_VALIDAS:
-            return jsonify({"erro": f"prioridade inválida em um dos leads (id={item.get('id')})"}), 400
+            return jsonify({"erro": f"prioridad inválida en uno de los leads (id={item.get('id')})"}), 400
         if len(str(item.get("justificativa", ""))) > MAX_CARACTERES_JUSTIFICATIVA:
-            return jsonify({"erro": f"justificativa muito longa em um dos leads (id={item.get('id')})"}), 400
+            return jsonify({"erro": f"justificación muy larga en uno de los leads (id={item.get('id')})"}), 400
         if len(str(item.get("sugestao_dm", ""))) > MAX_CARACTERES_SUGESTAO_DM:
-            return jsonify({"erro": f"sugestão de DM muito longa em um dos leads (id={item.get('id')})"}), 400
+            return jsonify({"erro": f"sugerencia de DM muy larga en uno de los leads (id={item.get('id')})"}), 400
         if len(str(item.get("nicho", ""))) > MAX_CARACTERES_NICHO_INSTAGRAM:
-            return jsonify({"erro": f"nicho muito longo em um dos leads (id={item.get('id')})"}), 400
+            return jsonify({"erro": f"rubro muy largo en uno de los leads (id={item.get('id')})"}), 400
 
     agora = datetime.now().isoformat(timespec="seconds")
     conexao = db.conectar()
@@ -436,7 +436,7 @@ def atualizar_status_lead_instagram(lead_id):
             "SELECT status FROM instagram_leads WHERE id = ?", (lead_id,)
         ).fetchone()
         if lead_atual is None:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
 
         if novo_status in STATUS_QUE_ENCERRAM_FOLLOWUP:
             conexao.execute(
@@ -485,7 +485,7 @@ def ignorar_lead_instagram(lead_id):
         )
         conexao.commit()
         if cursor.rowcount == 0:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
     finally:
         conexao.close()
 
@@ -567,9 +567,9 @@ def excluir_lead_instagram_definitivamente(lead_id):
             "SELECT status FROM instagram_leads WHERE id = ?", (lead_id,)
         ).fetchone()
         if lead is None:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
         if lead["status"] != "ignorado":
-            return jsonify({"erro": "só é possível excluir definitivamente leads já ignorados"}), 400
+            return jsonify({"erro": "solo se puede eliminar definitivamente leads que ya estén ignorados"}), 400
 
         conexao.execute("DELETE FROM historico_status_instagram WHERE lead_id = ?", (lead_id,))
         conexao.execute("DELETE FROM instagram_leads WHERE id = ?", (lead_id,))
@@ -617,7 +617,7 @@ def excluir_em_lote_definitivamente_instagram():
 def atualizar_observacoes_instagram(lead_id):
     texto = str((request.json or {}).get("observacoes", ""))
     if len(texto) > MAX_CARACTERES_OBSERVACOES_INSTAGRAM:
-        return jsonify({"erro": f"observações muito longas (máximo {MAX_CARACTERES_OBSERVACOES_INSTAGRAM} caracteres)"}), 400
+        return jsonify({"erro": f"notas muy largas (máximo {MAX_CARACTERES_OBSERVACOES_INSTAGRAM} caracteres)"}), 400
 
     conexao = db.conectar()
     try:
@@ -627,7 +627,7 @@ def atualizar_observacoes_instagram(lead_id):
         )
         conexao.commit()
         if cursor.rowcount == 0:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
     finally:
         conexao.close()
 
@@ -638,7 +638,7 @@ def atualizar_observacoes_instagram(lead_id):
 def atualizar_tags_instagram(lead_id):
     tags = str((request.json or {}).get("tags", ""))
     if len(tags) > MAX_CARACTERES_TAGS_INSTAGRAM:
-        return jsonify({"erro": f"tags muito longas (máximo {MAX_CARACTERES_TAGS_INSTAGRAM} caracteres)"}), 400
+        return jsonify({"erro": f"etiquetas muy largas (máximo {MAX_CARACTERES_TAGS_INSTAGRAM} caracteres)"}), 400
 
     conexao = db.conectar()
     try:
@@ -648,7 +648,7 @@ def atualizar_tags_instagram(lead_id):
         )
         conexao.commit()
         if cursor.rowcount == 0:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
     finally:
         conexao.close()
 
@@ -667,7 +667,7 @@ def atualizar_followup_instagram(lead_id):
         )
         conexao.commit()
         if cursor.rowcount == 0:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
     finally:
         conexao.close()
 
@@ -685,7 +685,7 @@ def marcar_followup_enviado_instagram(lead_id):
         )
         lead = cursor.fetchone()
         if lead is None:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
 
         proximo_followup_sugerido = sugerir_proxima_data_followup(
             lead["follow_ups_enviados"] + 1
@@ -727,7 +727,7 @@ def desfazer_followup_enviado_instagram(lead_id):
     proximo_followup_anterior = dados.get("proximo_followup_anterior")
 
     if follow_ups_enviados_anterior is None:
-        return jsonify({"erro": "follow_ups_enviados_anterior é obrigatório"}), 400
+        return jsonify({"erro": "follow_ups_enviados_anterior es obligatorio"}), 400
 
     conexao = db.conectar()
     try:
@@ -749,7 +749,7 @@ def desfazer_followup_enviado_instagram(lead_id):
             ),
         )
         if cursor.rowcount == 0:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
         conexao.commit()
     finally:
         conexao.close()
@@ -761,7 +761,7 @@ def desfazer_followup_enviado_instagram(lead_id):
 def salvar_sugestao_dm_instagram(lead_id):
     texto = str((request.json or {}).get("sugestao_dm", ""))
     if len(texto) > MAX_CARACTERES_SUGESTAO_DM:
-        return jsonify({"erro": f"sugestão de DM muito longa (máximo {MAX_CARACTERES_SUGESTAO_DM} caracteres)"}), 400
+        return jsonify({"erro": f"sugerencia de DM muy larga (máximo {MAX_CARACTERES_SUGESTAO_DM} caracteres)"}), 400
 
     conexao = db.conectar()
     try:
@@ -771,7 +771,7 @@ def salvar_sugestao_dm_instagram(lead_id):
         )
         conexao.commit()
         if cursor.rowcount == 0:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
     finally:
         conexao.close()
 
@@ -784,7 +784,7 @@ def gerar_mensagem_instagram(lead_id):
     tipo = corpo.get("tipo", "contato")
     forcar_nova = corpo.get("forcar_nova", False)
     if tipo not in ("contato", "followup"):
-        return jsonify({"erro": "tipo inválido, use 'contato' ou 'followup'"}), 400
+        return jsonify({"erro": "tipo inválido, usá 'contato' o 'followup'"}), 400
 
     conexao = db.conectar()
     try:
@@ -793,7 +793,7 @@ def gerar_mensagem_instagram(lead_id):
         ).fetchone()
 
         if lead is None:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
 
         if tipo == "contato" and lead["sugestao_dm"] and not forcar_nova:
             return jsonify({"mensagem": lead["sugestao_dm"], "cache": True})
@@ -885,7 +885,7 @@ def login_instagram():
     codigo_2fa = str(dados.get("codigo_2fa", "")).strip()
 
     if not usuario or not senha:
-        return jsonify({"erro": "informe usuário e senha do Instagram"}), 400
+        return jsonify({"erro": "informá usuario y contraseña de Instagram"}), 400
 
     from instagrapi import Client
     from instagrapi.exceptions import TwoFactorRequired
@@ -901,7 +901,7 @@ def login_instagram():
     except Exception as erro:
         # não logamos a senha em nenhuma hipótese; o tipo do erro basta pro diagnóstico
         logger.warning("login do instagram falhou para @%s (%s)", usuario, type(erro).__name__)
-        return jsonify({"erro": f"O Instagram recusou o login: {erro}"}), 400
+        return jsonify({"erro": f"Instagram rechazó el login: {erro}"}), 400
 
     pasta = _pasta_sessao_instagram()
     pasta.mkdir(parents=True, exist_ok=True)

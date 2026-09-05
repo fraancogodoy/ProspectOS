@@ -270,6 +270,28 @@ class TestExclusaoDefinitiva:
         assert resposta.status_code == 400
 
 
+class TestEliminarTodosOsLeads:
+    def test_apaga_tudo_com_frase_certa(self, cliente):
+        inserir_lead("lead-1", status="novo")
+        inserir_lead("lead-2", status="contatado")
+
+        resposta = cliente.delete("/api/leads", json={"confirmar": "ELIMINAR TODO"})
+        assert resposta.status_code == 200
+        assert resposta.get_json()["eliminados"] == 2
+
+        conexao = sqlite3.connect(db.CAMINHO_BANCO)
+        assert conexao.execute("SELECT COUNT(*) FROM leads").fetchone()[0] == 0
+
+    def test_sem_frase_nao_apaga_nada(self, cliente):
+        inserir_lead("lead-1", status="novo")
+
+        resposta = cliente.delete("/api/leads", json={"confirmar": "borrar todo"})
+        assert resposta.status_code == 400
+
+        conexao = sqlite3.connect(db.CAMINHO_BANCO)
+        assert conexao.execute("SELECT COUNT(*) FROM leads").fetchone()[0] == 1
+
+
 class TestObservacoesETags:
     def test_salva_observacoes(self, cliente):
         inserir_lead("lead-1")

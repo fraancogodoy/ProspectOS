@@ -19,6 +19,7 @@ import processar
 from validacao import validar_ids_bulk
 from constantes import (
     DIAS_PARA_LEAD_DIFICIL,
+    FRASE_CONFIRMACAO_ELIMINAR_TODOS,
     MAX_AREAS_BUSCA_MAPA,
     MAX_CARACTERES_CAMPANA,
     MAX_CARACTERES_CONTATO,
@@ -127,13 +128,13 @@ def listar_leads():
     busca_texto = request.args.get("busca", "").strip()
     ordenar = request.args.get("ordenar", "").strip()
     if ordenar not in ("", "score"):
-        return jsonify({"erro": f"ordenar inválido: {ordenar} (use 'score' ou omita)"}), 400
+        return jsonify({"erro": f"ordenar inválido: {ordenar} (usá 'score' o omitilo)"}), 400
     site_status_filtro = request.args.get("site_status", "").strip()
     if site_status_filtro and site_status_filtro not in SITUACOES_SITE_VALIDAS:
         return jsonify({"erro": f"site_status inválido: {site_status_filtro}"}), 400
     followup_filtro = request.args.get("followup", "").strip()
     if followup_filtro not in ("", "vencido"):
-        return jsonify({"erro": f"followup inválido: {followup_filtro} (use 'vencido' ou omita)"}), 400
+        return jsonify({"erro": f"followup inválido: {followup_filtro} (usá 'vencido' o omitilo)"}), 400
 
     try:
         limit = int(request.args.get("limit", LIMITE_PADRAO_LEADS))
@@ -266,7 +267,7 @@ def atualizar_status(place_id):
     try:
         lead_atual = conexao.execute("SELECT status FROM leads WHERE place_id = ?", (place_id,)).fetchone()
         if lead_atual is None:
-            return jsonify({"erro": "lead não encontrado (pode ter sido excluído)"}), 404
+            return jsonify({"erro": "lead no encontrado (puede haber sido eliminado)"}), 404
 
         if novo_status in STATUS_QUE_ENCERRAM_FOLLOWUP:
             conexao.execute(
@@ -316,7 +317,7 @@ def ignorar_lead(place_id):
         )
         conexao.commit()
         if cursor.rowcount == 0:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
     finally:
         conexao.close()
 
@@ -399,7 +400,7 @@ def obter_lead(place_id):
         conexao.close()
 
     if not linha:
-        return jsonify({"erro": "lead não encontrado"}), 404
+        return jsonify({"erro": "lead no encontrado"}), 404
     return jsonify(_enriquecer_lead_para_resposta(dict(linha)))
 
 
@@ -414,9 +415,9 @@ def excluir_lead_definitivamente(place_id):
             "SELECT status FROM leads WHERE place_id = ?", (place_id,)
         ).fetchone()
         if lead is None:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
         if lead["status"] != "ignorado":
-            return jsonify({"erro": "só é possível excluir definitivamente leads já ignorados"}), 400
+            return jsonify({"erro": "solo se puede eliminar definitivamente leads que ya estén ignorados"}), 400
 
         conexao.execute("DELETE FROM historico_status WHERE place_id = ?", (place_id,))
         conexao.execute("DELETE FROM leads WHERE place_id = ?", (place_id,))
@@ -464,11 +465,35 @@ def excluir_em_lote_definitivamente():
     return jsonify({"ok": True, "excluidos": len(ids_ignorados)})
 
 
+@bp.route("/api/leads", methods=["DELETE"])
+def excluir_todos_os_leads():
+    """Apaga TODOS os leads do Maps (com histórico e conversas) numa única
+    transação - pensado pra descartar uma base de teste e recomeçar do zero.
+    Sem volta. Exige a frase de confirmação exata no corpo pra evitar apagar
+    tudo com uma chamada errada."""
+    corpo = request.json or {}
+    if str(corpo.get("confirmar", "")).strip() != FRASE_CONFIRMACAO_ELIMINAR_TODOS:
+        return jsonify({"erro": f'escreva "{FRASE_CONFIRMACAO_ELIMINAR_TODOS}" pra confirmar'}), 400
+
+    conexao = db.conectar()
+    try:
+        total = conexao.execute("SELECT COUNT(*) AS n FROM leads").fetchone()["n"]
+        conexao.execute("DELETE FROM mensagens_conversa WHERE canal = 'maps'")
+        conexao.execute("DELETE FROM analises_conversa WHERE canal = 'maps'")
+        conexao.execute("DELETE FROM historico_status")
+        conexao.execute("DELETE FROM leads")
+        conexao.commit()
+    finally:
+        conexao.close()
+
+    return jsonify({"ok": True, "eliminados": total})
+
+
 @bp.route("/api/leads/<place_id>/observacoes", methods=["POST"])
 def atualizar_observacoes(place_id):
     texto = str((request.json or {}).get("observacoes", ""))
     if len(texto) > MAX_CARACTERES_OBSERVACOES:
-        return jsonify({"erro": f"observações muito longas (máximo {MAX_CARACTERES_OBSERVACOES} caracteres)"}), 400
+        return jsonify({"erro": f"notas muy largas (máximo {MAX_CARACTERES_OBSERVACOES} caracteres)"}), 400
 
     conexao = db.conectar()
     try:
@@ -478,7 +503,7 @@ def atualizar_observacoes(place_id):
         )
         conexao.commit()
         if cursor.rowcount == 0:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
     finally:
         conexao.close()
 
@@ -489,7 +514,7 @@ def atualizar_observacoes(place_id):
 def atualizar_tags(place_id):
     tags = str((request.json or {}).get("tags", ""))
     if len(tags) > MAX_CARACTERES_TAGS:
-        return jsonify({"erro": f"tags muito longas (máximo {MAX_CARACTERES_TAGS} caracteres)"}), 400
+        return jsonify({"erro": f"etiquetas muy largas (máximo {MAX_CARACTERES_TAGS} caracteres)"}), 400
 
     conexao = db.conectar()
     try:
@@ -499,7 +524,7 @@ def atualizar_tags(place_id):
         )
         conexao.commit()
         if cursor.rowcount == 0:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
     finally:
         conexao.close()
 
@@ -518,7 +543,7 @@ def atualizar_followup(place_id):
         )
         conexao.commit()
         if cursor.rowcount == 0:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
     finally:
         conexao.close()
 
@@ -543,11 +568,11 @@ def atualizar_contato(place_id):
             continue
         valor = str(corpo[campo] or "").strip()
         if len(valor) > MAX_CARACTERES_CONTATO:
-            return jsonify({"erro": f"{campo} muito longo (máximo {MAX_CARACTERES_CONTATO} caracteres)"}), 400
+            return jsonify({"erro": f"{campo} muy largo (máximo {MAX_CARACTERES_CONTATO} caracteres)"}), 400
         valores[campo] = valor or None
 
     if not valores:
-        return jsonify({"erro": "nenhum campo de contato enviado"}), 400
+        return jsonify({"erro": "ningún campo de contacto enviado"}), 400
 
     if "telefone" in valores:
         valores["whatsapp_link"] = processar.telefone_para_whatsapp(valores["telefone"])
@@ -562,7 +587,7 @@ def atualizar_contato(place_id):
         )
         conexao.commit()
         if cursor.rowcount == 0:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
     finally:
         conexao.close()
 
@@ -575,14 +600,14 @@ def gerar_mensagem(place_id):
     forcar_nova = corpo.get("forcar_nova", False)
     tipo = corpo.get("tipo", "contato")
     if tipo not in ("contato", "followup"):
-        return jsonify({"erro": "tipo inválido, use 'contato' ou 'followup'"}), 400
+        return jsonify({"erro": "tipo inválido, usá 'contato' o 'followup'"}), 400
 
     conexao = db.conectar()
     try:
         lead = conexao.execute("SELECT * FROM leads WHERE place_id = ?", (place_id,)).fetchone()
 
         if lead is None:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
 
         if tipo == "contato" and lead["mensagem_gerada"] and not forcar_nova:
             return jsonify({"mensagem": lead["mensagem_gerada"], "cache": True})
@@ -648,7 +673,7 @@ def marcar_followup_enviado(place_id):
         )
         lead = cursor.fetchone()
         if lead is None:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
 
         proximo_followup_sugerido = sugerir_proxima_data_followup(
             lead["follow_ups_enviados"] + 1
@@ -691,7 +716,7 @@ def desfazer_followup_enviado(place_id):
     proximo_followup_anterior = dados.get("proximo_followup_anterior")
 
     if follow_ups_enviados_anterior is None:
-        return jsonify({"erro": "follow_ups_enviados_anterior é obrigatório"}), 400
+        return jsonify({"erro": "follow_ups_enviados_anterior es obligatorio"}), 400
 
     conexao = db.conectar()
     try:
@@ -713,7 +738,7 @@ def desfazer_followup_enviado(place_id):
             ),
         )
         if cursor.rowcount == 0:
-            return jsonify({"erro": "lead não encontrado"}), 404
+            return jsonify({"erro": "lead no encontrado"}), 404
         conexao.commit()
     finally:
         conexao.close()
@@ -732,7 +757,7 @@ def reanalisar_site(place_id):
     finally:
         conexao.close()
     if lead is None:
-        return jsonify({"erro": "lead não encontrado"}), 404
+        return jsonify({"erro": "lead no encontrado"}), 404
 
     site_url = lead["site_url"] or processar.buscar_site_da_empresa(
         lead["nome"], lead["endereco"] or lead["cidade"] or ""
@@ -802,7 +827,7 @@ def baixar_diagnostico(place_id):
         conexao.close()
 
     if lead is None:
-        return jsonify({"erro": "lead não encontrado"}), 404
+        return jsonify({"erro": "lead no encontrado"}), 404
 
     pdf_bytes = diagnostico.gerar_diagnostico_pdf(lead)
     resposta = Response(pdf_bytes, mimetype="application/pdf")
@@ -900,19 +925,19 @@ def _validar_busca_por_texto(corpo):
     Retorna (queries_texto, None) ou (None, resposta_de_erro)."""
     queries_texto = corpo.get("queries", "").strip()
     if not queries_texto:
-        return None, (jsonify({"erro": "informe ao menos um nicho + cidade"}), 400)
+        return None, (jsonify({"erro": "informá al menos un rubro + ciudad"}), 400)
 
     linhas_queries = [linha for linha in queries_texto.splitlines() if linha.strip()]
     if len(linhas_queries) > MAX_LINHAS_QUERIES_BUSCA:
         return None, (jsonify({
-            "erro": f"no máximo {MAX_LINHAS_QUERIES_BUSCA} linhas por busca (você enviou {len(linhas_queries)})"
+            "erro": f"como máximo {MAX_LINHAS_QUERIES_BUSCA} líneas por búsqueda (enviaste {len(linhas_queries)})"
         }), 400)
     linha_longa_demais = next(
         (linha for linha in linhas_queries if len(linha) > MAX_CARACTERES_POR_LINHA_QUERY), None
     )
     if linha_longa_demais:
         return None, (jsonify({
-            "erro": f"uma das linhas passa de {MAX_CARACTERES_POR_LINHA_QUERY} caracteres: "
+            "erro": f"una de las líneas pasa de {MAX_CARACTERES_POR_LINHA_QUERY} caracteres: "
                     f"\"{linha_longa_demais[:60]}...\""
         }), 400)
 
@@ -926,9 +951,9 @@ def _validar_busca_por_mapa(corpo):
     areas_brutas = corpo.get("areas")
 
     if not isinstance(nichos_brutos, list) or not nichos_brutos:
-        return None, (jsonify({"erro": "informe ao menos um nicho (ex: clínica de estética)"}), 400)
+        return None, (jsonify({"erro": "informá al menos un rubro (ej.: centro de estética)"}), 400)
     if len(nichos_brutos) > MAX_NICHOS_BUSCA_MAPA:
-        return None, (jsonify({"erro": f"no máximo {MAX_NICHOS_BUSCA_MAPA} nichos por busca"}), 400)
+        return None, (jsonify({"erro": f"como máximo {MAX_NICHOS_BUSCA_MAPA} rubros por búsqueda"}), 400)
 
     nichos = []
     for nicho in nichos_brutos:
@@ -936,15 +961,15 @@ def _validar_busca_por_mapa(corpo):
         if not texto:
             continue
         if len(texto) > MAX_CARACTERES_NICHO_BUSCA:
-            return None, (jsonify({"erro": f"nicho muito longo (máximo {MAX_CARACTERES_NICHO_BUSCA} caracteres): \"{texto[:40]}...\""}), 400)
+            return None, (jsonify({"erro": f"rubro muy largo (máximo {MAX_CARACTERES_NICHO_BUSCA} caracteres): \"{texto[:40]}...\""}), 400)
         nichos.append(texto)
     if not nichos:
-        return None, (jsonify({"erro": "informe ao menos um nicho (ex: clínica de estética)"}), 400)
+        return None, (jsonify({"erro": "informá al menos un rubro (ej.: centro de estética)"}), 400)
 
     if not isinstance(areas_brutas, list) or not areas_brutas:
-        return None, (jsonify({"erro": "adicione ao menos um pino no mapa"}), 400)
+        return None, (jsonify({"erro": "agregá al menos un pin en el mapa"}), 400)
     if len(areas_brutas) > MAX_AREAS_BUSCA_MAPA:
-        return None, (jsonify({"erro": f"no máximo {MAX_AREAS_BUSCA_MAPA} áreas (pinos) por busca"}), 400)
+        return None, (jsonify({"erro": f"como máximo {MAX_AREAS_BUSCA_MAPA} áreas (pines) por búsqueda"}), 400)
 
     areas = []
     for indice, area in enumerate(areas_brutas, start=1):
@@ -958,10 +983,10 @@ def _validar_busca_por_mapa(corpo):
             return None, (jsonify({"erro": f"área {indice}: lat/lng/raio_m inválidos"}), 400)
 
         if not (-90 <= lat <= 90) or not (-180 <= lng <= 180):
-            return None, (jsonify({"erro": f"área {indice}: coordenadas fora do intervalo válido"}), 400)
+            return None, (jsonify({"erro": f"área {indice}: coordenadas fuera del rango válido"}), 400)
         if not (RAIO_MIN_METROS <= raio_m <= RAIO_MAX_METROS):
             return None, (jsonify({
-                "erro": f"área {indice}: raio deve ficar entre {RAIO_MIN_METROS} m e {RAIO_MAX_METROS // 1000} km"
+                "erro": f"área {indice}: el radio debe estar entre {RAIO_MIN_METROS} m y {RAIO_MAX_METROS // 1000} km"
             }), 400)
 
         rotulo = str(area.get("rotulo") or "").strip()[:MAX_CARACTERES_ROTULO_AREA]
@@ -996,7 +1021,7 @@ def disparar_busca():
         areas = None
 
     if not jobs.tentar_reservar_busca():
-        return jsonify({"erro": "já existe uma busca em andamento"}), 409
+        return jsonify({"erro": "ya existe una búsqueda en curso"}), 409
 
     try:
         # queries.txt é escrito a cada busca - vai pra área de dados (gravável)

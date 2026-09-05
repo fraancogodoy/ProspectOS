@@ -10,65 +10,66 @@ export function InstagramDoc() {
   return (
     <DocSection titulo="Instagram">
       <DocP>
-        O canal do Instagram analisa os comentários de um post específico,
-        pra achar pessoas que demonstraram interesse ou se identificam como
-        dono de negócio dentro de um nicho que você escolhe.
+        El canal de Instagram analiza los comentarios de un post puntual,
+        para encontrar personas que mostraron interés o se identifican como
+        dueñas de un negocio dentro de un rubro que vos elegís.
       </DocP>
 
-      <DocH2>Como analisar um post</DocH2>
+      <DocH2>Cómo analizar un post</DocH2>
       <DocP>
-        Cole a URL de um post (<code>/p/</code>, <code>/reel/</code> ou{" "}
-        <code>/tv/</code>) e, opcionalmente, um <strong>nicho-alvo</strong>{" "}
-        (ex.: "advogados"). O nicho-alvo direciona a classificação por IA —
-        sem ele, a análise é mais genérica.
+        Pegá la URL de un post (<code>/p/</code>, <code>/reel/</code> o{" "}
+        <code>/tv/</code>) y, opcionalmente, un <strong>rubro objetivo</strong>{" "}
+        (ej.: "abogados"). El rubro objetivo orienta la clasificación por IA
+        — sin él, el análisis es más genérico.
       </DocP>
 
-      <DocH2>O que acontece por trás (3 etapas)</DocH2>
+      <DocH2>Qué pasa detrás de escena (3 etapas)</DocH2>
       <DocList>
         <li>
-          <strong>Raspagem</strong>: extrai todos os comentários do post
-          (usuário + texto).
+          <strong>Raspado</strong>: extrae todos los comentarios del post
+          (usuario + texto).
         </li>
         <li>
-          <strong>Enriquecimento</strong>: consulta cada perfil único —
-          público ou privado, bio, seguidores, se é conta comercial.
+          <strong>Enriquecimiento</strong>: consulta cada perfil único —
+          público o privado, bio, seguidores, si es cuenta comercial.
         </li>
         <li>
-          <strong>Classificação por IA</strong>: para cada perfil público,
-          avalia bio/seguidores/comentários e retorna prioridade, nicho
-          identificado, justificativa e uma sugestão de DM pronta.
+          <strong>Clasificación por IA</strong>: para cada perfil público,
+          evalúa bio/seguidores/comentarios y devuelve prioridad, rubro
+          identificado, justificación y una sugerencia de DM lista para usar.
         </li>
       </DocList>
       <DocCallout variante="warning">
-        Perfis privados são descartados automaticamente antes da
-        classificação, sem gastar chamada de IA. A etapa de enriquecimento
-        usa a sua conta pessoal do Instagram — use com moderação para reduzir
-        risco de bloqueio.
+        Los perfiles privados se descartan automáticamente antes de
+        clasificar, sin gastar una llamada de IA. La etapa de enriquecimiento
+        usa tu cuenta personal de Instagram — usala con moderación para
+        reducir el riesgo de bloqueo.
       </DocCallout>
 
-      <DocH2>Prioridade</DocH2>
+      <DocH2>Prioridad</DocH2>
       <DocP>
-        Cada lead recebe uma prioridade: <strong>alta</strong>,{" "}
-        <strong>média</strong>, <strong>baixa</strong> ou{" "}
-        <strong>descartado</strong>. É reeditável manualmente a qualquer
+        Cada lead recibe una prioridad: <strong>alta</strong>,{" "}
+        <strong>media</strong>, <strong>baja</strong> o{" "}
+        <strong>descartado</strong>. Se puede reeditar a mano en cualquier
         momento.
       </DocP>
 
-      <DocH2>Sugestão de DM e follow-up</DocH2>
+      <DocH2>Sugerencia de DM y seguimiento</DocH2>
       <DocP>
-        A sugestão de DM vem pronta da classificação, mas pode ser regerada
-        (contato ou follow-up), editada manualmente, ou usada como base pra um
-        template. O follow-up inteligente funciona igual ao do Google Maps:
-        marcar como enviado, sugestão de próxima data, e selo de lead
-        difícil.
+        La sugerencia de DM viene lista desde la clasificación, pero se puede
+        regenerar (contacto o seguimiento), editar a mano, o usar como base
+        para una plantilla. El seguimiento inteligente funciona igual que en
+        Google Maps: marcar como enviado, sugerencia de próxima fecha, y
+        sello de lead difícil.
       </DocP>
 
-      <DocH2>Arquivar e excluir posts</DocH2>
+      <DocH2>Archivar y eliminar posts</DocH2>
       <DocP>
-        Um post analisado pode ser <strong>arquivado</strong> (some da lista
-        principal, mas continua recuperável) e depois, na aba "Arquivados",{" "}
-        <strong>restaurado</strong> ou <strong>excluído definitivamente</strong>{" "}
-        — o que apaga o post e todos os leads dele de vez do banco.
+        Un post analizado se puede <strong>archivar</strong> (desaparece de
+        la lista principal, pero sigue siendo recuperable) y después, en la
+        pestaña "Archivados", <strong>restaurar</strong> o{" "}
+        <strong>eliminar definitivamente</strong> — esto borra el post y
+        todos sus leads para siempre de la base.
       </DocP>
     </DocSection>
   )

@@ -3,6 +3,7 @@ import { Link } from "react-router-dom"
 import { Header } from "@/components/layout/Header"
 import { Skeleton } from "@/components/ui/skeleton"
 import { CopiaDatosCard } from "@/components/configuracoes/CopiaDatosCard"
+import { EliminarTodosLeadsCard } from "@/components/configuracoes/EliminarTodosLeadsCard"
 import { FonteMapsCard } from "@/components/configuracoes/FonteMapsCard"
 import { InstagramContaCard } from "@/components/configuracoes/InstagramContaCard"
 import { PerfilVendedorCard } from "@/components/configuracoes/PerfilVendedorCard"
@@ -131,6 +132,8 @@ export function ConfiguracoesPage() {
         </div>
 
         <CopiaDatosCard />
+
+        <EliminarTodosLeadsCard />
       </main>
     </div>
   )

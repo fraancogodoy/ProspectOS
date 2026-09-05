@@ -7,74 +7,87 @@ import {
 
 export function VisaoGeralDoc() {
   return (
-    <DocSection titulo="Visão geral">
+    <DocSection titulo="Visión general">
       <DocP>
-        Esta é uma ferramenta de prospecção de leads com dois canais de
-        captação independentes — <strong>Google Maps</strong> e{" "}
-        <strong>Instagram</strong> — que compartilham o mesmo vocabulário de
-        funil, tags, observações e follow-up inteligente, mas com fluxos de
-        captação bem diferentes entre si.
+        Esta es una herramienta de prospección de leads con dos canales de
+        captación independientes — <strong>Google Maps</strong> e{" "}
+        <strong>Instagram</strong> — que comparten el mismo vocabulario de
+        embudo, etiquetas, notas y seguimiento inteligente, pero con flujos de
+        captación bien distintos entre sí.
       </DocP>
 
-      <DocH2>Os dois canais</DocH2>
+      <DocH2>Los dos canales</DocH2>
       <DocList>
         <li>
-          <strong>Google Maps</strong>: busca empresas por nicho + cidade
-          (ex.: "corretor de imóveis em Curitiba"), filtra automaticamente só
-          as que têm nota alta e não têm site cadastrado — são as candidatas
-          mais óbvias a fechar um site novo.
+          <strong>Google Maps</strong>: busca negocios por rubro + ciudad
+          (ej.: "peluquería en Tandil"), filtra automáticamente solo los que
+          tienen buena puntuación y no tienen sitio web — son los candidatos
+          más obvios para venderles PresencIA.
         </li>
         <li>
-          <strong>Instagram</strong>: analisa os comentários de um post
-          específico, identificando pessoas que comentaram e classificando
-          automaticamente por IA quem parece ser dono de negócio dentro de um
-          nicho-alvo que você escolhe.
+          <strong>Instagram</strong>: analiza los comentarios de un post
+          puntual, identifica a quienes comentaron y clasifica
+          automáticamente por IA quién parece ser dueño de un negocio dentro
+          de un rubro objetivo que vos elegís.
         </li>
       </DocList>
 
-      <DocH2>Conceitos que valem para os dois canais</DocH2>
+      <DocH2>Conceptos que valen para los dos canales</DocH2>
       <DocList>
         <li>
-          <strong>Status do funil</strong>: todo lead progride por{" "}
-          <em>novo → contatado → respondeu → fechou</em>. Existem também dois
-          estados que saem do funil: <em>recusou</em> (disse não) e{" "}
-          <em>ignorado</em> (você escondeu o lead, mas ele continua no banco,
-          recuperável).
+          <strong>Estado del embudo</strong>: todo lead avanza por{" "}
+          <em>nuevo → contactado → respondió → cerró</em>. Existen además dos
+          estados que salen del embudo: <em>rechazó</em> (dijo que no) e{" "}
+          <em>ignorado</em> (lo escondiste, pero sigue en la base, se puede
+          recuperar).
         </li>
         <li>
-          <strong>Nicho</strong>: no Maps, extraído automaticamente do texto
-          da busca. No Instagram, identificado pela IA na classificação (e
-          editável depois).
+          <strong>Rubro</strong>: en Maps se extrae automáticamente del texto
+          de la búsqueda. En Instagram lo identifica la IA al clasificar (y
+          se puede editar después).
         </li>
         <li>
-          <strong>Prioridade</strong>: só existe no Instagram (alta / média /
-          baixa / descartado) — indica o quão promissor é aquele perfil.
+          <strong>Campaña</strong> (solo Maps): un rótulo libre y opcional que
+          le podés poner a una búsqueda (ej.: "belleza", "inmobiliarias",
+          "deportes") para agrupar varios rubros bajo un mismo nombre y
+          filtrarlos juntos después en la lista de leads. Se define al lanzar
+          la búsqueda, pero también se puede cambiar a mano en la ficha de
+          cada lead.
         </li>
         <li>
-          <strong>Lead difícil</strong>: um selo que aparece quando um lead já
-          recebeu pelo menos um follow-up e está há mais de 5 dias parado em{" "}
-          <em>novo</em> ou <em>contatado</em>. É só um aviso visual — arquivar
-          ou não continua sendo sempre sua decisão.
+          <strong>Prioridad</strong>: solo existe en Instagram (alta / media /
+          baja / descartado) — indica qué tan prometedor es ese perfil.
+        </li>
+        <li>
+          <strong>Lead difícil</strong>: un sello que aparece cuando un lead
+          ya recibió al menos un seguimiento y lleva más de 5 días parado en{" "}
+          <em>nuevo</em> o <em>contactado</em>. Es solo un aviso visual —
+          archivarlo o no sigue siendo siempre tu decisión.
         </li>
       </DocList>
 
-      <DocH2>Onde cada coisa fica</DocH2>
+      <DocH2>Dónde está cada cosa</DocH2>
       <DocList>
         <li>
-          <strong>Dashboard</strong> (página inicial): métricas combinadas dos
-          dois canais, funil e ranking de nichos somados, e atalhos para as
-          outras áreas.
+          <strong>Dashboard</strong> (página de inicio): métricas combinadas
+          de los dos canales, embudo y ranking de rubros sumados, y accesos
+          directos a las demás secciones.
         </li>
         <li>
-          <strong>Google Maps</strong>: lista/kanban de leads, busca nova,
-          follow-up, templates.
+          <strong>Google Maps</strong>: lista/kanban de leads, búsqueda nueva
+          por texto o por mapa (con campañas), búsqueda por nombre, dirección
+          o teléfono, edición de datos de contacto, seguimiento, plantillas.
         </li>
         <li>
-          <strong>Instagram</strong>: análise de posts, leads classificados
-          por prioridade, follow-up, posts arquivados.
+          <strong>Instagram</strong>: análisis de posts, leads clasificados
+          por prioridad, seguimiento, posts archivados.
         </li>
         <li>
-          <strong>Configurações</strong>: chaves de API dos provedores de IA.
+          <strong>Configuración</strong>: tu perfil de vendedor, claves de API
+          de los proveedores de IA, fuente de datos de Maps (scraper o Google
+          Places), cuenta de Instagram, sonidos, copia de seguridad de todos
+          los datos (exportar/importar) y la zona de peligro para borrar todo
+          y empezar de cero.
         </li>
       </DocList>
     </DocSection>

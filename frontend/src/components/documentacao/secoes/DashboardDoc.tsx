@@ -2,37 +2,38 @@ import { DocSection, DocH2, DocP, DocList } from "@/components/documentacao/DocS
 
 export function DashboardDoc() {
   return (
-    <DocSection titulo="Dashboard geral">
+    <DocSection titulo="Dashboard general">
       <DocP>
-        A página inicial do sistema é uma visão executiva combinada dos dois
-        canais — não mostra listas de leads, só métricas e atalhos.
+        La página de inicio del sistema es una vista ejecutiva combinada de
+        los dos canales — no muestra listas de leads, solo métricas y
+        accesos directos.
       </DocP>
 
-      <DocH2>O que cada bloco mostra</DocH2>
+      <DocH2>Qué muestra cada bloque</DocH2>
       <DocList>
         <li>
-          <strong>Métricas combinadas</strong>: total de leads ativos
-          (separado por canal também), contatados, fechados, taxa de
-          conversão e follow-ups para hoje — somando Maps + Instagram.
+          <strong>Métricas combinadas</strong>: total de leads activos
+          (separado por canal también), contactados, cerrados, tasa de
+          conversión y seguimientos para hoy — sumando Maps + Instagram.
         </li>
         <li>
-          <strong>Follow-ups de hoje</strong>: lista dos leads com follow-up
-          vencido ou para hoje, dos dois canais juntos, com atalho direto pra
-          cada um.
+          <strong>Seguimientos de hoy</strong>: lista de los leads con
+          seguimiento vencido o para hoy, de los dos canales juntos, con
+          acceso directo a cada uno.
         </li>
         <li>
-          <strong>Funil de conversão combinado</strong>: quantos leads
-          alcançaram cada estágio (novo → contatado → respondeu → fechou),
-          somando os dois canais.
+          <strong>Embudo de conversión combinado</strong>: cuántos leads
+          llegaron a cada etapa (nuevo → contactado → respondió → cerró),
+          sumando los dos canales.
         </li>
         <li>
-          <strong>Ranking de nichos combinado</strong>: total e taxa de
-          conversão por nicho, somando os dois canais quando o nome do nicho
-          coincide.
+          <strong>Ranking de rubros combinado</strong>: total y tasa de
+          conversión por rubro, sumando los dos canales cuando el nombre del
+          rubro coincide.
         </li>
         <li>
-          <strong>Atalhos</strong>: cards de navegação rápida para Leads do
-          Google Maps, Leads do Instagram e Analytics do Maps.
+          <strong>Accesos directos</strong>: tarjetas de navegación rápida a
+          Leads de Google Maps, Leads de Instagram y Analytics de Maps.
         </li>
       </DocList>
     </DocSection>

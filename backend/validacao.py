@@ -11,9 +11,9 @@ def validar_ids_bulk(ids, nome_campo):
     o limite de variáveis vinculadas do SQLite num IN (...)."""
     ids = ids or []
     if not ids:
-        return None, (jsonify({"erro": f"informe ao menos um {nome_campo}"}), 400)
+        return None, (jsonify({"erro": f"informá al menos un {nome_campo}"}), 400)
     if len(ids) > MAX_IDS_BULK:
         return None, (jsonify({
-            "erro": f"no máximo {MAX_IDS_BULK} itens por ação em lote (você enviou {len(ids)})"
+            "erro": f"como máximo {MAX_IDS_BULK} ítems por acción en lote (enviaste {len(ids)})"
         }), 400)
     return ids, None

@@ -55,7 +55,7 @@ def importar_tudo():
     corpo = request.json or {}
     tabelas_recebidas = corpo.get("tabelas")
     if not isinstance(tabelas_recebidas, dict):
-        return jsonify({"erro": "formato inválido - esperado {tabelas: {...}}"}), 400
+        return jsonify({"erro": "formato inválido - se espera {tabelas: {...}}"}), 400
 
     resumo = {}
     conexao = db.conectar()

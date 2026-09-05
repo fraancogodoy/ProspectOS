@@ -27,10 +27,10 @@ const TOPICOS = [
   { id: "google-maps", label: "Google Maps", icone: MapPin, Conteudo: GoogleMapsDoc },
   { id: "instagram", label: "Instagram", icone: InstagramIcon, Conteudo: InstagramDoc },
   { id: "dashboard", label: "Dashboard general", icone: LayoutDashboard, Conteudo: DashboardDoc },
-  { id: "configuracoes", label: "Configuración de API", icone: Settings, Conteudo: ConfiguracoesDoc },
+  { id: "configuracoes", label: "Configuración", icone: Settings, Conteudo: ConfiguracoesDoc },
   { id: "instalacao", label: "Instalación y requisitos", icone: BookOpen, Conteudo: InstalacaoDoc },
   { id: "faq", label: "Preguntas comunes", icone: HelpCircle, Conteudo: FaqDoc },
-  { id: "sobre", label: "Acerca de / Contacto", icone: User, Conteudo: SobreDoc },
+  { id: "sobre", label: "Acerca de", icone: User, Conteudo: SobreDoc },
 ] as const
 
 export function DocumentacaoPage() {

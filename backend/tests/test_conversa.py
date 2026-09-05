@@ -420,7 +420,7 @@ class TestRotaAnalisar:
         criar_lead()
         resposta = cliente.post("/api/conversa/maps/place-1/analisar")
         assert resposta.status_code == 400
-        assert "ainda não há mensagens" in resposta.get_json()["erro"]
+        assert "todavía no hay mensajes" in resposta.get_json()["erro"]
 
     def test_analise_com_sucesso(self, cliente, monkeypatch):
         criar_lead()
@@ -453,4 +453,4 @@ class TestRotaAnalisar:
         monkeypatch.setattr(ia, "analisar_conversa_com_fallback", falhar)
         resposta = cliente.post("/api/conversa/maps/place-1/analisar")
         assert resposta.status_code == 500
-        assert "Configurações" in resposta.get_json()["erro"]
+        assert "Configuración" in resposta.get_json()["erro"]

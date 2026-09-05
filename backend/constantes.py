@@ -75,3 +75,7 @@ MAX_CARACTERES_ROTULO_AREA = 120
 RAIO_MIN_METROS = 500
 RAIO_MAX_METROS = 50_000
 MAX_CARACTERES_CAMPANA = 60
+
+# frase que o usuário precisa digitar pra confirmar o apagão total de leads -
+# não é segredo, só fricção deliberada contra um clique/chamada acidental
+FRASE_CONFIRMACAO_ELIMINAR_TODOS = "ELIMINAR TODO"

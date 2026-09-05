@@ -267,7 +267,7 @@ class TestRotaFonteMaps:
     def test_post_places_sem_chave(self, cliente):
         resposta = cliente.post("/api/configuracoes/fonte-maps", json={"fonte": "places"})
         assert resposta.status_code == 400
-        assert "chave" in resposta.get_json()["erro"]
+        assert "clave" in resposta.get_json()["erro"]
 
     def test_post_places_valida_e_salva(self, cliente, monkeypatch):
         monkeypatch.setattr(fontes_maps, "validar_chave_places", lambda chave: (True, None))
@@ -387,7 +387,7 @@ class TestRotasSessaoInstagram:
             "/api/instagram/login", json={"usuario": "nando", "senha": "errada"}
         )
         assert resposta.status_code == 400
-        assert "recusou" in resposta.get_json()["erro"]
+        assert "rechazó" in resposta.get_json()["erro"]
 
     def test_login_novo_substitui_sessao_antiga(self, cliente, pasta_dados, instagrapi_fake):
         pasta = pasta_dados / "instagram" / "sessao"
