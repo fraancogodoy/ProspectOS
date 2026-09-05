@@ -43,13 +43,23 @@ _handler_log = RotatingFileHandler(
 )
 _handler_log.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
 logging.getLogger().addHandler(_handler_log)
+# em la nube no hay disco persistente para leer este archivo: sin un handler
+# de consola, ningún logger.info/warning llega a los logs de Railway.
+_handler_console = logging.StreamHandler()
+_handler_console.setFormatter(logging.Formatter("%(asctime)s %(levelname)s %(name)s: %(message)s"))
+logging.getLogger().addHandler(_handler_console)
 # nível configurável via .env: PROSPECCAO_LOG_LEVEL=DEBUG|INFO|WARNING|ERROR
 _nivel_log = os.environ.get("PROSPECCAO_LOG_LEVEL", "INFO").upper()
 logging.getLogger().setLevel(getattr(logging, _nivel_log, logging.INFO))
 logger = logging.getLogger(__name__)
+logger.info(
+    "directorio de datos resuelto: %s (existe: %s, escribible: %s)",
+    paths.DIR_DADOS, paths.DIR_DADOS.exists(), os.access(paths.DIR_DADOS, os.W_OK),
+)
 
 import auth
 import db
+logger.info("banco de datos en: %s (existe: %s)", db.CAMINHO_BANCO, db.CAMINHO_BANCO.exists())
 import jobs
 import processar
 import rotas_admin
