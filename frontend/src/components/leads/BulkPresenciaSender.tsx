@@ -59,6 +59,9 @@ export function BulkPresenciaSender({
   const [hechos, setHechos] = useState(0)
   const [fallidos, setFallidos] = useState<string[]>([])
   const [termino, setTermino] = useState(false)
+  // Fase posterior: chequear cuáles se entregaron de verdad.
+  const [verificando, setVerificando] = useState(false)
+  const [rebotaron, setRebotaron] = useState<number | null>(null)
 
   const total = placeIdsSelecionados.length
 
@@ -90,12 +93,15 @@ export function BulkPresenciaSender({
     setHechos(0)
     setFallidos([])
     setTermino(false)
+    setVerificando(false)
+    setRebotaron(null)
   }, [abierto])
 
   const demasiados = total > 100
   const puedeEnviar =
     !demasiados &&
     !enviando &&
+    !verificando &&
     Boolean(plantilla) &&
     parametros.every((p) => p.trim().length > 0)
 
@@ -105,7 +111,9 @@ export function BulkPresenciaSender({
     setTermino(false)
     setHechos(0)
     setFallidos([])
+    setRebotaron(null)
     const falladas: string[] = []
+    const okIds: string[] = []
 
     for (let i = 0; i < placeIdsSelecionados.length; i++) {
       if (i > 0) await dormir(PAUSA_ENTRE_ENVIOS_MS)
@@ -116,6 +124,7 @@ export function BulkPresenciaSender({
           language: plantilla.language,
           parameters: parametros,
         })
+        okIds.push(placeId)
       } catch (err) {
         falladas.push(err instanceof ApiError ? err.message : String(err))
         setFallidos([...falladas])
@@ -126,11 +135,34 @@ export function BulkPresenciaSender({
     setEnviando(false)
     setTermino(true)
     invalidarLeads()
-    const ok = placeIdsSelecionados.length - falladas.length
+    const aceptados = okIds.length
     if (falladas.length === 0) {
-      toast.success(`Plantilla enviada a ${ok} negocio(s).`)
+      toast.success(`Plantilla enviada a ${aceptados} negocio(s).`)
     } else {
-      toast.warning(`Enviada a ${ok}. No salió en ${falladas.length}.`)
+      toast.warning(`Enviada a ${aceptados}. No salió en ${falladas.length}.`)
+    }
+
+    // Meta acepta la plantilla al toque pero puede rechazarla al entregar
+    // (ej. 131049). Ese "failed" tarda unos segundos en aparecer, así que se
+    // espera y recién ahí se pregunta cuáles llegaron: los que rebotaron
+    // vuelven a "novo".
+    if (aceptados > 0) {
+      setVerificando(true)
+      await dormir(8000)
+      try {
+        const r = await presenciaService.reconciliar(okIds)
+        setRebotaron(r.revertidos.length)
+        invalidarLeads()
+        if (r.revertidos.length > 0) {
+          toast.warning(
+            `${r.revertidos.length} no se entregaron (rebotaron) y volvieron a "nuevo".`
+          )
+        }
+      } catch {
+        // El chequeo es un extra: si falla, los envíos ya salieron igual.
+      } finally {
+        setVerificando(false)
+      }
     }
   }
 
@@ -145,8 +177,8 @@ export function BulkPresenciaSender({
     <Dialog
       open={abierto}
       onOpenChange={(v) => {
-        // No dejar cerrar en pleno envío.
-        if (enviando) return
+        // No dejar cerrar mientras manda o mientras verifica la entrega.
+        if (enviando || verificando) return
         setAbierto(v)
         if (!v && termino) onEnviado()
       }}
@@ -239,16 +271,28 @@ export function BulkPresenciaSender({
               <p className="text-xs text-muted-foreground">
                 {hechos} de {total} enviados
                 {fallidos.length > 0 && ` · ${fallidos.length} con error`}
-                {termino && " · listo"}
+                {termino && !verificando && " · listo"}
               </p>
+              {verificando && (
+                <p className="text-xs text-muted-foreground">
+                  Verificando entrega… los que reboten vuelven a “nuevo”.
+                </p>
+              )}
+              {rebotaron !== null && !verificando && (
+                <p className="text-xs text-muted-foreground">
+                  {rebotaron === 0
+                    ? "Todos los aceptados se entregaron."
+                    : `${rebotaron} rebotó/rebotaron y volvieron a “nuevo”.`}
+                </p>
+              )}
             </div>
           )}
         </div>
 
         <DialogFooter>
           {termino ? (
-            <Button size="sm" onClick={cerrarYlimpiar}>
-              Cerrar
+            <Button size="sm" onClick={cerrarYlimpiar} disabled={verificando}>
+              {verificando ? "Verificando…" : "Cerrar"}
             </Button>
           ) : (
             <>

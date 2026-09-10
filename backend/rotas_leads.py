@@ -1058,13 +1058,16 @@ def presencia_listar_plantillas():
 TOKEN_NOMBRE_LEAD = "{nombre}"
 
 
-def _marcar_contatado(conexao, place_id, status_anterior):
-    """Tras un envío exitoso: pasa a "contatado" con fecha/hora exacta y lo
-    anota en el historial, igual que un cambio de estado manual."""
+def _marcar_contatado(conexao, place_id, status_anterior, wamid=None):
+    """Tras un envío aceptado por Meta: pasa a "contatado" con fecha/hora
+    exacta y lo anota en el historial, igual que un cambio de estado manual.
+    Guarda el wamid para después poder chequear si se entregó de verdad
+    (ver /api/leads/presencia/reconciliar)."""
     agora = datetime.now().isoformat(timespec="seconds")
     conexao.execute(
-        "UPDATE leads SET status = 'contatado', contatado_em = ?, atualizado_em = ? WHERE place_id = ?",
-        (agora, agora, place_id),
+        "UPDATE leads SET status = 'contatado', contatado_em = ?, atualizado_em = ?, "
+        "presencia_wamid = ?, presencia_falla = NULL WHERE place_id = ?",
+        (agora, agora, wamid, place_id),
     )
     conexao.execute(
         "INSERT INTO historico_status (place_id, status_anterior, status_novo, alterado_em) VALUES (?, ?, ?, ?)",
@@ -1109,7 +1112,7 @@ def presencia_enviar(place_id):
     telefone_digitos = link.rsplit("/", 1)[-1]
 
     try:
-        presencia.enviar_a_lead(
+        resposta = presencia.enviar_a_lead(
             telefone_digitos, lead["nome"], template_name, language,
             _resolver_parametros(parameters, lead),
         )
@@ -1118,7 +1121,7 @@ def presencia_enviar(place_id):
 
     conexao = db.conectar()
     try:
-        agora = _marcar_contatado(conexao, place_id, lead["status"])
+        agora = _marcar_contatado(conexao, place_id, lead["status"], (resposta or {}).get("wamid"))
     finally:
         conexao.close()
 
@@ -1171,16 +1174,90 @@ def presencia_enviar_lote():
                 continue
             telefone_digitos = link.rsplit("/", 1)[-1]
             try:
-                presencia.enviar_a_lead(
+                resposta = presencia.enviar_a_lead(
                     telefone_digitos, lead["nome"], template_name, language,
                     _resolver_parametros(parameters, lead),
                 )
             except presencia.PresenciaError as erro:
                 fallidos.append({"place_id": pid, "nome": lead["nome"], "erro": str(erro)})
                 continue
-            _marcar_contatado(conexao, pid, lead["status"])
+            _marcar_contatado(conexao, pid, lead["status"], (resposta or {}).get("wamid"))
             enviados += 1
     finally:
         conexao.close()
 
     return jsonify({"ok": True, "enviados": enviados, "fallidos": fallidos})
+
+
+@bp.route("/api/leads/presencia/reconciliar", methods=["POST"])
+def presencia_reconciliar():
+    """Chequea, contra PresencIA, si las plantillas recién enviadas se
+    entregaron de verdad. Meta las acepta al toque pero puede rechazarlas al
+    entregar (ej. 131049, límite de interacciones): ese "failed" recién se
+    sabe unos segundos después.
+
+    A los que rebotaron los devuelve a "novo", les borra contatado_em y anota
+    el código de rechazo en presencia_falla - así solo quedan en "contatado"
+    los que llegaron. No toca a los que el usuario ya movió de estado a mano."""
+    corpo = request.json or {}
+    place_ids = corpo.get("place_ids") or []
+    if not isinstance(place_ids, list) or not place_ids:
+        return jsonify({"erro": "Falta place_ids"}), 400
+
+    conexao = db.conectar()
+    try:
+        filas = conexao.execute(
+            "SELECT place_id, nome, status, presencia_wamid FROM leads "
+            "WHERE place_id IN ({})".format(",".join("?" * len(place_ids))),
+            place_ids,
+        ).fetchall()
+        por_wamid = {f["presencia_wamid"]: f for f in filas if f["presencia_wamid"]}
+
+        if not por_wamid:
+            return jsonify({"ok": True, "entregados": 0, "revertidos": [], "pendientes": 0})
+
+        try:
+            estados = presencia.consultar_estados(list(por_wamid.keys()))
+        except presencia.PresenciaError as erro:
+            return jsonify({"erro": str(erro)}), 502
+
+        revertidos = []
+        entregados = 0
+        pendientes = 0
+        agora = datetime.now().isoformat(timespec="seconds")
+        for wamid, fila in por_wamid.items():
+            info = estados.get(wamid) or {}
+            estado = info.get("status")
+            if estado == "failed":
+                # Solo si sigue en "contatado" por este envío: si el usuario ya
+                # lo movió a mano, se respeta.
+                if fila["status"] == "contatado":
+                    conexao.execute(
+                        "UPDATE leads SET status = 'novo', contatado_em = NULL, "
+                        "presencia_falla = ?, atualizado_em = ? WHERE place_id = ?",
+                        (str(info.get("codigo_falla") or "rechazado"), agora, fila["place_id"]),
+                    )
+                    conexao.execute(
+                        "INSERT INTO historico_status (place_id, status_anterior, status_novo, alterado_em) "
+                        "VALUES (?, 'contatado', 'novo', ?)",
+                        (fila["place_id"], agora),
+                    )
+                revertidos.append({
+                    "place_id": fila["place_id"],
+                    "nome": fila["nome"],
+                    "codigo": info.get("codigo_falla"),
+                })
+            elif estado in ("delivered", "read"):
+                entregados += 1
+            else:
+                pendientes += 1
+        conexao.commit()
+    finally:
+        conexao.close()
+
+    return jsonify({
+        "ok": True,
+        "entregados": entregados,
+        "revertidos": revertidos,
+        "pendientes": pendientes,
+    })

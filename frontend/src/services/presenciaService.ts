@@ -27,4 +27,14 @@ export const presenciaService = {
       enviados: number
       fallidos: { place_id: string; nome: string | null; erro: string }[]
     }>("/api/presencia/enviar-lote", dados),
+
+  // Chequea contra PresencIA cuáles de los envíos recién hechos se entregaron
+  // de verdad. Los que Meta rechazó al entregar (ej. 131049) vuelven a "novo".
+  reconciliar: (placeIds: string[]) =>
+    httpClient.post<{
+      ok: true
+      entregados: number
+      pendientes: number
+      revertidos: { place_id: string; nome: string; codigo: string | null }[]
+    }>("/api/leads/presencia/reconciliar", { place_ids: placeIds }),
 }

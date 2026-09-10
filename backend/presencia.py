@@ -72,6 +72,19 @@ def listar_plantillas_aprobadas():
     return [t for t in dados.get("templates", []) if t.get("status") == "APPROVED"]
 
 
+def consultar_estados(wamids):
+    """Estado de entrega de esos mensajes, por wamid:
+    {wamid: {"status": "sent|delivered|read|failed", "codigo_falla": "131049"|None}}
+
+    Meta acepta la plantilla al toque pero puede rechazarla al entregar; ese
+    "failed" recién aparece acá unos segundos después, cuando el webhook lo
+    guarda en PresencIA."""
+    if not wamids:
+        return {}
+    dados = _pedir("POST", "/api/tenant/templates/estado", json={"wamids": list(wamids)})
+    return dados.get("estados", {})
+
+
 def enviar_a_lead(telefono_digitos, nombre, template_name, language, parameters=None):
     """Manda la plantilla y, de paso, deja el nombre del lead en la
     conversación (nombre_cliente) para que en el panel no aparezca solo el

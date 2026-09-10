@@ -470,6 +470,8 @@ def migrar_banco(conexao):
         "email": "TEXT",
         "campana": "TEXT",
         "contatado_em": "TEXT",  # cuándo se mandó la plantilla de primer contacto por PresencIA
+        "presencia_wamid": "TEXT",  # id del mensaje en Meta, para consultar si se entregó
+        "presencia_falla": "TEXT",  # código de rechazo de Meta si NO se entregó (ej. 131049)
     }
     for nome, tipo in novas_colunas.items():
         if nome not in colunas_existentes:
