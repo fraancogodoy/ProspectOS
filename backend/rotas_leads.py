@@ -1081,4 +1081,22 @@ def presencia_enviar(place_id):
     except presencia.PresenciaError as erro:
         return jsonify({"erro": str(erro)}), 502
 
-    return jsonify({"ok": True})
+    # El envío ya salió: pasa a "contatado" con la fecha/hora exacta, igual
+    # que un cambio de estado manual - queda en el historial y no hace falta
+    # acordarse de tocarlo a mano después de cada plantilla mandada.
+    agora = datetime.now().isoformat(timespec="seconds")
+    conexao = db.conectar()
+    try:
+        conexao.execute(
+            "UPDATE leads SET status = 'contatado', contatado_em = ?, atualizado_em = ? WHERE place_id = ?",
+            (agora, agora, place_id),
+        )
+        conexao.execute(
+            "INSERT INTO historico_status (place_id, status_anterior, status_novo, alterado_em) VALUES (?, ?, ?, ?)",
+            (place_id, lead["status"], "contatado", agora),
+        )
+        conexao.commit()
+    finally:
+        conexao.close()
+
+    return jsonify({"ok": True, "status": "contatado", "contatado_em": agora})

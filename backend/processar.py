@@ -469,6 +469,7 @@ def migrar_banco(conexao):
         "facebook_url": "TEXT",
         "email": "TEXT",
         "campana": "TEXT",
+        "contatado_em": "TEXT",  # cuándo se mandó la plantilla de primer contacto por PresencIA
     }
     for nome, tipo in novas_colunas.items():
         if nome not in colunas_existentes:

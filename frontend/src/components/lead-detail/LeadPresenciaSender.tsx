@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { usePresenciaPlantillas } from "@/hooks/usePresenciaPlantillas"
+import { formatarTempoRelativo } from "@/lib/formatters"
 import type { UseMutationResult } from "@tanstack/react-query"
 import type { Lead } from "@/types/lead"
 
@@ -128,6 +129,12 @@ export function LeadPresenciaSender({ lead, enviarPresencia }: LeadPresenciaSend
         <Send className="size-4" />
         {enviarPresencia.isPending ? "Enviando..." : "Enviar por PresencIA"}
       </Button>
+
+      {lead.contatado_em && (
+        <p className="text-xs text-muted-foreground">
+          Último contacto por PresencIA: {formatarTempoRelativo(lead.contatado_em)}
+        </p>
+      )}
     </div>
   )
 }

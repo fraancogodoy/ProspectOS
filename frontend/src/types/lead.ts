@@ -46,6 +46,7 @@ export interface Lead {
   facebook_url: string | null
   email: string | null
   campana: string | null
+  contatado_em: string | null
 }
 
 export interface HistoricoStatusItem {
