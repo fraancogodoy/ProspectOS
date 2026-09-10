@@ -1222,6 +1222,7 @@ def presencia_reconciliar():
             return jsonify({"erro": str(erro)}), 502
 
         revertidos = []
+        wamids_fallidos = []
         entregados = 0
         pendientes = 0
         agora = datetime.now().isoformat(timespec="seconds")
@@ -1229,6 +1230,7 @@ def presencia_reconciliar():
             info = estados.get(wamid) or {}
             estado = info.get("status")
             if estado == "failed":
+                wamids_fallidos.append(wamid)
                 # Solo si sigue en "contatado" por este envío: si el usuario ya
                 # lo movió a mano, se respeta.
                 if fila["status"] == "contatado":
@@ -1254,6 +1256,14 @@ def presencia_reconciliar():
         conexao.commit()
     finally:
         conexao.close()
+
+    # Que la conversación que abrió el envío rebotado desaparezca de la
+    # bandeja del bot. Es un extra: si falla, los estados ya quedaron bien.
+    if wamids_fallidos:
+        try:
+            presencia.limpiar_fallidos(wamids_fallidos)
+        except presencia.PresenciaError as erro:
+            logger.warning("no se pudo limpiar la bandeja de los envíos rebotados: %s", erro)
 
     return jsonify({
         "ok": True,

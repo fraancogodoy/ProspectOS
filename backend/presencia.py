@@ -85,6 +85,15 @@ def consultar_estados(wamids):
     return dados.get("estados", {})
 
 
+def limpiar_fallidos(wamids):
+    """Borra de la bandeja del bot los rastros de las plantillas que NO se
+    entregaron: el mensaje fallido y, si quedó vacía, la conversación. No toca
+    conversaciones que ya tenían historia."""
+    if not wamids:
+        return {}
+    return _pedir("POST", "/api/tenant/templates/limpiar-fallido", json={"wamids": list(wamids)})
+
+
 def enviar_a_lead(telefono_digitos, nombre, template_name, language, parameters=None):
     """Manda la plantilla y, de paso, deja el nombre del lead en la
     conversación (nombre_cliente) para que en el panel no aparezca solo el
