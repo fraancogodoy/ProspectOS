@@ -1,12 +1,13 @@
 // Envío masivo de una plantilla de WhatsApp a los leads seleccionados, vía
-// PresencIA. Cada envío es una llamada individual a la API oficial de Meta
-// (no hay endpoint "masivo" de Meta), así que el límite real es el tier de
-// mensajería de la cuenta (250 / 1.000 / 10.000 plantillas por 24 h según
-// calidad). El backend recorre los leads, personaliza {nombre} por negocio,
-// no corta ante un fallo y devuelve el detalle de los que no salieron.
+// PresencIA. El loop lo maneja el frontend -un lead por vez, con ~1 s de
+// pausa- para poder mostrar una barra que se llena a medida que salen. Cada
+// envío es una llamada individual a la API oficial de Meta (no hay endpoint
+// "masivo"), así que el límite real es el tier de mensajería de la cuenta
+// (250 / 1.000 / 10.000 plantillas por 24 h según calidad).
 
 import { useEffect, useMemo, useState } from "react"
 import { Send } from "lucide-react"
+import { toast } from "sonner"
 import {
   Dialog,
   DialogContent,
@@ -27,7 +28,9 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { usePresenciaPlantillas } from "@/hooks/usePresenciaPlantillas"
-import { useBulkMutations } from "@/hooks/useBulkMutations"
+import { useInvalidarLeads } from "@/hooks/useInvalidarLeads"
+import { presenciaService } from "@/services/presenciaService"
+import { ApiError } from "@/services/httpClient"
 import { TOKEN_NOMBRE_LEAD, contarVariablesBody } from "@/lib/presencia"
 
 interface BulkPresenciaSenderProps {
@@ -35,18 +38,29 @@ interface BulkPresenciaSenderProps {
   onEnviado: () => void
 }
 
+const PAUSA_ENTRE_ENVIOS_MS = 1000
+const dormir = (ms: number) => new Promise((r) => setTimeout(r, ms))
+
 export function BulkPresenciaSender({
   placeIdsSelecionados,
   onEnviado,
 }: BulkPresenciaSenderProps) {
   const [abierto, setAbierto] = useState(false)
   const { plantillas, isLoading, isError, error } = usePresenciaPlantillas()
-  const { enviarPlantillaEmLote } = useBulkMutations()
+  const invalidarLeads = useInvalidarLeads()
 
   const [nombrePlantilla, setNombrePlantilla] = useState("")
   // parametros[0] arranca en el token {nombre} (lo reemplaza el backend por
   // cada negocio); el resto son valores fijos, iguales para todos.
   const [parametros, setParametros] = useState<string[]>([])
+
+  // Progreso del envío en curso.
+  const [enviando, setEnviando] = useState(false)
+  const [hechos, setHechos] = useState(0)
+  const [fallidos, setFallidos] = useState<string[]>([])
+  const [termino, setTermino] = useState(false)
+
+  const total = placeIdsSelecionados.length
 
   const plantilla = useMemo(
     () => plantillas.find((p) => p.name === nombrePlantilla),
@@ -69,32 +83,74 @@ export function BulkPresenciaSender({
     }
   }, [plantillas, nombrePlantilla])
 
-  const demasiados = placeIdsSelecionados.length > 100
+  // Al cerrar el diálogo, limpia el progreso para la próxima.
+  useEffect(() => {
+    if (abierto) return
+    setEnviando(false)
+    setHechos(0)
+    setFallidos([])
+    setTermino(false)
+  }, [abierto])
+
+  const demasiados = total > 100
   const puedeEnviar =
     !demasiados &&
+    !enviando &&
     Boolean(plantilla) &&
     parametros.every((p) => p.trim().length > 0)
 
-  const enviar = () => {
+  const enviar = async () => {
     if (!plantilla) return
-    enviarPlantillaEmLote.mutate(
-      {
-        placeIds: placeIdsSelecionados,
-        template_name: plantilla.name,
-        language: plantilla.language,
-        parameters: parametros,
-      },
-      {
-        onSuccess: () => {
-          setAbierto(false)
-          onEnviado()
-        },
+    setEnviando(true)
+    setTermino(false)
+    setHechos(0)
+    setFallidos([])
+    const falladas: string[] = []
+
+    for (let i = 0; i < placeIdsSelecionados.length; i++) {
+      if (i > 0) await dormir(PAUSA_ENTRE_ENVIOS_MS)
+      const placeId = placeIdsSelecionados[i]
+      try {
+        await presenciaService.enviar(placeId, {
+          template_name: plantilla.name,
+          language: plantilla.language,
+          parameters: parametros,
+        })
+      } catch (err) {
+        falladas.push(err instanceof ApiError ? err.message : String(err))
+        setFallidos([...falladas])
       }
-    )
+      setHechos(i + 1)
+    }
+
+    setEnviando(false)
+    setTermino(true)
+    invalidarLeads()
+    const ok = placeIdsSelecionados.length - falladas.length
+    if (falladas.length === 0) {
+      toast.success(`Plantilla enviada a ${ok} negocio(s).`)
+    } else {
+      toast.warning(`Enviada a ${ok}. No salió en ${falladas.length}.`)
+    }
   }
 
+  const cerrarYlimpiar = () => {
+    setAbierto(false)
+    if (termino) onEnviado()
+  }
+
+  const progresoPct = total > 0 ? Math.round((hechos / total) * 100) : 0
+
   return (
-    <Dialog open={abierto} onOpenChange={setAbierto}>
+    <Dialog
+      open={abierto}
+      onOpenChange={(v) => {
+        // No dejar cerrar en pleno envío.
+        if (enviando) return
+        setAbierto(v)
+        if (!v && termino) onEnviado()
+      }}
+    >
       <DialogTrigger asChild>
         <Button size="sm" className="bg-success text-white hover:bg-success/90">
           <Send className="size-4" />
@@ -103,9 +159,7 @@ export function BulkPresenciaSender({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>
-            Enviar plantilla a {placeIdsSelecionados.length} negocio(s)
-          </DialogTitle>
+          <DialogTitle>Enviar plantilla a {total} negocio(s)</DialogTitle>
           <DialogDescription>
             Se manda la misma plantilla a cada uno por su WhatsApp, vía PresencIA,
             con ~1 s de pausa entre cada envío. El saludo se personaliza con el
@@ -116,8 +170,8 @@ export function BulkPresenciaSender({
         <div className="flex flex-col gap-3 py-1">
           {demasiados && (
             <p className="text-xs text-destructive">
-              Son {placeIdsSelecionados.length} seleccionados. Mandá en tandas de
-              hasta 100 — es lo sano para la calidad de un número nuevo.
+              Son {total} seleccionados. Mandá en tandas de hasta 100 — es lo
+              sano para la calidad de un número nuevo.
             </p>
           )}
           {isError && (
@@ -128,7 +182,11 @@ export function BulkPresenciaSender({
 
           <div className="flex flex-col gap-1.5">
             <Label>Plantilla aprobada</Label>
-            <Select value={nombrePlantilla} onValueChange={setNombrePlantilla}>
+            <Select
+              value={nombrePlantilla}
+              onValueChange={setNombrePlantilla}
+              disabled={enviando}
+            >
               <SelectTrigger>
                 <SelectValue
                   placeholder={
@@ -153,7 +211,7 @@ export function BulkPresenciaSender({
                   <Input
                     value={valor}
                     placeholder={`Variable {{${i + 1}}}`}
-                    disabled={i === 0}
+                    disabled={i === 0 || enviando}
                     onChange={(e) => {
                       const copia = [...parametros]
                       copia[i] = e.target.value
@@ -169,22 +227,49 @@ export function BulkPresenciaSender({
               ))}
             </div>
           )}
+
+          {(enviando || termino) && (
+            <div className="flex flex-col gap-1.5">
+              <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
+                <div
+                  className="h-full rounded-full bg-success transition-all duration-300"
+                  style={{ width: `${progresoPct}%` }}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                {hechos} de {total} enviados
+                {fallidos.length > 0 && ` · ${fallidos.length} con error`}
+                {termino && " · listo"}
+              </p>
+            </div>
+          )}
         </div>
 
         <DialogFooter>
-          <Button variant="outline" size="sm" onClick={() => setAbierto(false)}>
-            Cancelar
-          </Button>
-          <Button
-            size="sm"
-            className="bg-success text-white hover:bg-success/90"
-            disabled={!puedeEnviar || enviarPlantillaEmLote.isPending}
-            onClick={enviar}
-          >
-            {enviarPlantillaEmLote.isPending
-              ? "Enviando..."
-              : `Enviar a ${placeIdsSelecionados.length}`}
-          </Button>
+          {termino ? (
+            <Button size="sm" onClick={cerrarYlimpiar}>
+              Cerrar
+            </Button>
+          ) : (
+            <>
+              <Button
+                variant="outline"
+                size="sm"
+                disabled={enviando}
+                onClick={() => setAbierto(false)}
+              >
+                Cancelar
+              </Button>
+              <Button
+                size="sm"
+                className="bg-success text-white hover:bg-success/90"
+                disabled={!puedeEnviar}
+                onClick={enviar}
+              >
+                {enviando ? "Enviando..." : `Enviar a ${total}`}
+              </Button>
+            </>
+          )}
         </DialogFooter>
       </DialogContent>
     </Dialog>
