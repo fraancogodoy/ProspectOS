@@ -66,33 +66,21 @@ def _pedir(metodo, ruta, **kwargs):
     return dados
 
 
-def crear_o_actualizar_contacto(telefono_digitos, nombre):
-    """Da de alta el contacto con su nombre antes de mandar el mensaje - así
-    la conversación no queda con el número pelado en el panel."""
-    return _pedir("POST", "/api/tenant/contactos", json={
-        "wa_id": telefono_digitos,
-        "nombre_cliente": nombre,
-    })
-
-
 def listar_plantillas_aprobadas():
     """Solo las que Meta ya aprobó - las demás no se pueden mandar."""
     dados = _pedir("GET", "/api/tenant/templates/")
     return [t for t in dados.get("templates", []) if t.get("status") == "APPROVED"]
 
 
-def enviar_plantilla(telefono_digitos, template_name, language, parameters=None):
-    """parameters: lista de strings, en el mismo orden que las variables
-    {{1}}, {{2}}... del body de la plantilla."""
+def enviar_a_lead(telefono_digitos, nombre, template_name, language, parameters=None):
+    """Manda la plantilla y, de paso, deja el nombre del lead en la
+    conversación (nombre_cliente) para que en el panel no aparezca solo el
+    número. NO lo da de alta como cliente: es un lead, no un cliente todavía.
+    El nombre solo se escribe si la conversación no tenía uno."""
     return _pedir("POST", "/api/tenant/templates/send", json={
         "to": telefono_digitos,
         "template_name": template_name,
         "language": language,
         "parameters": parameters or [],
+        "nombre_cliente": nombre,
     })
-
-
-def enviar_a_lead(telefono_digitos, nombre, template_name, language, parameters=None):
-    """Junta los tres pasos: contacto con nombre, y recién ahí la plantilla."""
-    crear_o_actualizar_contacto(telefono_digitos, nombre)
-    return enviar_plantilla(telefono_digitos, template_name, language, parameters)

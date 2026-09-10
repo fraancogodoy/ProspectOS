@@ -17,6 +17,10 @@ interface LeadCardProps {
   onClick: () => void
   selecionado: boolean
   onAlternarSelecao: () => void
+  // Con al menos un lead ya tildado, tocar la tarjeta entera selecciona/
+  // deselecciona en vez de abrir el detalle - no hace falta apuntar al
+  // cuadradito.
+  modoSelecao: boolean
 }
 
 export function LeadCard({
@@ -24,9 +28,11 @@ export function LeadCard({
   onClick,
   selecionado,
   onAlternarSelecao,
+  modoSelecao,
 }: LeadCardProps) {
   const vencido = followupVencidoOuHoje(lead.proximo_followup)
   const { ignorar } = useLeadMutations(lead.place_id)
+  const alTocar = () => (modoSelecao ? onAlternarSelecao() : onClick())
 
   return (
     <motion.div
@@ -36,11 +42,18 @@ export function LeadCard({
       whileHover={{ y: -2 }}
       role="button"
       tabIndex={0}
-      onClick={onClick}
+      onClick={alTocar}
       onKeyDown={(e) => {
-        if (e.key === "Enter" || e.key === " ") onClick()
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault()
+          alTocar()
+        }
       }}
-      aria-label={`Abrir detalle de ${lead.nome}`}
+      aria-label={
+        modoSelecao
+          ? `${selecionado ? "Quitar de la selección" : "Agregar a la selección"}: ${lead.nome}`
+          : `Abrir detalle de ${lead.nome}`
+      }
       className={cn(
         "relative flex cursor-pointer flex-col gap-2 rounded-xl border border-border bg-card p-4 text-left shadow-sm transition-colors hover:bg-accent/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
         vencido && "ring-2 ring-warning",

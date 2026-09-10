@@ -172,6 +172,7 @@ export function LeadGrid({
               onClick={() => onSelecionarLead(lead)}
               selecionado={selecionados.has(lead.place_id)}
               onAlternarSelecao={() => alternar(lead.place_id)}
+              modoSelecao={quantidade > 0}
             />
           ))}
         </div>
