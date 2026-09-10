@@ -95,3 +95,17 @@ export interface PaginaLeads {
   leads: Lead[]
   tem_mais: boolean
 }
+
+/** Plantilla de WhatsApp ya aprobada por Meta, tal como la devuelve el
+ * PresencIA (GET /templates de la Graph API, solo status APPROVED). */
+export interface PresenciaPlantilla {
+  name: string
+  language: string
+  status: "APPROVED"
+  category: string
+  components: Array<{
+    type: "HEADER" | "BODY" | "FOOTER" | "BUTTONS"
+    text?: string
+    format?: string
+  }>
+}

@@ -19,6 +19,7 @@ import { LeadTagsFollowupForm } from "@/components/lead-detail/LeadTagsFollowupF
 import { LeadObservacoesForm } from "@/components/lead-detail/LeadObservacoesForm"
 import { LeadContatoForm } from "@/components/lead-detail/LeadContatoForm"
 import { LeadMessageGenerator } from "@/components/lead-detail/LeadMessageGenerator"
+import { LeadPresenciaSender } from "@/components/lead-detail/LeadPresenciaSender"
 import { LeadHistoryAccordion } from "@/components/lead-detail/LeadHistoryAccordion"
 import { DeleteLeadButton } from "@/components/lead-detail/DeleteLeadButton"
 import type { Lead } from "@/types/lead"
@@ -161,6 +162,8 @@ export function LeadDetailModal({ lead, onClose }: LeadDetailModalProps) {
                 gerarMensagem={mutations.gerarMensagem}
                 marcarFollowupEnviado={mutations.marcarFollowupEnviado}
               />
+
+              <LeadPresenciaSender lead={lead} enviarPresencia={mutations.enviarPresencia} />
 
               <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
                 <Button

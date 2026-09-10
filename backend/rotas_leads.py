@@ -15,6 +15,7 @@ import diagnostico
 import ia
 import jobs
 import paths
+import presencia
 import processar
 from validacao import validar_ids_bulk
 from constantes import (
@@ -1038,3 +1039,46 @@ def disparar_busca():
 @bp.route("/api/buscar/status")
 def status_busca():
     return jsonify(jobs.estado_busca)
+
+
+@bp.route("/api/presencia/plantillas")
+def presencia_listar_plantillas():
+    """Solo las plantillas ya aprobadas por Meta - las demás no se pueden mandar."""
+    try:
+        plantillas = presencia.listar_plantillas_aprobadas()
+    except presencia.PresenciaError as erro:
+        return jsonify({"erro": str(erro)}), 502
+    return jsonify({"plantillas": plantillas})
+
+
+@bp.route("/api/leads/<place_id>/presencia/enviar", methods=["POST"])
+def presencia_enviar(place_id):
+    """Manda al lead la plantilla elegida a través del PresencIA: crea el
+    contacto con su nombre real y recién ahí dispara el envío, para que la
+    conversación aparezca en el panel identificada, no con el número pelado."""
+    corpo = request.json or {}
+    template_name = str(corpo.get("template_name") or "").strip()
+    language = str(corpo.get("language") or "").strip()
+    parameters = corpo.get("parameters") or []
+    if not template_name or not language:
+        return jsonify({"erro": "Falta template_name o language"}), 400
+
+    conexao = db.conectar()
+    try:
+        lead = conexao.execute("SELECT * FROM leads WHERE place_id = ?", (place_id,)).fetchone()
+    finally:
+        conexao.close()
+    if lead is None:
+        return jsonify({"erro": "lead no encontrado"}), 404
+
+    link = lead["whatsapp_link"]
+    if not link:
+        return jsonify({"erro": "Ese lead no tiene un teléfono de WhatsApp válido."}), 400
+    telefone_digitos = link.rsplit("/", 1)[-1]
+
+    try:
+        presencia.enviar_a_lead(telefone_digitos, lead["nome"], template_name, language, parameters)
+    except presencia.PresenciaError as erro:
+        return jsonify({"erro": str(erro)}), 502
+
+    return jsonify({"ok": True})

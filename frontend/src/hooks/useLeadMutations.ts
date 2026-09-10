@@ -1,6 +1,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { leadsService } from "@/services/leadsService"
+import { presenciaService } from "@/services/presenciaService"
 import { useInvalidarLeads } from "@/hooks/useInvalidarLeads"
 import { tocarSom } from "@/hooks/useSom"
 import type { StatusLead } from "@/types/lead"
@@ -116,6 +117,15 @@ export function useLeadMutations(placeId: string) {
     },
   })
 
+  const enviarPresencia = useMutation({
+    mutationFn: (dados: { template_name: string; language: string; parameters: string[] }) =>
+      presenciaService.enviar(placeId, dados),
+    onSuccess: () => {
+      invalidarListaEMetricas()
+      toast.success("Plantilla enviada por PresencIA.")
+    },
+  })
+
   const excluirDefinitivamente = useMutation({
     mutationFn: () => leadsService.excluirDefinitivamente(placeId),
     onSuccess: () => {
@@ -134,6 +144,7 @@ export function useLeadMutations(placeId: string) {
     marcarFollowupEnviado,
     ignorar,
     reanalisarSite,
+    enviarPresencia,
     excluirDefinitivamente,
   }
 }
