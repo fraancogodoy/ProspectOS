@@ -6,6 +6,7 @@ import io
 import json
 import logging
 import re
+import time
 from datetime import date, datetime, timedelta
 
 from flask import Blueprint, Response, jsonify, request
@@ -1051,6 +1052,37 @@ def presencia_listar_plantillas():
     return jsonify({"plantillas": plantillas})
 
 
+# El literal que, en los parámetros de la plantilla, se reemplaza por el
+# nombre de cada negocio - así el envío masivo personaliza el saludo sin que
+# haya que tipear negocio por negocio.
+TOKEN_NOMBRE_LEAD = "{nombre}"
+
+
+def _marcar_contatado(conexao, place_id, status_anterior):
+    """Tras un envío exitoso: pasa a "contatado" con fecha/hora exacta y lo
+    anota en el historial, igual que un cambio de estado manual."""
+    agora = datetime.now().isoformat(timespec="seconds")
+    conexao.execute(
+        "UPDATE leads SET status = 'contatado', contatado_em = ?, atualizado_em = ? WHERE place_id = ?",
+        (agora, agora, place_id),
+    )
+    conexao.execute(
+        "INSERT INTO historico_status (place_id, status_anterior, status_novo, alterado_em) VALUES (?, ?, ?, ?)",
+        (place_id, status_anterior, "contatado", agora),
+    )
+    conexao.commit()
+    return agora
+
+
+def _resolver_parametros(parametros_plantilla, lead):
+    """Reemplaza el token del nombre por el nombre real del lead; el resto
+    queda tal cual (son valores compartidos por todos los envíos del lote)."""
+    return [
+        lead["nome"] if p == TOKEN_NOMBRE_LEAD else p
+        for p in parametros_plantilla
+    ]
+
+
 @bp.route("/api/leads/<place_id>/presencia/enviar", methods=["POST"])
 def presencia_enviar(place_id):
     """Manda al lead la plantilla elegida a través del PresencIA: crea el
@@ -1077,26 +1109,78 @@ def presencia_enviar(place_id):
     telefone_digitos = link.rsplit("/", 1)[-1]
 
     try:
-        presencia.enviar_a_lead(telefone_digitos, lead["nome"], template_name, language, parameters)
+        presencia.enviar_a_lead(
+            telefone_digitos, lead["nome"], template_name, language,
+            _resolver_parametros(parameters, lead),
+        )
     except presencia.PresenciaError as erro:
         return jsonify({"erro": str(erro)}), 502
 
-    # El envío ya salió: pasa a "contatado" con la fecha/hora exacta, igual
-    # que un cambio de estado manual - queda en el historial y no hace falta
-    # acordarse de tocarlo a mano después de cada plantilla mandada.
-    agora = datetime.now().isoformat(timespec="seconds")
     conexao = db.conectar()
     try:
-        conexao.execute(
-            "UPDATE leads SET status = 'contatado', contatado_em = ?, atualizado_em = ? WHERE place_id = ?",
-            (agora, agora, place_id),
-        )
-        conexao.execute(
-            "INSERT INTO historico_status (place_id, status_anterior, status_novo, alterado_em) VALUES (?, ?, ?, ?)",
-            (place_id, lead["status"], "contatado", agora),
-        )
-        conexao.commit()
+        agora = _marcar_contatado(conexao, place_id, lead["status"])
     finally:
         conexao.close()
 
     return jsonify({"ok": True, "status": "contatado", "contatado_em": agora})
+
+
+@bp.route("/api/presencia/enviar-lote", methods=["POST"])
+def presencia_enviar_lote():
+    """Envío masivo: la misma plantilla a varios leads de una. El token
+    "{nombre}" en los parámetros se reemplaza por el nombre de cada negocio;
+    el resto de los parámetros van iguales para todos.
+
+    No corta ante el primer error: sigue con el resto y devuelve el detalle
+    de los que fallaron (número inválido, otro operador dueño de la charla,
+    etc.) para mostrarlo al final."""
+    corpo = request.json or {}
+    place_ids = corpo.get("place_ids") or []
+    template_name = str(corpo.get("template_name") or "").strip()
+    language = str(corpo.get("language") or "").strip()
+    parameters = corpo.get("parameters") or []
+
+    if not isinstance(place_ids, list) or not place_ids:
+        return jsonify({"erro": "Falta place_ids"}), 400
+    if not template_name or not language:
+        return jsonify({"erro": "Falta template_name o language"}), 400
+    # Tope por lote: con la pausa de 1 s de abajo, 100 leads son ~100 s de
+    # request - por debajo de cualquier timeout de gateway. Y de paso obliga a
+    # tandas chicas, que es lo sano para la calidad de un número nuevo.
+    if len(place_ids) > 100:
+        return jsonify({"erro": "Máximo 100 leads por lote. Mandá en tandas."}), 400
+
+    # Pausa entre envíos: nada de ráfaga. Da apariencia orgánica y margen para
+    # cortar si la calidad del número se resiente en el medio.
+    PAUSA_ENTRE_ENVIOS_SEG = 1.0
+
+    enviados = 0
+    fallidos = []
+    conexao = db.conectar()
+    try:
+        for indice, pid in enumerate(place_ids):
+            if indice > 0:
+                time.sleep(PAUSA_ENTRE_ENVIOS_SEG)
+            lead = conexao.execute("SELECT * FROM leads WHERE place_id = ?", (pid,)).fetchone()
+            if lead is None:
+                fallidos.append({"place_id": pid, "nome": None, "erro": "lead no encontrado"})
+                continue
+            link = lead["whatsapp_link"]
+            if not link:
+                fallidos.append({"place_id": pid, "nome": lead["nome"], "erro": "sin WhatsApp válido"})
+                continue
+            telefone_digitos = link.rsplit("/", 1)[-1]
+            try:
+                presencia.enviar_a_lead(
+                    telefone_digitos, lead["nome"], template_name, language,
+                    _resolver_parametros(parameters, lead),
+                )
+            except presencia.PresenciaError as erro:
+                fallidos.append({"place_id": pid, "nome": lead["nome"], "erro": str(erro)})
+                continue
+            _marcar_contatado(conexao, pid, lead["status"])
+            enviados += 1
+    finally:
+        conexao.close()
+
+    return jsonify({"ok": True, "enviados": enviados, "fallidos": fallidos})

@@ -17,6 +17,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { usePresenciaPlantillas } from "@/hooks/usePresenciaPlantillas"
+import { contarVariablesBody } from "@/lib/presencia"
 import { formatarTempoRelativo } from "@/lib/formatters"
 import type { UseMutationResult } from "@tanstack/react-query"
 import type { Lead } from "@/types/lead"
@@ -29,18 +30,11 @@ interface LeadPresenciaSenderProps {
     { template_name: string; language: string; parameters: string[] },
     unknown
   >
+  // Cerrar la ficha del negocio apenas sale el envío.
+  onEnviado?: () => void
 }
 
-// Cuenta las variables {{1}}, {{2}}... del body - es el único componente que
-// las plantillas de marketing pueden tener con texto libre por variable.
-function contarVariablesBody(plantilla: { components: { type: string; text?: string }[] } | undefined) {
-  const body = plantilla?.components.find((c) => c.type === "BODY")
-  if (!body?.text) return 0
-  const matches = body.text.match(/\{\{\d+\}\}/g)
-  return matches ? new Set(matches).size : 0
-}
-
-export function LeadPresenciaSender({ lead, enviarPresencia }: LeadPresenciaSenderProps) {
+export function LeadPresenciaSender({ lead, enviarPresencia, onEnviado }: LeadPresenciaSenderProps) {
   const { plantillas, isLoading, isError, error } = usePresenciaPlantillas()
   const [nombrePlantilla, setNombrePlantilla] = useState("")
   const [parametros, setParametros] = useState<string[]>([])
@@ -119,11 +113,14 @@ export function LeadPresenciaSender({ lead, enviarPresencia }: LeadPresenciaSend
         disabled={!puedeEnviar || enviarPresencia.isPending}
         onClick={() =>
           plantilla &&
-          enviarPresencia.mutate({
-            template_name: plantilla.name,
-            language: plantilla.language,
-            parameters: parametros,
-          })
+          enviarPresencia.mutate(
+            {
+              template_name: plantilla.name,
+              language: plantilla.language,
+              parameters: parametros,
+            },
+            { onSuccess: () => onEnviado?.() }
+          )
         }
       >
         <Send className="size-4" />

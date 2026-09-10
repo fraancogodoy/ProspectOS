@@ -163,7 +163,11 @@ export function LeadDetailModal({ lead, onClose }: LeadDetailModalProps) {
                 marcarFollowupEnviado={mutations.marcarFollowupEnviado}
               />
 
-              <LeadPresenciaSender lead={lead} enviarPresencia={mutations.enviarPresencia} />
+              <LeadPresenciaSender
+                lead={lead}
+                enviarPresencia={mutations.enviarPresencia}
+                onEnviado={onClose}
+              />
 
               <div className="flex flex-wrap items-center justify-between gap-2 border-t border-border pt-3">
                 <Button

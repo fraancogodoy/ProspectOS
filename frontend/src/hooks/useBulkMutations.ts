@@ -1,6 +1,7 @@
 import { useMutation } from "@tanstack/react-query"
 import { toast } from "sonner"
 import { leadsService } from "@/services/leadsService"
+import { presenciaService } from "@/services/presenciaService"
 import { useInvalidarLeads } from "@/hooks/useInvalidarLeads"
 import { tocarSom } from "@/hooks/useSom"
 import type { StatusLead } from "@/types/lead"
@@ -35,9 +36,38 @@ export function useBulkMutations() {
     },
   })
 
+  const enviarPlantillaEmLote = useMutation({
+    mutationFn: (input: {
+      placeIds: string[]
+      template_name: string
+      language: string
+      parameters: string[]
+    }) =>
+      presenciaService.enviarLote({
+        place_ids: input.placeIds,
+        template_name: input.template_name,
+        language: input.language,
+        parameters: input.parameters,
+      }),
+    onSuccess: (resposta) => {
+      invalidarListaEMetricas()
+      if (resposta.fallidos.length === 0) {
+        toast.success(`Plantilla enviada a ${resposta.enviados} negocio(s).`)
+      } else {
+        toast.warning(
+          `Enviada a ${resposta.enviados}. No salió en ${resposta.fallidos.length}: ` +
+            resposta.fallidos
+              .map((f) => `${f.nome ?? f.place_id} (${f.erro})`)
+              .join("; ")
+        )
+      }
+    },
+  })
+
   return {
     atualizarStatusEmLote,
     ignorarEmLote,
     excluirEmLoteDefinitivamente,
+    enviarPlantillaEmLote,
   }
 }

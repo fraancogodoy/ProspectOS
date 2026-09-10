@@ -20,6 +20,7 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { useBulkMutations } from "@/hooks/useBulkMutations"
+import { BulkPresenciaSender } from "@/components/leads/BulkPresenciaSender"
 import { LABEL_STATUS } from "@/lib/constants"
 import { STATUS_VALIDOS, type StatusLead } from "@/types/lead"
 
@@ -66,18 +67,25 @@ export function BulkActionsBar({
       </span>
 
       {!modoIgnorados && (
-        <Select onValueChange={(v) => handleMudarStatus(v as StatusLead)}>
-          <SelectTrigger className="h-8 w-[160px]">
-            <SelectValue placeholder="Cambiar estado" />
-          </SelectTrigger>
-          <SelectContent>
-            {STATUS_VALIDOS.filter((s) => s !== "ignorado").map((status) => (
-              <SelectItem key={status} value={status}>
-                {LABEL_STATUS[status]}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <>
+          <Select onValueChange={(v) => handleMudarStatus(v as StatusLead)}>
+            <SelectTrigger className="h-8 w-[160px]">
+              <SelectValue placeholder="Cambiar estado" />
+            </SelectTrigger>
+            <SelectContent>
+              {STATUS_VALIDOS.filter((s) => s !== "ignorado").map((status) => (
+                <SelectItem key={status} value={status}>
+                  {LABEL_STATUS[status]}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <BulkPresenciaSender
+            placeIdsSelecionados={placeIdsSelecionados}
+            onEnviado={onLimparSelecao}
+          />
+        </>
       )}
 
       <AlertDialog>
