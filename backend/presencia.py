@@ -67,9 +67,21 @@ def _pedir(metodo, ruta, **kwargs):
         resp.status_code == 404 and "tenant" in str(dados.get("message") or "").lower()
     )
     if necesita_relogin:
+        logger.warning(
+            "PresencIA %s %s -> %s %r, reintentando con login nuevo",
+            metodo, ruta, resp.status_code, dados.get("message"),
+        )
         _login()
         resp = _sessao.request(metodo, f"{url}{ruta}", timeout=20, **kwargs)
         dados = resp.json() if resp.content else {}
+        if resp.status_code == 404 and "tenant" in str(dados.get("message") or "").lower():
+            # el reintento no alcanzó: no es un blip transitorio, algo sigue
+            # mal del lado de PresencIA (cuenta/tenant configurados mal) -
+            # esto es lo que hace falta ver para diagnosticarlo de verdad.
+            logger.error(
+                "PresencIA %s %s sigue sin encontrar el tenant después de reloguear (usuario=%s)",
+                metodo, ruta, os.environ.get("PRESENCIA_USUARIO"),
+            )
 
     if not resp.ok or dados.get("ok") is False:
         raise PresenciaError(dados.get("message") or f"Error inesperado del PresencIA ({resp.status_code}).")

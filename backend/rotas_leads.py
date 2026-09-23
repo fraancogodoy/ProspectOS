@@ -1049,6 +1049,7 @@ def presencia_listar_plantillas():
     try:
         plantillas = presencia.listar_plantillas_aprobadas()
     except presencia.PresenciaError as erro:
+        logger.warning("PresencIA rechazó listar plantillas: %s", erro)
         return jsonify({"erro": str(erro)}), 502
     return jsonify({"plantillas": plantillas})
 
@@ -1184,6 +1185,10 @@ def presencia_enviar(place_id):
             header_media=_cargar_header_plantilla(template_name),
         )
     except presencia.PresenciaError as erro:
+        logger.warning(
+            "PresencIA rechazó el envío a %s (plantilla=%s): %s",
+            place_id, template_name, erro,
+        )
         return jsonify({"erro": str(erro)}), 502
 
     conexao = db.conectar()
@@ -1249,6 +1254,10 @@ def presencia_enviar_lote():
                     header_media=header_media,
                 )
             except presencia.PresenciaError as erro:
+                logger.warning(
+                    "PresencIA rechazó el envío a %s (plantilla=%s): %s",
+                    pid, template_name, erro,
+                )
                 fallidos.append({"place_id": pid, "nome": lead["nome"], "erro": str(erro)})
                 continue
             _marcar_contatado(conexao, pid, lead["status"], (resposta or {}).get("wamid"))
@@ -1289,6 +1298,7 @@ def presencia_reconciliar():
         try:
             estados = presencia.consultar_estados(list(por_wamid.keys()))
         except presencia.PresenciaError as erro:
+            logger.warning("PresencIA rechazó consultar estados: %s", erro)
             return jsonify({"erro": str(erro)}), 502
 
         revertidos = []
