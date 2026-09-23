@@ -81,6 +81,7 @@ app.config.update(
     SESSION_COOKIE_SAMESITE="Lax",
     SESSION_COOKIE_SECURE=MODO_NUVEM,
     PERMANENT_SESSION_LIFETIME=60 * 60 * 24 * 30,  # 30 dias
+    MAX_CONTENT_LENGTH=16 * 1024 * 1024,  # header de plantilla (imagen/video/documento) - mismo límite que PresencIA
 )
 if MODO_NUVEM and not os.environ.get("SECRET_KEY"):
     logger.warning(

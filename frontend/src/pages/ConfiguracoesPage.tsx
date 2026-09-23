@@ -7,6 +7,7 @@ import { EliminarTodosLeadsCard } from "@/components/configuracoes/EliminarTodos
 import { FonteMapsCard } from "@/components/configuracoes/FonteMapsCard"
 import { InstagramContaCard } from "@/components/configuracoes/InstagramContaCard"
 import { PerfilVendedorCard } from "@/components/configuracoes/PerfilVendedorCard"
+import { PresenciaHeadersCard } from "@/components/configuracoes/PresenciaHeadersCard"
 import { ProvedorApiCard } from "@/components/configuracoes/ProvedorApiCard"
 import { ScraperProxyCard } from "@/components/configuracoes/ScraperProxyCard"
 import { SomConfigCard } from "@/components/configuracoes/SomConfigCard"
@@ -123,6 +124,8 @@ export function ConfiguracoesPage() {
         </div>
 
         <SomConfigCard />
+
+        <PresenciaHeadersCard />
 
         <div>
           <h2 className="text-xl font-semibold tracking-tight">Datos</h2>

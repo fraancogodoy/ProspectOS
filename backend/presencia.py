@@ -12,6 +12,7 @@ A sessão é um cookie assinado que dura 7 dias (ver lib/sesion.js no
 PresencIA); se vencer ou for revogado, um 401 dispara um re-login automático.
 """
 
+import json
 import logging
 import os
 
@@ -94,11 +95,29 @@ def limpiar_fallidos(wamids):
     return _pedir("POST", "/api/tenant/templates/limpiar-fallido", json={"wamids": list(wamids)})
 
 
-def enviar_a_lead(telefono_digitos, nombre, template_name, language, parameters=None):
+def enviar_a_lead(telefono_digitos, nombre, template_name, language, parameters=None, header_media=None):
     """Manda la plantilla y, de paso, deja el nombre del lead en la
     conversación (nombre_cliente) para que en el panel no aparezca solo el
     número. NO lo da de alta como cliente: es un lead, no un cliente todavía.
-    El nombre solo se escribe si la conversación no tenía uno."""
+    El nombre solo se escribe si la conversación no tenía uno.
+
+    header_media: tupla opcional (contenido_bytes, mimetype, nombre_archivo)
+    con el header de la plantilla (imagen/video/documento). Meta no guarda ese
+    archivo en la plantilla - hay que re-mandarlo en cada envío, si no
+    rechaza con (#132012) "Parameter format does not match"."""
+    if header_media:
+        contenido, mimetype, nombre_archivo = header_media
+        return _pedir(
+            "POST", "/api/tenant/templates/send",
+            data={
+                "to": telefono_digitos,
+                "template_name": template_name,
+                "language": language,
+                "parameters": json.dumps(parameters or []),
+                "nombre_cliente": nombre or "",
+            },
+            files={"header_media": (nombre_archivo, contenido, mimetype)},
+        )
     return _pedir("POST", "/api/tenant/templates/send", json={
         "to": telefono_digitos,
         "template_name": template_name,

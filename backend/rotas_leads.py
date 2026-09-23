@@ -8,6 +8,7 @@ import logging
 import re
 import time
 from datetime import date, datetime, timedelta
+from pathlib import Path
 
 from flask import Blueprint, Response, jsonify, request
 
@@ -1052,6 +1053,66 @@ def presencia_listar_plantillas():
     return jsonify({"plantillas": plantillas})
 
 
+# ---------------------------------------------------------------------------
+# Header (imagen/video/documento) de las plantillas de PresencIA. Meta no
+# guarda ese archivo en la plantilla - hay que re-mandarlo en cada envío. Para
+# no pedírselo al operador negocio por negocio, se sube una sola vez acá (por
+# nombre de plantilla) y se re-usa automáticamente en cada envío individual o
+# masivo de esa plantilla.
+# ---------------------------------------------------------------------------
+
+def _pasta_headers_plantillas():
+    return paths.caminho_dados("presencia_headers", criar_pai=True)
+
+
+def _archivo_header_plantilla(template_name):
+    coincidencias = list(_pasta_headers_plantillas().glob(f"{template_name}.*"))
+    return coincidencias[0] if coincidencias else None
+
+
+def _cargar_header_plantilla(template_name):
+    """Devuelve (contenido_bytes, mimetype, nombre_archivo) o None si no hay
+    header cargado para esta plantilla."""
+    archivo = _archivo_header_plantilla(template_name)
+    if archivo is None:
+        return None
+    import mimetypes
+
+    mimetype = mimetypes.guess_type(archivo.name)[0] or "application/octet-stream"
+    return archivo.read_bytes(), mimetype, archivo.name
+
+
+@bp.route("/api/presencia/plantillas/<template_name>/header")
+def presencia_obter_header(template_name):
+    archivo = _archivo_header_plantilla(template_name)
+    if archivo is None:
+        return jsonify({"existe": False})
+    return jsonify({"existe": True, "nombre_archivo": archivo.name, "tamano": archivo.stat().st_size})
+
+
+@bp.route("/api/presencia/plantillas/<template_name>/header", methods=["POST"])
+def presencia_subir_header(template_name):
+    arquivo = request.files.get("arquivo")
+    if not arquivo or not arquivo.filename:
+        return jsonify({"erro": "Falta el archivo"}), 400
+
+    extension = "".join(Path(arquivo.filename).suffixes)[-10:] or ""
+    pasta = _pasta_headers_plantillas()
+    for anterior in pasta.glob(f"{template_name}.*"):
+        anterior.unlink()
+    destino = pasta / f"{template_name}{extension}"
+    arquivo.save(destino)
+    return jsonify({"ok": True, "nombre_archivo": destino.name, "tamano": destino.stat().st_size})
+
+
+@bp.route("/api/presencia/plantillas/<template_name>/header", methods=["DELETE"])
+def presencia_borrar_header(template_name):
+    archivo = _archivo_header_plantilla(template_name)
+    if archivo is not None:
+        archivo.unlink()
+    return jsonify({"ok": True})
+
+
 # El literal que, en los parámetros de la plantilla, se reemplaza por el
 # nombre de cada negocio - así el envío masivo personaliza el saludo sin que
 # haya que tipear negocio por negocio.
@@ -1115,6 +1176,7 @@ def presencia_enviar(place_id):
         resposta = presencia.enviar_a_lead(
             telefone_digitos, lead["nome"], template_name, language,
             _resolver_parametros(parameters, lead),
+            header_media=_cargar_header_plantilla(template_name),
         )
     except presencia.PresenciaError as erro:
         return jsonify({"erro": str(erro)}), 502
@@ -1157,6 +1219,8 @@ def presencia_enviar_lote():
     # cortar si la calidad del número se resiente en el medio.
     PAUSA_ENTRE_ENVIOS_SEG = 1.0
 
+    header_media = _cargar_header_plantilla(template_name)
+
     enviados = 0
     fallidos = []
     conexao = db.conectar()
@@ -1177,6 +1241,7 @@ def presencia_enviar_lote():
                 resposta = presencia.enviar_a_lead(
                     telefone_digitos, lead["nome"], template_name, language,
                     _resolver_parametros(parameters, lead),
+                    header_media=header_media,
                 )
             except presencia.PresenciaError as erro:
                 fallidos.append({"place_id": pid, "nome": lead["nome"], "erro": str(erro)})

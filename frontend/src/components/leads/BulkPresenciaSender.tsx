@@ -6,6 +6,7 @@
 // (250 / 1.000 / 10.000 plantillas por 24 h según calidad).
 
 import { useEffect, useMemo, useState } from "react"
+import { Link } from "react-router-dom"
 import { Send } from "lucide-react"
 import { toast } from "sonner"
 import {
@@ -28,10 +29,11 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { usePresenciaPlantillas } from "@/hooks/usePresenciaPlantillas"
+import { usePresenciaHeader } from "@/hooks/usePresenciaHeader"
 import { useInvalidarLeads } from "@/hooks/useInvalidarLeads"
 import { presenciaService } from "@/services/presenciaService"
 import { ApiError } from "@/services/httpClient"
-import { TOKEN_NOMBRE_LEAD, contarVariablesBody } from "@/lib/presencia"
+import { TOKEN_NOMBRE_LEAD, contarVariablesBody, formatoHeaderMedia } from "@/lib/presencia"
 
 interface BulkPresenciaSenderProps {
   placeIdsSelecionados: string[]
@@ -70,6 +72,11 @@ export function BulkPresenciaSender({
     [plantillas, nombrePlantilla]
   )
   const cantidadVariables = contarVariablesBody(plantilla)
+  const formatoHeader = formatoHeaderMedia(plantilla)
+  const { estado: headerEstado, isLoading: cargandoHeader } = usePresenciaHeader(
+    formatoHeader ? plantilla?.name : undefined
+  )
+  const faltaHeader = Boolean(formatoHeader) && !cargandoHeader && !headerEstado?.existe
 
   useEffect(() => {
     if (!plantilla) return
@@ -103,7 +110,8 @@ export function BulkPresenciaSender({
     !enviando &&
     !verificando &&
     Boolean(plantilla) &&
-    parametros.every((p) => p.trim().length > 0)
+    parametros.every((p) => p.trim().length > 0) &&
+    !faltaHeader
 
   const enviar = async () => {
     if (!plantilla) return
@@ -235,6 +243,18 @@ export function BulkPresenciaSender({
               </SelectContent>
             </Select>
           </div>
+
+          {faltaHeader && (
+            <p className="text-xs text-destructive">
+              Esta plantilla lleva un{" "}
+              {formatoHeader === "VIDEO" ? "video" : formatoHeader === "IMAGE" ? "imagen" : "documento"} de
+              encabezado y todavía no lo cargaste.{" "}
+              <Link to="/configuracoes" className="underline" target="_blank">
+                Cargalo en Configuración
+              </Link>{" "}
+              antes de mandar.
+            </p>
+          )}
 
           {plantilla && cantidadVariables > 0 && (
             <div className="flex flex-col gap-1.5">

@@ -13,3 +13,16 @@ export function contarVariablesBody(plantilla: PresenciaPlantilla | undefined): 
   const matches = body.text.match(/\{\{\d+\}\}/g)
   return matches ? new Set(matches).size : 0
 }
+
+// Si la plantilla lleva un header de imagen/video/documento, ese archivo NO
+// queda guardado en la plantilla - Meta lo pide de nuevo en cada envío. Sin
+// eso, el envío sale rechazado con (#132012) "Parameter format does not
+// match" (ver backend/presencia.py). Un header de tipo TEXT no cuenta: ese sí
+// vive en la plantilla, no hace falta volver a mandarlo.
+export function formatoHeaderMedia(
+  plantilla: PresenciaPlantilla | undefined
+): "IMAGE" | "VIDEO" | "DOCUMENT" | null {
+  const header = plantilla?.components.find((c) => c.type === "HEADER")
+  if (!header?.format || header.format === "TEXT") return null
+  return header.format as "IMAGE" | "VIDEO" | "DOCUMENT"
+}

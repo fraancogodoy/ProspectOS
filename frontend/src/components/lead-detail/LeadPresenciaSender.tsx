@@ -5,6 +5,7 @@
 // backend/rotas_leads.py:/api/leads/<place_id>/presencia/enviar.
 
 import { useEffect, useMemo, useState } from "react"
+import { Link } from "react-router-dom"
 import { Send } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { Input } from "@/components/ui/input"
@@ -17,7 +18,8 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { usePresenciaPlantillas } from "@/hooks/usePresenciaPlantillas"
-import { contarVariablesBody } from "@/lib/presencia"
+import { usePresenciaHeader } from "@/hooks/usePresenciaHeader"
+import { contarVariablesBody, formatoHeaderMedia } from "@/lib/presencia"
 import { formatarTempoRelativo } from "@/lib/formatters"
 import type { UseMutationResult } from "@tanstack/react-query"
 import type { Lead } from "@/types/lead"
@@ -44,6 +46,11 @@ export function LeadPresenciaSender({ lead, enviarPresencia, onEnviado }: LeadPr
     [plantillas, nombrePlantilla]
   )
   const cantidadVariables = contarVariablesBody(plantilla)
+  const formatoHeader = formatoHeaderMedia(plantilla)
+  const { estado: headerEstado, isLoading: cargandoHeader } = usePresenciaHeader(
+    formatoHeader ? plantilla?.name : undefined
+  )
+  const faltaHeader = Boolean(formatoHeader) && !cargandoHeader && !headerEstado?.existe
 
   // Al elegir (o cambiar de) plantilla, precarga la primera variable con el
   // nombre del lead - es lo que casi siempre pide el saludo - y deja el resto
@@ -65,7 +72,8 @@ export function LeadPresenciaSender({ lead, enviarPresencia, onEnviado }: LeadPr
 
   if (!lead.whatsapp_link) return null
 
-  const puedeEnviar = Boolean(plantilla) && parametros.every((p) => p.trim().length > 0)
+  const puedeEnviar =
+    Boolean(plantilla) && parametros.every((p) => p.trim().length > 0) && !faltaHeader
 
   return (
     <div className="flex flex-col gap-2 rounded-lg border border-border p-3">
@@ -89,6 +97,17 @@ export function LeadPresenciaSender({ lead, enviarPresencia, onEnviado }: LeadPr
           ))}
         </SelectContent>
       </Select>
+
+      {faltaHeader && (
+        <p className="text-xs text-destructive">
+          Esta plantilla lleva un {formatoHeader === "VIDEO" ? "video" : formatoHeader === "IMAGE" ? "imagen" : "documento"} de
+          encabezado y todavía no lo cargaste.{" "}
+          <Link to="/configuracoes" className="underline">
+            Cargalo en Configuración
+          </Link>{" "}
+          antes de mandar.
+        </p>
+      )}
 
       {plantilla && cantidadVariables > 0 && (
         <div className="flex flex-col gap-1.5">

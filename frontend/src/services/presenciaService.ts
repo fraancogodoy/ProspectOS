@@ -1,11 +1,44 @@
-import { httpClient } from "@/services/httpClient"
+import { httpClient, ApiError } from "@/services/httpClient"
 import type { PresenciaPlantilla } from "@/types/lead"
+
+export interface EstadoHeaderPlantilla {
+  existe: boolean
+  nombre_archivo?: string
+  tamano?: number
+}
 
 export const presenciaService = {
   listarPlantillas: () =>
     httpClient
       .get<{ plantillas: PresenciaPlantilla[] }>("/api/presencia/plantillas")
       .then((d) => d.plantillas),
+
+  // El header (imagen/video/documento) de una plantilla no queda guardado en
+  // Meta - se sube una sola vez acá y el backend lo re-manda automáticamente
+  // en cada envío de esa plantilla (ver backend/rotas_leads.py).
+  obtenerHeader: (templateName: string) =>
+    httpClient.get<EstadoHeaderPlantilla>(
+      `/api/presencia/plantillas/${encodeURIComponent(templateName)}/header`
+    ),
+
+  subirHeader: async (templateName: string, archivo: File) => {
+    const formData = new FormData()
+    formData.append("arquivo", archivo)
+    const resp = await fetch(
+      `/api/presencia/plantillas/${encodeURIComponent(templateName)}/header`,
+      { method: "POST", body: formData }
+    )
+    if (!resp.ok) {
+      const dados = await resp.json().catch(() => null)
+      throw new ApiError(dados?.erro || `Error del servidor (${resp.status}).`, resp.status)
+    }
+    return resp.json() as Promise<EstadoHeaderPlantilla>
+  },
+
+  borrarHeader: (templateName: string) =>
+    httpClient.delete<{ ok: true }>(
+      `/api/presencia/plantillas/${encodeURIComponent(templateName)}/header`
+    ),
 
   enviar: (
     placeId: string,
