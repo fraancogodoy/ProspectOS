@@ -24,10 +24,13 @@ export function useSelecaoLeads(chaveContexto?: string) {
 
   const limpar = () => setSelecionados(new Set())
 
+  const selecionarTodos = (placeIds: string[]) => setSelecionados(new Set(placeIds))
+
   return {
     selecionados,
     alternar,
     limpar,
+    selecionarTodos,
     quantidade: selecionados.size,
   }
 }

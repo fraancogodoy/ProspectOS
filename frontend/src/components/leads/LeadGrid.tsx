@@ -1,7 +1,10 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { AnimatePresence } from "framer-motion"
-import { LayoutGrid, List, Loader2, Trash2 } from "lucide-react"
+import { CheckSquare, LayoutGrid, List, Loader2, Trash2 } from "lucide-react"
+import { toast } from "sonner"
 import { useLeads } from "@/hooks/useLeads"
+import { leadsService } from "@/services/leadsService"
+import { ApiError } from "@/services/httpClient"
 import { useSelecaoLeads } from "@/hooks/useSelecaoLeads"
 import { useIntersectionObserver } from "@/hooks/useIntersectionObserver"
 import { useBulkMutations } from "@/hooks/useBulkMutations"
@@ -48,11 +51,40 @@ export function LeadGrid({
   const { leads, isLoading, isFetchingNextPage, hasNextPage, fetchNextPage } =
     useLeads(filtrosEfetivos)
   // ao trocar filtro/visualização, a seleção zera (não age em leads invisíveis)
-  const { selecionados, alternar, limpar, quantidade } = useSelecaoLeads(
-    JSON.stringify(filtrosEfetivos)
-  )
+  const chaveFiltros = JSON.stringify(filtrosEfetivos)
+  const { selecionados, alternar, limpar, selecionarTodos, quantidade } =
+    useSelecaoLeads(chaveFiltros)
   const { excluirEmLoteDefinitivamente } = useBulkMutations()
   const modoIgnorados = filtros.status === "ignorado"
+
+  // La lista carga de a 30: "seleccionar todos" pide al servidor todos los
+  // que cumplen el filtro, no solo los cards que ya se ven.
+  const [buscandoTodos, setBuscandoTodos] = useState(false)
+  const [cantidadTodos, setCantidadTodos] = useState<number | null>(null)
+  useEffect(() => setCantidadTodos(null), [chaveFiltros])
+  const todosSelecionados = cantidadTodos !== null && quantidade > 0 && quantidade === cantidadTodos
+
+  const handleSelecionarTodos = async () => {
+    if (todosSelecionados) {
+      limpar()
+      return
+    }
+    setBuscandoTodos(true)
+    try {
+      const { ids, total, truncado } = await leadsService.listarIds(filtrosEfetivos)
+      selecionarTodos(ids)
+      setCantidadTodos(ids.length)
+      if (truncado) {
+        toast.warning(
+          `Hay ${total} leads con este filtro: se seleccionaron los primeros ${ids.length}, que es el máximo por acción.`
+        )
+      }
+    } catch (erro) {
+      toast.error(erro instanceof ApiError ? erro.message : "No se pudo seleccionar todos.")
+    } finally {
+      setBuscandoTodos(false)
+    }
+  }
 
   const sentinelaRef = useIntersectionObserver(
     () => fetchNextPage(),
@@ -86,9 +118,27 @@ export function LeadGrid({
   return (
     <div>
       <div className="mb-3 flex items-center justify-between gap-2">
-        <p className="text-sm text-muted-foreground">
-          {leads.length} lead(s) cargado(s)
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="text-sm text-muted-foreground">
+            {leads.length} lead(s) cargado(s)
+          </p>
+          {visualizacao === "lista" && (
+            <Button
+              variant="outline"
+              size="sm"
+              className="h-7 px-2"
+              onClick={handleSelecionarTodos}
+              disabled={buscandoTodos}
+            >
+              {buscandoTodos ? (
+                <Loader2 className="size-3.5 animate-spin" />
+              ) : (
+                <CheckSquare className="size-3.5" />
+              )}
+              {todosSelecionados ? "Quitar selección" : "Seleccionar todos"}
+            </Button>
+          )}
+        </div>
         <div className="flex items-center gap-1 rounded-lg border border-border p-0.5">
           <Button
             variant="ghost"

@@ -34,6 +34,17 @@ export const leadsService = {
       `/api/leads?${montarQueryString(filtros, offset)}`
     ),
 
+  /** Todos los place_id que cumplen los filtros, no solo la página cargada. */
+  listarIds: (filtros: Partial<FiltrosLeads>) => {
+    const params = new URLSearchParams(montarQueryString(filtros, 0))
+    params.delete("limit")
+    params.delete("offset")
+    params.delete("ordenar")
+    return httpClient.get<{ ids: string[]; total: number; truncado: boolean }>(
+      `/api/leads/ids?${params.toString()}`
+    )
+  },
+
   historico: (placeId: string) =>
     httpClient.get<HistoricoStatusItem[]>(
       `/api/leads/${encodeURIComponent(placeId)}/historico`

@@ -31,6 +31,7 @@ from constantes import (
     MAX_CARACTERES_POR_LINHA_QUERY,
     MAX_CARACTERES_ROTULO_AREA,
     MAX_CARACTERES_TAGS,
+    MAX_IDS_BULK,
     MAX_LINHAS_QUERIES_BUSCA,
     MAX_NICHOS_BUSCA_MAPA,
     RAIO_MAX_METROS,
@@ -120,36 +121,23 @@ def sugerir_proxima_data_followup(follow_ups_enviados):
     return (date.today() + timedelta(days=dias)).isoformat()
 
 
-@bp.route("/api/leads")
-def listar_leads():
-    """Lista os leads, com filtros opcionais via query string: status, nicho, nota_min, busca.
-    Paginado via limit/offset (padrão: 30 por página). Resposta: {leads, tem_mais}."""
+def _condicoes_filtro_leads():
+    """Monta o WHERE dos filtros da lista (status, nicho, campana, nota_min,
+    busca, site_status, followup) a partir da query string. Compartilhado entre
+    a lista paginada e "selecionar todos", para que os dois enxerguem
+    exatamente o mesmo conjunto de leads.
+    Retorna (condicoes, parametros, None) ou (None, None, resposta_de_erro)."""
     status = request.args.get("status", "").strip()
     nicho = request.args.get("nicho", "").strip()
     campana = request.args.get("campana", "").strip()
     nota_min_bruta = request.args.get("nota_min", "").strip()
     busca_texto = request.args.get("busca", "").strip()
-    ordenar = request.args.get("ordenar", "").strip()
-    if ordenar not in ("", "score"):
-        return jsonify({"erro": f"ordenar inválido: {ordenar} (usá 'score' o omitilo)"}), 400
     site_status_filtro = request.args.get("site_status", "").strip()
     if site_status_filtro and site_status_filtro not in SITUACOES_SITE_VALIDAS:
-        return jsonify({"erro": f"site_status inválido: {site_status_filtro}"}), 400
+        return None, None, (jsonify({"erro": f"site_status inválido: {site_status_filtro}"}), 400)
     followup_filtro = request.args.get("followup", "").strip()
     if followup_filtro not in ("", "vencido"):
-        return jsonify({"erro": f"followup inválido: {followup_filtro} (usá 'vencido' o omitilo)"}), 400
-
-    try:
-        limit = int(request.args.get("limit", LIMITE_PADRAO_LEADS))
-    except ValueError:
-        return jsonify({"erro": "limit inválido"}), 400
-    limit = max(1, min(limit, LIMITE_MAXIMO_LEADS))
-
-    try:
-        offset = int(request.args.get("offset", 0))
-    except ValueError:
-        return jsonify({"erro": "offset inválido"}), 400
-    offset = max(0, offset)
+        return None, None, (jsonify({"erro": f"followup inválido: {followup_filtro} (usá 'vencido' o omitilo)"}), 400)
 
     condicoes = []
     parametros = []
@@ -171,7 +159,7 @@ def listar_leads():
         try:
             nota_min = float(nota_min_bruta)
         except ValueError:
-            return jsonify({"erro": f"nota_min inválida: {nota_min_bruta}"}), 400
+            return None, None, (jsonify({"erro": f"nota_min inválida: {nota_min_bruta}"}), 400)
         condicoes.append("nota >= ?")
         parametros.append(nota_min)
     if busca_texto:
@@ -194,6 +182,34 @@ def listar_leads():
     if followup_filtro == "vencido":
         condicoes.append("proximo_followup IS NOT NULL AND proximo_followup <= ?")
         parametros.append(date.today().isoformat())
+
+    return condicoes, parametros, None
+
+
+@bp.route("/api/leads")
+def listar_leads():
+    """Lista os leads, com filtros opcionais via query string: status, nicho, nota_min, busca.
+    Paginado via limit/offset (padrão: 30 por página). Resposta: {leads, tem_mais}."""
+    ordenar = request.args.get("ordenar", "").strip()
+    if ordenar not in ("", "score"):
+        return jsonify({"erro": f"ordenar inválido: {ordenar} (usá 'score' o omitilo)"}), 400
+
+    condicoes, parametros, erro = _condicoes_filtro_leads()
+    if erro:
+        return erro
+    followup_filtro = request.args.get("followup", "").strip()
+
+    try:
+        limit = int(request.args.get("limit", LIMITE_PADRAO_LEADS))
+    except ValueError:
+        return jsonify({"erro": "limit inválido"}), 400
+    limit = max(1, min(limit, LIMITE_MAXIMO_LEADS))
+
+    try:
+        offset = int(request.args.get("offset", 0))
+    except ValueError:
+        return jsonify({"erro": "offset inválido"}), 400
+    offset = max(0, offset)
 
     sql = "SELECT * FROM leads"
     if condicoes:
@@ -222,6 +238,37 @@ def listar_leads():
     return jsonify({
         "leads": [_enriquecer_lead_para_resposta(db.linha_para_dict(linha)) for linha in linhas],
         "tem_mais": tem_mais,
+    })
+
+
+@bp.route("/api/leads/ids")
+def listar_ids_leads():
+    """Todos os place_id que batem com os filtros da lista, sem paginar - é o
+    "selecionar todos": a lista carrega de 30 em 30 (scroll infinito), então
+    só os cards visíveis não bastam. Corta em MAX_IDS_BULK, que é o máximo
+    que as ações em lote aceitam; `total` diz quantos havia de verdade."""
+    condicoes, parametros, erro = _condicoes_filtro_leads()
+    if erro:
+        return erro
+
+    if not db.CAMINHO_BANCO.exists():
+        return jsonify({"ids": [], "total": 0, "truncado": False})
+
+    where = (" WHERE " + " AND ".join(condicoes)) if condicoes else ""
+    conexao = db.conectar()
+    try:
+        total = conexao.execute(f"SELECT COUNT(*) AS n FROM leads{where}", parametros).fetchone()["n"]
+        linhas = conexao.execute(
+            f"SELECT place_id FROM leads{where} ORDER BY visto_em DESC, nota DESC LIMIT ?",
+            [*parametros, MAX_IDS_BULK],
+        ).fetchall()
+    finally:
+        conexao.close()
+
+    return jsonify({
+        "ids": [linha["place_id"] for linha in linhas],
+        "total": total,
+        "truncado": total > MAX_IDS_BULK,
     })
 
 

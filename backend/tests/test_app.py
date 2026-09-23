@@ -270,6 +270,40 @@ class TestExclusaoDefinitiva:
         assert resposta.status_code == 400
 
 
+class TestIdsParaSelecionarTodos:
+    def test_devolve_todos_os_ids_do_filtro_sem_paginar(self, cliente):
+        for i in range(35):  # mais que uma página (30)
+            inserir_lead(f"lead-{i}")
+        inserir_lead("ignorado-1", status="ignorado")
+
+        dados = cliente.get("/api/leads/ids").get_json()
+        assert dados["total"] == 35
+        assert len(dados["ids"]) == 35
+        assert "ignorado-1" not in dados["ids"]  # mesma regra da lista: ignorados escondidos
+        assert dados["truncado"] is False
+
+    def test_respeita_os_mesmos_filtros_da_lista(self, cliente):
+        inserir_lead("a", nome="Barbería Uno")
+        inserir_lead("b", nome="Spa Dos")
+
+        dados = cliente.get("/api/leads/ids?busca=barber").get_json()
+        assert dados["ids"] == ["a"]
+
+    def test_filtro_invalido_retorna_400(self, cliente):
+        assert cliente.get("/api/leads/ids?site_status=xyz").status_code == 400
+
+    def test_corta_no_maximo_do_lote(self, cliente, monkeypatch):
+        import rotas_leads
+        monkeypatch.setattr(rotas_leads, "MAX_IDS_BULK", 3)
+        for i in range(5):
+            inserir_lead(f"lead-{i}")
+
+        dados = cliente.get("/api/leads/ids").get_json()
+        assert len(dados["ids"]) == 3
+        assert dados["total"] == 5
+        assert dados["truncado"] is True
+
+
 class TestEliminarTodosOsLeads:
     def test_apaga_tudo_com_frase_certa(self, cliente):
         inserir_lead("lead-1", status="novo")
