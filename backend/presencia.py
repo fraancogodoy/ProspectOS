@@ -51,17 +51,26 @@ def _login():
 
 
 def _pedir(metodo, ruta, **kwargs):
-    """Un pedido autenticado, con un solo reintento de login si la cookie venció."""
+    """Un pedido autenticado, con un solo reintento de login si la cookie venció
+    (401) o si quedó con un tenant vacío (404 "Tenant no encontrado" - puede
+    pasar si el login anterior coincidió con el negocio propio en un estado
+    transitorio del lado de PresencIA; sin este reintento, ProspectOS se queda
+    devolviendo ese error hasta que el proceso se reinicie solo)."""
     url, _, _ = _config()
     if not _logado:
         _login()
 
     resp = _sessao.request(metodo, f"{url}{ruta}", timeout=20, **kwargs)
-    if resp.status_code == 401:
+    dados = resp.json() if resp.content else {}
+
+    necesita_relogin = resp.status_code == 401 or (
+        resp.status_code == 404 and "tenant" in str(dados.get("message") or "").lower()
+    )
+    if necesita_relogin:
         _login()
         resp = _sessao.request(metodo, f"{url}{ruta}", timeout=20, **kwargs)
+        dados = resp.json() if resp.content else {}
 
-    dados = resp.json() if resp.content else {}
     if not resp.ok or dados.get("ok") is False:
         raise PresenciaError(dados.get("message") or f"Error inesperado del PresencIA ({resp.status_code}).")
     return dados
