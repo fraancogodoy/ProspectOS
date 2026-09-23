@@ -1062,7 +1062,12 @@ def presencia_listar_plantillas():
 # ---------------------------------------------------------------------------
 
 def _pasta_headers_plantillas():
-    return paths.caminho_dados("presencia_headers", criar_pai=True)
+    # criar_pai crea el padre de "presencia_headers" (DIR_DADOS), no esta
+    # carpeta en sí - hay que crearla a mano, si no arquivo.save() explota con
+    # FileNotFoundError al intentar escribir en un directorio inexistente.
+    pasta = paths.caminho_dados("presencia_headers")
+    pasta.mkdir(parents=True, exist_ok=True)
+    return pasta
 
 
 def _archivo_header_plantilla(template_name):
