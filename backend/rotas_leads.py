@@ -6,13 +6,13 @@ import io
 import json
 import logging
 import re
-import time
 from datetime import date, datetime, timedelta
 from pathlib import Path
 
 from flask import Blueprint, Response, jsonify, request
 
 import db
+import cola_envios
 import diagnostico
 import ia
 import jobs
@@ -1200,29 +1200,23 @@ def _resolver_parametros(parametros_plantilla, lead):
     ]
 
 
-@bp.route("/api/leads/<place_id>/presencia/enviar", methods=["POST"])
-def presencia_enviar(place_id):
-    """Manda al lead la plantilla elegida a través del PresencIA: crea el
-    contacto con su nombre real y recién ahí dispara el envío, para que la
-    conversación aparezca en el panel identificada, no con el número pelado."""
-    corpo = request.json or {}
-    template_name = str(corpo.get("template_name") or "").strip()
-    language = str(corpo.get("language") or "").strip()
-    parameters = corpo.get("parameters") or []
-    if not template_name or not language:
-        return jsonify({"erro": "Falta template_name o language"}), 400
-
+def enviar_plantilla_a_lead(place_id, template_name, language, parameters):
+    """Manda la plantilla a un lead por PresencIA y lo pasa a "contatado".
+    La usan el botón individual y la cola del envío masivo (cola_envios.py).
+    Levanta cola_envios.EnvioSinDestino si ni se llegó a llamar a PresencIA
+    (lead borrado o sin WhatsApp) y presencia.PresenciaError si PresencIA o
+    Meta lo rechazaron."""
     conexao = db.conectar()
     try:
         lead = conexao.execute("SELECT * FROM leads WHERE place_id = ?", (place_id,)).fetchone()
     finally:
         conexao.close()
     if lead is None:
-        return jsonify({"erro": "lead no encontrado"}), 404
+        raise cola_envios.EnvioSinDestino("lead no encontrado")
 
     link = lead["whatsapp_link"]
     if not link:
-        return jsonify({"erro": "Ese lead no tiene un teléfono de WhatsApp válido."}), 400
+        raise cola_envios.EnvioSinDestino("Ese lead no tiene un teléfono de WhatsApp válido.")
     telefone_digitos = link.rsplit("/", 1)[-1]
 
     try:
@@ -1236,87 +1230,74 @@ def presencia_enviar(place_id):
             "PresencIA rechazó el envío a %s (plantilla=%s): %s",
             place_id, template_name, erro,
         )
-        return jsonify({"erro": str(erro)}), 502
+        raise
 
+    wamid = (resposta or {}).get("wamid")
     conexao = db.conectar()
     try:
-        agora = _marcar_contatado(conexao, place_id, lead["status"], (resposta or {}).get("wamid"))
+        agora = _marcar_contatado(conexao, place_id, lead["status"], wamid)
     finally:
         conexao.close()
+    return {"contatado_em": agora, "wamid": wamid}
 
-    return jsonify({"ok": True, "status": "contatado", "contatado_em": agora})
 
-
-@bp.route("/api/presencia/enviar-lote", methods=["POST"])
-def presencia_enviar_lote():
-    """Envío masivo: la misma plantilla a varios leads de una. El token
-    "{nombre}" en los parámetros se reemplaza por el nombre de cada negocio;
-    el resto de los parámetros van iguales para todos.
-
-    No corta ante el primer error: sigue con el resto y devuelve el detalle
-    de los que fallaron (número inválido, otro operador dueño de la charla,
-    etc.) para mostrarlo al final."""
+@bp.route("/api/leads/<place_id>/presencia/enviar", methods=["POST"])
+def presencia_enviar(place_id):
+    """Manda al lead la plantilla elegida a través del PresencIA: crea el
+    contacto con su nombre real y recién ahí dispara el envío, para que la
+    conversación aparezca en el panel identificada, no con el número pelado.
+    Es el envío individual (el botón de la ficha): sale en el momento, sin
+    pasar por la cola."""
     corpo = request.json or {}
-    place_ids = corpo.get("place_ids") or []
     template_name = str(corpo.get("template_name") or "").strip()
     language = str(corpo.get("language") or "").strip()
     parameters = corpo.get("parameters") or []
-
-    if not isinstance(place_ids, list) or not place_ids:
-        return jsonify({"erro": "Falta place_ids"}), 400
     if not template_name or not language:
         return jsonify({"erro": "Falta template_name o language"}), 400
-    # Tope por lote: con la pausa de 1 s de abajo, 100 leads son ~100 s de
-    # request - por debajo de cualquier timeout de gateway. Y de paso obliga a
-    # tandas chicas, que es lo sano para la calidad de un número nuevo.
-    if len(place_ids) > 100:
-        return jsonify({"erro": "Máximo 100 leads por lote. Mandá en tandas."}), 400
 
-    # Pausa entre envíos: nada de ráfaga. Da apariencia orgánica y margen para
-    # cortar si la calidad del número se resiente en el medio.
-    PAUSA_ENTRE_ENVIOS_SEG = 1.0
-
-    header_media = _cargar_header_plantilla(template_name)
-
-    enviados = 0
-    fallidos = []
-    conexao = db.conectar()
     try:
-        for indice, pid in enumerate(place_ids):
-            if indice > 0:
-                time.sleep(PAUSA_ENTRE_ENVIOS_SEG)
-            lead = conexao.execute("SELECT * FROM leads WHERE place_id = ?", (pid,)).fetchone()
-            if lead is None:
-                fallidos.append({"place_id": pid, "nome": None, "erro": "lead no encontrado"})
-                continue
-            link = lead["whatsapp_link"]
-            if not link:
-                fallidos.append({"place_id": pid, "nome": lead["nome"], "erro": "sin WhatsApp válido"})
-                continue
-            telefone_digitos = link.rsplit("/", 1)[-1]
-            try:
-                resposta = presencia.enviar_a_lead(
-                    telefone_digitos, lead["nome"], template_name, language,
-                    _resolver_parametros(parameters, lead),
-                    header_media=header_media,
-                )
-            except presencia.PresenciaError as erro:
-                logger.warning(
-                    "PresencIA rechazó el envío a %s (plantilla=%s): %s",
-                    pid, template_name, erro,
-                )
-                fallidos.append({"place_id": pid, "nome": lead["nome"], "erro": str(erro)})
-                continue
-            _marcar_contatado(conexao, pid, lead["status"], (resposta or {}).get("wamid"))
-            enviados += 1
-    finally:
-        conexao.close()
+        resultado = enviar_plantilla_a_lead(place_id, template_name, language, parameters)
+    except cola_envios.EnvioSinDestino as erro:
+        codigo = 404 if str(erro) == "lead no encontrado" else 400
+        return jsonify({"erro": str(erro)}), codigo
+    except presencia.PresenciaError as erro:
+        return jsonify({"erro": str(erro)}), 502
 
-    return jsonify({"ok": True, "enviados": enviados, "fallidos": fallidos})
+    return jsonify({"ok": True, "status": "contatado", "contatado_em": resultado["contatado_em"]})
 
 
-@bp.route("/api/leads/presencia/reconciliar", methods=["POST"])
-def presencia_reconciliar():
+@bp.route("/api/presencia/cola", methods=["POST"])
+def presencia_encolar():
+    """Envío masivo: pone los leads en la cola, que manda uno cada 3-5 min al
+    azar (ver cola_envios.py). El token "{nombre}" en los parámetros se
+    reemplaza por el nombre de cada negocio al momento de mandar."""
+    corpo = request.json or {}
+    place_ids, erro = validar_ids_bulk(corpo.get("place_ids"), "place_id")
+    if erro:
+        return erro
+    template_name = str(corpo.get("template_name") or "").strip()
+    language = str(corpo.get("language") or "").strip()
+    parameters = corpo.get("parameters") or []
+    if not template_name or not language:
+        return jsonify({"erro": "Falta template_name o language"}), 400
+    if not isinstance(parameters, list):
+        return jsonify({"erro": "parameters tiene que ser una lista"}), 400
+
+    return jsonify({"ok": True, **cola_envios.encolar(place_ids, template_name, language, parameters)})
+
+
+@bp.route("/api/presencia/cola")
+def presencia_estado_cola():
+    return jsonify(cola_envios.estado())
+
+
+@bp.route("/api/presencia/cola/cancelar", methods=["POST"])
+def presencia_cancelar_cola():
+    lote_id = str((request.json or {}).get("lote_id") or "").strip() or None
+    return jsonify({"ok": True, "cancelados": cola_envios.cancelar(lote_id)})
+
+
+def reconciliar_envios(place_ids):
     """Chequea, contra PresencIA, si las plantillas recién enviadas se
     entregaron de verdad. Meta las acepta al toque pero puede rechazarlas al
     entregar (ej. 131049, límite de interacciones): ese "failed" recién se
@@ -1324,12 +1305,8 @@ def presencia_reconciliar():
 
     A los que rebotaron los devuelve a "novo", les borra contatado_em y anota
     el código de rechazo en presencia_falla - así solo quedan en "contatado"
-    los que llegaron. No toca a los que el usuario ya movió de estado a mano."""
-    corpo = request.json or {}
-    place_ids = corpo.get("place_ids") or []
-    if not isinstance(place_ids, list) or not place_ids:
-        return jsonify({"erro": "Falta place_ids"}), 400
-
+    los que llegaron. No toca a los que el usuario ya movió de estado a mano.
+    Levanta presencia.PresenciaError si no se pudo consultar."""
     conexao = db.conectar()
     try:
         filas = conexao.execute(
@@ -1340,13 +1317,13 @@ def presencia_reconciliar():
         por_wamid = {f["presencia_wamid"]: f for f in filas if f["presencia_wamid"]}
 
         if not por_wamid:
-            return jsonify({"ok": True, "entregados": 0, "revertidos": [], "pendientes": 0})
+            return {"entregados": 0, "revertidos": [], "pendientes": 0}
 
         try:
             estados = presencia.consultar_estados(list(por_wamid.keys()))
         except presencia.PresenciaError as erro:
             logger.warning("PresencIA rechazó consultar estados: %s", erro)
-            return jsonify({"erro": str(erro)}), 502
+            raise
 
         revertidos = []
         wamids_fallidos = []
@@ -1392,9 +1369,22 @@ def presencia_reconciliar():
         except presencia.PresenciaError as erro:
             logger.warning("no se pudo limpiar la bandeja de los envíos rebotados: %s", erro)
 
-    return jsonify({
-        "ok": True,
+    return {
         "entregados": entregados,
         "revertidos": revertidos,
         "pendientes": pendientes,
-    })
+    }
+
+
+@bp.route("/api/leads/presencia/reconciliar", methods=["POST"])
+def presencia_reconciliar():
+    """Endpoint conservado para instalaciones que aún lo consulten manualmente.
+    La cola lo ejecuta automáticamente después de cada envío."""
+    place_ids, erro = validar_ids_bulk((request.json or {}).get("place_ids"), "place_id")
+    if erro:
+        return erro
+    try:
+        resultado = reconciliar_envios(place_ids)
+    except presencia.PresenciaError as erro_presencia:
+        return jsonify({"erro": str(erro_presencia)}), 502
+    return jsonify({"ok": True, **resultado})

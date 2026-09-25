@@ -58,6 +58,7 @@ logger.info(
 )
 
 import auth
+import cola_envios
 import db
 logger.info("banco de datos en: %s (existe: %s)", db.CAMINHO_BANCO, db.CAMINHO_BANCO.exists())
 import jobs
@@ -173,6 +174,12 @@ def _abrir_navegador(porta):
 
 
 if __name__ == "__main__":
+    # La cola se inicia sólo en el proceso real, nunca al importar `app` desde
+    # los tests. Así los envíos programados sobreviven a cerrar el navegador.
+    cola_envios.iniciar_worker(
+        rotas_leads.enviar_plantilla_a_lead,
+        rotas_leads.reconciliar_envios,
+    )
     modo_dev = os.environ.get("PROSPECCAO_DEBUG", "false").lower() == "true"
     if modo_dev:
         # dev com auto-reload do Flask, comportamento de sempre

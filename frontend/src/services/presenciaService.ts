@@ -49,7 +49,7 @@ export const presenciaService = {
       dados
     ),
 
-  enviarLote: (dados: {
+  encolar: (dados: {
     place_ids: string[]
     template_name: string
     language: string
@@ -57,17 +57,30 @@ export const presenciaService = {
   }) =>
     httpClient.post<{
       ok: true
-      enviados: number
-      fallidos: { place_id: string; nome: string | null; erro: string }[]
-    }>("/api/presencia/enviar-lote", dados),
+      lote_id: string
+      encolados: number
+      omitidos: number
+      en_cola: number
+      minutos_estimados: number
+    }>("/api/presencia/cola", dados),
 
-  // Chequea contra PresencIA cuáles de los envíos recién hechos se entregaron
-  // de verdad. Los que Meta rechazó al entregar (ej. 131049) vuelven a "novo".
-  reconciliar: (placeIds: string[]) =>
-    httpClient.post<{
-      ok: true
-      entregados: number
+  estadoCola: () =>
+    httpClient.get<{
+      activo: boolean
+      lotes: string[]
+      total: number
       pendientes: number
-      revertidos: { place_id: string; nome: string; codigo: string | null }[]
-    }>("/api/leads/presencia/reconciliar", { place_ids: placeIds }),
+      enviados: number
+      fallidos: number
+      cancelados: number
+      segundos_para_proximo: number | null
+      lista_fallidos: { place_id: string; nome: string | null; erro: string }[]
+    }>("/api/presencia/cola"),
+
+  // Sin loteId cancela todo lo pendiente (el aviso de la página muestra la
+  // cola entera, no un lote).
+  cancelarCola: (loteId?: string) =>
+    httpClient.post<{ ok: true; cancelados: number }>("/api/presencia/cola/cancelar", {
+      lote_id: loteId ?? null,
+    }),
 }

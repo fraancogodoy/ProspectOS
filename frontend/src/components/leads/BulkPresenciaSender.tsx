@@ -1,11 +1,12 @@
 // Envío masivo de una plantilla de WhatsApp a los leads seleccionados, vía
-// PresencIA. El loop lo maneja el frontend -un lead por vez, con ~1 s de
-// pausa- para poder mostrar una barra que se llena a medida que salen. Cada
-// envío es una llamada individual a la API oficial de Meta (no hay endpoint
-// "masivo"), así que el límite real es el tier de mensajería de la cuenta
-// (250 / 1.000 / 10.000 plantillas por 24 h según calidad).
+// PresencIA. No manda nada acá: arma la cola del servidor, que saca uno cada
+// 3 a 5 min al azar para que Meta no lo lea como spam (ver
+// backend/cola_envios.py). El avance se sigue en ColaEnviosBanner, arriba de
+// la lista. Aparte del ritmo, el límite real sigue siendo el tier de
+// mensajería de la cuenta (250 / 1.000 / 10.000 plantillas por 24 h).
 
 import { useEffect, useMemo, useState } from "react"
+import { useQueryClient } from "@tanstack/react-query"
 import { Link } from "react-router-dom"
 import { Send } from "lucide-react"
 import { toast } from "sonner"
@@ -32,7 +33,6 @@ import { usePresenciaPlantillas } from "@/hooks/usePresenciaPlantillas"
 import { usePresenciaHeader } from "@/hooks/usePresenciaHeader"
 import { useInvalidarLeads } from "@/hooks/useInvalidarLeads"
 import { presenciaService } from "@/services/presenciaService"
-import { ApiError } from "@/services/httpClient"
 import { TOKEN_NOMBRE_LEAD, contarVariablesBody, formatoHeaderMedia } from "@/lib/presencia"
 
 interface BulkPresenciaSenderProps {
@@ -40,8 +40,7 @@ interface BulkPresenciaSenderProps {
   onEnviado: () => void
 }
 
-const PAUSA_ENTRE_ENVIOS_MS = 1000
-const dormir = (ms: number) => new Promise((r) => setTimeout(r, ms))
+type EstadoCola = Awaited<ReturnType<typeof presenciaService.estadoCola>>
 
 export function BulkPresenciaSender({
   placeIdsSelecionados,
@@ -50,20 +49,17 @@ export function BulkPresenciaSender({
   const [abierto, setAbierto] = useState(false)
   const { plantillas, isLoading, isError, error } = usePresenciaPlantillas()
   const invalidarLeads = useInvalidarLeads()
+  const queryClient = useQueryClient()
 
   const [nombrePlantilla, setNombrePlantilla] = useState("")
   // parametros[0] arranca en el token {nombre} (lo reemplaza el backend por
   // cada negocio); el resto son valores fijos, iguales para todos.
   const [parametros, setParametros] = useState<string[]>([])
 
-  // Progreso del envío en curso.
-  const [enviando, setEnviando] = useState(false)
-  const [hechos, setHechos] = useState(0)
-  const [fallidos, setFallidos] = useState<string[]>([])
-  const [termino, setTermino] = useState(false)
-  // Fase posterior: chequear cuáles se entregaron de verdad.
-  const [verificando, setVerificando] = useState(false)
-  const [rebotaron, setRebotaron] = useState<number | null>(null)
+  const [encolando, setEncolando] = useState(false)
+  const [cancelando, setCancelando] = useState(false)
+  const [loteId, setLoteId] = useState<string | null>(null)
+  const [cola, setCola] = useState<EstadoCola | null>(null)
 
   const total = placeIdsSelecionados.length
 
@@ -96,99 +92,78 @@ export function BulkPresenciaSender({
   // Al cerrar el diálogo, limpia el progreso para la próxima.
   useEffect(() => {
     if (abierto) return
-    setEnviando(false)
-    setHechos(0)
-    setFallidos([])
-    setTermino(false)
-    setVerificando(false)
-    setRebotaron(null)
+    setEncolando(false)
+    setCancelando(false)
+    setLoteId(null)
+    setCola(null)
+  }, [abierto])
+
+  useEffect(() => {
+    if (!abierto) return
+    const actualizar = () => {
+      presenciaService.estadoCola().then(setCola).catch(() => undefined)
+    }
+    actualizar()
+    const intervalo = window.setInterval(actualizar, 10_000)
+    return () => window.clearInterval(intervalo)
   }, [abierto])
 
   const demasiados = total > 100
   const puedeEnviar =
     !demasiados &&
-    !enviando &&
-    !verificando &&
+    !encolando &&
     Boolean(plantilla) &&
     parametros.every((p) => p.trim().length > 0) &&
     !faltaHeader
 
-  const enviar = async () => {
+  const encolar = async () => {
     if (!plantilla) return
-    setEnviando(true)
-    setTermino(false)
-    setHechos(0)
-    setFallidos([])
-    setRebotaron(null)
-    const falladas: string[] = []
-    const okIds: string[] = []
-
-    for (let i = 0; i < placeIdsSelecionados.length; i++) {
-      if (i > 0) await dormir(PAUSA_ENTRE_ENVIOS_MS)
-      const placeId = placeIdsSelecionados[i]
-      try {
-        await presenciaService.enviar(placeId, {
-          template_name: plantilla.name,
-          language: plantilla.language,
-          parameters: parametros,
-        })
-        okIds.push(placeId)
-      } catch (err) {
-        falladas.push(err instanceof ApiError ? err.message : String(err))
-        setFallidos([...falladas])
+    setEncolando(true)
+    try {
+      const resultado = await presenciaService.encolar({
+        place_ids: placeIdsSelecionados,
+        template_name: plantilla.name,
+        language: plantilla.language,
+        parameters: parametros,
+      })
+      setLoteId(resultado.lote_id)
+      setCola(await presenciaService.estadoCola())
+      invalidarLeads()
+      queryClient.invalidateQueries({ queryKey: ["cola-envios"] })
+      toast.success(
+        `${resultado.encolados} negocio(s) en cola. Tiempo estimado: ${resultado.minutos_estimados} min.`
+      )
+      if (resultado.omitidos > 0) {
+        toast.info(`${resultado.omitidos} ya estaba(n) esperando en la cola.`)
       }
-      setHechos(i + 1)
-    }
-
-    setEnviando(false)
-    setTermino(true)
-    invalidarLeads()
-    const aceptados = okIds.length
-    if (falladas.length === 0) {
-      toast.success(`Plantilla enviada a ${aceptados} negocio(s).`)
-    } else {
-      toast.warning(`Enviada a ${aceptados}. No salió en ${falladas.length}.`)
-    }
-
-    // Meta acepta la plantilla al toque pero puede rechazarla al entregar
-    // (ej. 131049). Ese "failed" tarda unos segundos en aparecer, así que se
-    // espera y recién ahí se pregunta cuáles llegaron: los que rebotaron
-    // vuelven a "novo".
-    if (aceptados > 0) {
-      setVerificando(true)
-      await dormir(8000)
-      try {
-        const r = await presenciaService.reconciliar(okIds)
-        setRebotaron(r.revertidos.length)
-        invalidarLeads()
-        if (r.revertidos.length > 0) {
-          toast.warning(
-            `${r.revertidos.length} no se entregaron (rebotaron) y volvieron a "nuevo".`
-          )
-        }
-      } catch {
-        // El chequeo es un extra: si falla, los envíos ya salieron igual.
-      } finally {
-        setVerificando(false)
-      }
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo crear la cola.")
+    } finally {
+      setEncolando(false)
     }
   }
 
-  const cerrarYlimpiar = () => {
-    setAbierto(false)
-    if (termino) onEnviado()
+  const cancelar = async () => {
+    if (!loteId) return
+    setCancelando(true)
+    try {
+      const resultado = await presenciaService.cancelarCola(loteId)
+      setCola(await presenciaService.estadoCola())
+      toast.info(`${resultado.cancelados} envío(s) pendiente(s) cancelado(s).`)
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "No se pudo cancelar la cola.")
+    } finally {
+      setCancelando(false)
+    }
   }
-
-  const progresoPct = total > 0 ? Math.round((hechos / total) * 100) : 0
 
   return (
     <Dialog
       open={abierto}
       onOpenChange={(v) => {
-        // No dejar cerrar mientras manda o mientras verifica la entrega.
-        if (enviando || verificando) return
+        if (encolando || cancelando) return
         setAbierto(v)
-        if (!v && termino) onEnviado()
+        if (!v && loteId) onEnviado()
       }}
     >
       <DialogTrigger asChild>
@@ -201,9 +176,8 @@ export function BulkPresenciaSender({
         <DialogHeader>
           <DialogTitle>Enviar plantilla a {total} negocio(s)</DialogTitle>
           <DialogDescription>
-            Se manda la misma plantilla a cada uno por su WhatsApp, vía PresencIA,
-            con ~1 s de pausa entre cada envío. El saludo se personaliza con el
-            nombre de cada negocio. Los que ya recibieron pasan a “contactado”.
+            La cola manda una plantilla aprobada por vez, con una pausa variable de
+            3 a 5 minutos. Podés cerrar esta ventana: el proceso continúa en el servidor.
           </DialogDescription>
         </DialogHeader>
 
@@ -225,7 +199,7 @@ export function BulkPresenciaSender({
             <Select
               value={nombrePlantilla}
               onValueChange={setNombrePlantilla}
-              disabled={enviando}
+              disabled={encolando || Boolean(loteId)}
             >
               <SelectTrigger>
                 <SelectValue
@@ -263,7 +237,7 @@ export function BulkPresenciaSender({
                   <Input
                     value={valor}
                     placeholder={`Variable {{${i + 1}}}`}
-                    disabled={i === 0 || enviando}
+                    disabled={i === 0 || encolando || Boolean(loteId)}
                     onChange={(e) => {
                       const copia = [...parametros]
                       copia[i] = e.target.value
@@ -280,29 +254,20 @@ export function BulkPresenciaSender({
             </div>
           )}
 
-          {(enviando || termino) && (
+          {cola && (
             <div className="flex flex-col gap-1.5">
-              <div className="h-2 w-full overflow-hidden rounded-full bg-muted">
-                <div
-                  className="h-full rounded-full bg-success transition-all duration-300"
-                  style={{ width: `${progresoPct}%` }}
-                />
-              </div>
               <p className="text-xs text-muted-foreground">
-                {hechos} de {total} enviados
-                {fallidos.length > 0 && ` · ${fallidos.length} con error`}
-                {termino && !verificando && " · listo"}
+                Cola: {cola.pendientes} pendiente(s) · {cola.enviados} enviado(s)
+                {cola.fallidos > 0 && ` · ${cola.fallidos} con error`}
               </p>
-              {verificando && (
+              {cola.segundos_para_proximo !== null && cola.pendientes > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  Verificando entrega… los que reboten vuelven a “nuevo”.
+                  Próximo envío en aproximadamente {Math.ceil(cola.segundos_para_proximo / 60)} min.
                 </p>
               )}
-              {rebotaron !== null && !verificando && (
+              {cola.lista_fallidos.length > 0 && (
                 <p className="text-xs text-muted-foreground">
-                  {rebotaron === 0
-                    ? "Todos los aceptados se entregaron."
-                    : `${rebotaron} rebotó/rebotaron y volvieron a “nuevo”.`}
+                  Hay envíos que fallaron; revisalos antes de volver a intentarlo.
                 </p>
               )}
             </div>
@@ -310,16 +275,21 @@ export function BulkPresenciaSender({
         </div>
 
         <DialogFooter>
-          {termino ? (
-            <Button size="sm" onClick={cerrarYlimpiar} disabled={verificando}>
-              {verificando ? "Verificando…" : "Cerrar"}
-            </Button>
+          {loteId ? (
+            <>
+              <Button size="sm" variant="outline" onClick={cancelar} disabled={cancelando}>
+                {cancelando ? "Cancelando…" : "Cancelar pendientes"}
+              </Button>
+              <Button size="sm" onClick={() => setAbierto(false)} disabled={cancelando}>
+                Cerrar
+              </Button>
+            </>
           ) : (
             <>
               <Button
                 variant="outline"
                 size="sm"
-                disabled={enviando}
+                disabled={encolando}
                 onClick={() => setAbierto(false)}
               >
                 Cancelar
@@ -328,9 +298,9 @@ export function BulkPresenciaSender({
                 size="sm"
                 className="bg-success text-white hover:bg-success/90"
                 disabled={!puedeEnviar}
-                onClick={enviar}
+                onClick={encolar}
               >
-                {enviando ? "Enviando..." : `Enviar a ${total}`}
+                {encolando ? "Agregando..." : `Agregar ${total} a la cola`}
               </Button>
             </>
           )}

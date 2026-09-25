@@ -4,6 +4,7 @@ import { Link } from "react-router-dom"
 import { Header } from "@/components/layout/Header"
 import { Button } from "@/components/ui/button"
 import { GoogleMapsBanner } from "@/components/leads/GoogleMapsBanner"
+import { ColaEnviosBanner } from "@/components/leads/ColaEnviosBanner"
 import { MetricsDashboard } from "@/components/dashboard/MetricsDashboard"
 import { LeadFilterBar } from "@/components/filters/LeadFilterBar"
 import { LeadGrid } from "@/components/leads/LeadGrid"
@@ -72,6 +73,8 @@ export function LeadsMapsPage() {
         </Link>
 
         <GoogleMapsBanner />
+
+        <ColaEnviosBanner />
 
         <MetricsDashboard />
 

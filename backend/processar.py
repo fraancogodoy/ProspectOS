@@ -613,6 +613,33 @@ def migrar_banco(conexao):
         """
     )
 
+    # Cola del envío masivo de plantillas por PresencIA (ver cola_envios.py):
+    # un envío cada 3-5 min al azar, para que Meta no lo lea como spam. Vive
+    # en la base y no en memoria para que un reinicio del servidor (cada
+    # deploy de Railway) retome donde quedó en vez de perder la cola.
+    conexao.execute(
+        """
+        CREATE TABLE IF NOT EXISTS envios_programados (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            lote_id TEXT NOT NULL,
+            place_id TEXT NOT NULL,
+            template_name TEXT NOT NULL,
+            language TEXT NOT NULL,
+            parameters TEXT NOT NULL DEFAULT '[]',
+            estado TEXT NOT NULL DEFAULT 'pendiente',
+            programado_para TEXT,
+            intentado_em TEXT,
+            wamid TEXT,
+            erro TEXT,
+            reconciliado INTEGER NOT NULL DEFAULT 0,
+            criado_em TEXT NOT NULL
+        )
+        """
+    )
+    conexao.execute(
+        "CREATE INDEX IF NOT EXISTS idx_envios_programados_estado ON envios_programados(estado, id)"
+    )
+
     # Cockpit de conversa: histórico de mensagens trocadas com cada lead.
     # Serve os dois canais, por isso a referência é (canal, lead_ref) em vez de
     # FK - as PKs são incompatíveis (leads.place_id TEXT vs instagram_leads.id
